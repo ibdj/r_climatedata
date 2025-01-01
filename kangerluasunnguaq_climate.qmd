@@ -1,0 +1,460 @@
+---
+title: "macroclimate"
+author: "ibdj"
+date: "2024 11 08"
+format: html
+#format: pdf
+editor: visual
+pdf:
+    documentclass: scrreprt
+    toc: true
+    number-sections: true
+    colorlinks: true
+bibliography: references.bib
+---
+
+## Macroclimate
+
+Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@asiaqa; @asiaq].
+
+```{r}
+#| output: FALSE
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(glue)
+library(hms)
+library(knitr)
+opts_chunk$set( size="small")
+
+# colors
+sleet <- rgb(110/255, 107/255, 196/255, 1)
+rain <- rgb(0/255, 0/255, 165/255, 1)
+warm <- rgb(165/255, 0/255, 0/255, 1)
+```
+
+## Temperature data
+
+```{r}
+#| label: importing-temp
+data_temp <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/temperature/data/View_ClimateBasis_Nuuk_Data_Temperature_Air_temperature_@_200_cm__30min_average__DegreesC220420240157436123.csv", delim = "\t", escape_double = FALSE,col_types = cols(Date = col_datetime(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
+  janitor::clean_names() |> 
+  drop_na() |>  
+  filter(at_c != -9999) |>  
+   mutate(year = year(date),
+         month = month(date), 
+         doy = yday(date),
+         month_string = month.name[month])
+```
+
+The imported data has entries between `r min(data_temp$year)` and `r max(data_temp$year)`.
+
+Temperatures between `r min(data_temp$at_c)`°C (`r data_temp$date[which.min(data_temp$at_c)]`) and `r max(data_temp$at_c)`°C (`r data_temp$date[which.max(data_temp$at_c)]`) have been recorded.
+
+### Mean annual temperature
+
+```{r}
+#| echo: false
+
+year_mean <- round(mean(data_temp$at_c),4)
+
+```
+
+The mean temperature across all entries is `r year_mean`°C.
+
+```{r}
+#| label: temp-mean-annual
+
+data_temp_annual_mean <- data_temp |> 
+  group_by(year) |> 
+  filter(year != 2007) |> #excluding 2007 because it is only the months of oct, nov, dec
+  summarize(mean = mean(at_c))
+```
+
+```{r}
+#| label: fig-annual-mean-temp
+#| fig-cap: !expr glue("Mean air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)}. Data from 2007 is excluded because data is only from October, November and December. Blue dashed line indicate over all mean of {year_mean}°C. Solid blue is trend line.")
+#| message: false
+#| warning: false
+
+ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
+  geom_smooth(method = lm, color = "blue", se = F)+
+  geom_point()+
+  geom_line(size = 0.25, color = "black", linetype="dotted")+
+  scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
+  geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
+  labs(x = "Year", y = "Mean temperature (°C)", title = "Annual mean temperature, Kangerluassunguaq")
+```
+
+```{r}
+
+data_temp_monthly_mean <- data_temp |> 
+  group_by(month) |> 
+  summarize(mean = round(mean(at_c),2),
+            sd = round(sd(at_c),2)) |> 
+  mutate(month_string = month.name[month]) |> 
+  arrange(desc(mean)) |> 
+  mutate(temp_rank = row_number())
+
+```
+
+
+```{r}
+#| label: fig-month-mean-temp
+#| fig-cap: !expr glue("Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}.")
+#| message: false
+#| warning: false
+
+ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
+  geom_smooth(color = "blue", se = F)+
+  geom_point()+
+  geom_line(size = 0.25, linetype="dotted")+
+  scale_x_continuous(breaks=seq(1, 12, by = 1))+
+  geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
+  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")
+```
+
+The warmest months are `r data_temp_monthly_mean$month_string[1]` (`r data_temp_monthly_mean$mean[1]`°C), `r data_temp_monthly_mean$month_string[2]` (`r data_temp_monthly_mean$mean[2]`°C) and `r data_temp_monthly_mean$month_string[3]` (`r data_temp_monthly_mean$mean[3]`°C).
+
+The coldest months are `r data_temp_monthly_mean$month_string[12]` (`r data_temp_monthly_mean$mean[12]`°C), `r data_temp_monthly_mean$month_string[11]` (`r data_temp_monthly_mean$mean[11]`°C), and `r data_temp_monthly_mean$month_string[10]` (`r data_temp_monthly_mean$mean[10]`°C).
+
+
+```{r}
+data_temp_monthly_mean_summer <- data_temp |> 
+  filter(month %in%  c(6,7,8)) |> 
+  group_by(month, year) |> 
+  summarize(mean = mean(at_c))
+```
+
+```{r}
+#| label: fig-month-summer-mean-temp
+#| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}.")
+#| message: false
+#| warning: false
+
+ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(month)))+
+  geom_smooth(method = lm, color = "black", se = F, size = 0.4)+
+  geom_point()+
+  scale_x_continuous(breaks=seq(min(data_temp_monthly_mean_summer$year), max(data_temp_monthly_mean_summer$year), by = 1))+
+  #geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
+  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")
+```
+
+## Precipitation data
+
+```{r}
+#| label: importing-precip
+
+data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/data/View_ClimateBasis_Nuuk_Data_Precipitation_Precipitation_accumulated_mm210420242020078158.csv", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
+  janitor::clean_names() |> 
+  drop_na() |>
+  filter(pre_mm != -9999) |> 
+   mutate(year = year(date),
+         month = month(date),
+         doy = yday(date),
+         month_string = month.name[month])
+```
+
+### Yearly precipitation
+
+```{r}
+#| label: precip-mean-annual
+
+data_precip_sum <- data_precip |> 
+  group_by(year) |> 
+  filter(year != 2007) |> 
+  summarise(pre_mm_sum = sum(pre_mm))
+```
+
+```{r}
+#| echo: false
+
+data_precip_mean <- data_precip_sum |> 
+  summarize(mean = mean(pre_mm_sum))
+
+precip_year_mean <- round(mean(data_precip_mean$mean),2)
+```
+
+The mean annual precipitation is `r precip_year_mean` mm.
+
+```{r}
+#| label: fig-precipitation-annual
+#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm")
+
+ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
+  geom_bar(stat = "identity", fill = "#6e6bc4")+
+  scale_x_continuous(breaks=seq(min(data_precip_sum$year), max(data_precip_sum$year), by = 1))+
+geom_hline(yintercept = precip_year_mean, linetype="dashed", color = "blue", linewidth =0.5)+
+  geom_smooth(method = lm, color = "blue", size = 0.5, se = F)
+```
+
+### Monthly precipitation
+
+```{r}
+#| label: precip-mean-monthly
+#| warning: false
+
+data_precip_month_sum <- data_precip |> 
+  group_by(month, year) |> 
+  summarise(pre_mm_sum = sum(pre_mm))
+
+data_precip_month_mean <- data_precip_month_sum |> 
+  group_by(month) |> 
+  summarise(pre_mm_mean = round(mean(pre_mm_sum),2))
+
+precip_month_mean <- round(mean(data_precip_month_mean$pre_mm_mean),2)
+```
+
+```{r}
+#| label: fig-precipitation-month
+#| warning: false
+#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip$year)} to {max(data_precip$year)}. Data from 2007 is excluded because it was only from May - December.")
+
+ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
+  geom_smooth(color = "blue", se = F)+
+  geom_bar(stat = "identity", fill = "#6e6bc4")+
+  scale_x_continuous(breaks=seq(min(data_precip_month_mean$month), max(data_precip_month_mean$month), by = 1))+
+geom_hline(yintercept = precip_month_mean, linetype="dashed", color = "blue", linewidth =0.25)
+```
+
+EDIT NOT DONE!!\
+On average across the monitoring period the months with most precipitation are `r min(data_temp$at_c)`°C (`r data_temp$date[which.min(data_temp$at_c)]`) and `r max(data_temp$at_c)`°C (`r data_temp$date[which.max(data_temp$at_c)]`) have been recorded.
+
+September (134.80 mm), October (103.84 mm) and August (96.93 mm).
+
+### Precipitation split in rain and snow
+
+```{r}
+#| label: temp-data-hourly
+
+# making the temperature data hourly 
+
+data_temp_hour <- data_temp |> 
+  mutate(hour = substr(time, 1, 2)) |> 
+  group_by(date, hour) |> 
+  summarise(at_c = mean(at_c, na.rm = TRUE)) |> 
+  mutate(time = hms::hms(hours = as.numeric(hour)))
+
+```
+
+```{r}
+#| label: joining-temp-precip-data
+
+# joint the temperature precipitation data to destinguish snow and rain. 
+
+# data_pre_tem_joined <- data_precip |> 
+#   left_join(data_temp_hour, by = c("date" = "date", "time" = "time")) |> 
+#   drop_na() |> 
+#   mutate(precip_type = ifelse(at_c < 0,"snow","rain"))
+
+sleet_lower <- -1
+sleet_upper <- 1 
+  
+  data_pre_tem_joined <- data_precip |> 
+  left_join(data_temp_hour, by = c("date" = "date", "time" = "time")) |> 
+  drop_na() |> 
+  mutate(precip_type = case_when(at_c < sleet_lower ~ "snow",
+                              at_c <= sleet_upper ~ "sleet",
+                              TRUE ~ "rain"))
+```
+
+```{r}
+#| label: monthly-dist-rain-snow
+
+# joint the temperature precipitation data to destinguish snow and rain. 
+
+data_pre_tem_joined_monthly <- data_pre_tem_joined |> 
+  group_by(year,month,precip_type) |> 
+  summarise(sum = sum(pre_mm)) |> 
+  filter(year != 2007)
+```
+
+```{r}
+#| label: monthly-mean-dist_rain-snow
+
+# joint the temperature precipitation data to destinguish snow and rain. 
+
+data_pre_tem_monthly <- data_pre_tem_joined_monthly |> 
+  group_by(month,precip_type) |> 
+  summarise(mean = round(mean(sum),2)) 
+```
+
+```{r}
+#| label: yearly-mean-dist_rain-snow
+
+# joint the temperature precipitation data to distinguish snow and rain. 
+
+data_pre_tem_year <- data_pre_tem_joined_monthly |> 
+  group_by(year,precip_type) |> 
+  summarise(mean = round(sum(sum),2)) 
+```
+
+```{r}
+#| label: fig-snow-rain-year
+#| fig-cap: !expr glue("Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_precip$year)} to {max(data_precip$year)}. Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+
+ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) + 
+  geom_bar(stat = "identity")+
+  scale_x_continuous(breaks=seq(min(data_pre_tem_monthly$month), max(data_pre_tem_monthly$month), by = 1))+
+  labs(x = "Month", y = "Mean precipitation (mm)", title = "Mean precipitation type pr month")+
+  scale_fill_manual(values = c(rain,sleet,"#b3b3b3"))+
+  guides(fill = guide_legend(title = ""))
+
+```
+
+```{r}
+#| label: fig-snow-rain
+#| fig-cap: !expr glue(" CAPTION ")
+
+ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) + 
+  geom_bar(stat = "identity")+
+  scale_x_continuous(breaks=seq(min(data_pre_tem_year$year), max(data_pre_tem_year$year), by = 1))+
+  labs(x = "Year", y = "Mean precipitation (mm)", title = "Mean precipitation type pr year")+
+  scale_fill_manual(values = c(rain,sleet ,"#b3b3b3"))+
+  geom_smooth(aes(color = precip_type), method = "lm", se = FALSE, show.legend = FALSE, size = 0.5) + 
+  scale_color_manual(values = c(rain, sleet, "#b3b3b3")) +
+  guides(fill = guide_legend(title = ""))
+
+```
+```{r}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+# Data prepping for precip anomalies heat map
+
+data_precip_month_sum <- data_precip |> 
+  group_by(year, month) |> 
+  summarise(monthly_pre_sum = sum(pre_mm, na.rm = TRUE)) |> 
+  ungroup()
+
+data_precip_monthly_mean_sum <- data_precip_month_sum |> 
+  group_by(month) |> 
+  summarise(overall_pre_monthly_mean = mean(monthly_pre_sum, na.rm = TRUE)) |> 
+  ungroup()
+
+monthly_prep_anomalies <- data_precip_monthly_mean_sum |> 
+  left_join(data_precip_month_sum, by = "month") |> 
+  mutate(prep_anomaly = monthly_pre_sum - overall_pre_monthly_mean)
+
+```
+
+```{r}
+#| label: fig-monthly-prep-anomaly
+#| fig-cap: !expr glue(" CAPTION ")
+
+ggplot(monthly_prep_anomalies, aes(x = factor(year), y = factor(month), fill = prep_anomaly)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "orange", high = rain, mid = "white", 
+                       midpoint = 0, limit = c(-max(abs(monthly_prep_anomalies$prep_anomaly)), 
+                                               max(abs(monthly_prep_anomalies$prep_anomaly))),
+                       space = "Lab", name="Precipitation Anomaly (mm)") +
+  labs(x = "Year", y = "Month", title = "Monthly Precipitation Anomalies Heatmap") +
+  scale_y_discrete(labels = month.name) + # Use full month names on y-axis
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    legend.position = "right",
+    legend.direction = "vertical",
+    legend.title = element_text(angle = 90, hjust = 0.5, vjust = 1, size = 10),
+    legend.text = element_text(angle = 90, hjust = 1),
+    legend.key.height = unit(1, "cm"),
+    legend.key.width = unit(0.5, "cm"),
+    legend.box.just = "bottom") +
+ guides(fill = guide_colorbar(title.position = "left", label.position = "left"))
+
+```
+
+```{r}
+#| label: fig-yearly-prep-anomaly-trend
+#| fig-cap: !expr glue(" CAPTION ")
+
+ggplot(monthly_prep_anomalies, aes(x = year, y = prep_anomaly , color = as.factor(month))) +
+  geom_point(aes(color = factor(month))) +  # Color points by month
+  geom_smooth(method = lm, se = F)+
+  #geom_smooth(method = "lm", se = FALSE, size = 0.4, color = "black") +  # Single trend line in black
+  labs(x = "Year", y = "Temperature Anomaly (°C)", color = "Month") +
+  theme_minimal()+
+  scale_x_continuous(breaks=seq(min(monthly_prep_anomalies$year), max(monthly_prep_anomalies$year), by = 1))+
+  theme(axis.text.x = element_text(angle = -45,  hjust=-0))
+#vjust = 0.5,
+
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+# Data prepping for temperature anomalies heat map
+
+data_temp_monthly_mean <- data_temp |> 
+  group_by(year, month) |> 
+  summarise(monthly_mean = mean(at_c, na.rm = TRUE)) |> 
+  ungroup()
+
+data_temp_monthly_mean_overall <- data_temp_monthly_mean |> 
+  group_by(month) |> 
+  summarise(overall_monthly_mean = mean(monthly_mean, na.rm = TRUE)) |> 
+  ungroup()
+
+data_temp_anomaly <- data_temp_monthly_mean |> 
+  left_join(data_temp_monthly_mean_overall, by = "month") |> 
+  mutate(temperature_anomaly = monthly_mean - overall_monthly_mean)
+
+```
+
+```{r}
+#| label: fig-monthly-temp-anomaly
+#| fig-cap: !expr glue(" CAPTION ")
+
+# ggplot(data_temp_anomaly, aes(x = factor(year), y = factor(month), fill = temperature_anomaly)) +
+#   geom_tile(color = "white") +
+#   scale_fill_gradient2(low = rain, high = warm, mid = "white",
+#                        midpoint = 0, limit = c(-max(abs(data_temp_anomaly$temperature_anomaly)),
+#                                                max(abs(data_temp_anomaly$temperature_anomaly))),
+#                        space = "Lab", name="Temperature Anomaly (°C)") +
+#   labs(x = "Year", y = "Month", title = "Monthly Temperature Anomalies Heatmap") +
+#   scale_y_discrete(labels = month.name) + # Use full month names on y-axis
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+ggplot(monthly_anomalies, aes(x = factor(year), y = factor(month), fill = temperature_anomaly)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = rain, high = warm, mid = "white", 
+                       midpoint = 0, limit = c(-max(abs(monthly_anomalies$temperature_anomaly)), 
+                                               max(abs(monthly_anomalies$temperature_anomaly))),
+                       space = "Lab", name="Temperature Anomaly (°C)") +
+  labs(x = "Year", y = "Month", title = "Monthly Temperature Anomalies Heatmap") +
+  scale_y_discrete(labels = month.name) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    legend.position = "right",
+    legend.direction = "vertical",
+    legend.title = element_text(angle = 90, hjust = 0.5, vjust = 1, size = 10),
+    legend.text = element_text(angle = 90, hjust = 1),
+    legend.key.height = unit(1, "cm"),
+    legend.key.width = unit(0.5, "cm"),
+    legend.box.just = "bottom") +
+ guides(fill = guide_colorbar(title.position = "left", label.position = "left"))
+
+
+```
+
+```{r}
+#| label: fig-yearly-temp-anomaly-trend
+#| fig-cap: !expr glue(" CAPTION ")
+
+ggplot(monthly_anomalies, aes(x = year, y = temperature_anomaly, color = as.factor(month))) +
+  geom_point(aes(color = factor(month))) +  # Color points by month
+  geom_smooth(method = lm, se = F)+
+  #geom_smooth(method = "lm", se = FALSE, size = 0.4, color = "black") +  # Single trend line in black
+  labs(x = "Year", y = "Temperature Anomaly (°C)", color = "Month") +
+  theme_minimal()+
+  scale_x_continuous(breaks=seq(min(monthly_anomalies$year), max(monthly_anomalies$year), by = 1))+
+  theme(axis.text.x = element_text(angle = -45,  hjust=-0))
+#vjust = 0.5,
+
+```
