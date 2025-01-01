@@ -98,7 +98,6 @@ data_temp_monthly_mean <- data_temp |>
 
 ```
 
-
 ```{r}
 #| label: fig-month-mean-temp
 #| fig-cap: !expr glue("Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}.")
@@ -118,7 +117,6 @@ The warmest months are `r data_temp_monthly_mean$month_string[1]` (`r data_temp_
 
 The coldest months are `r data_temp_monthly_mean$month_string[12]` (`r data_temp_monthly_mean$mean[12]`°C), `r data_temp_monthly_mean$month_string[11]` (`r data_temp_monthly_mean$mean[11]`°C), and `r data_temp_monthly_mean$month_string[10]` (`r data_temp_monthly_mean$mean[10]`°C).
 
-
 ```{r}
 data_temp_monthly_mean_summer <- data_temp |> 
   filter(month %in%  c(6,7,8)) |> 
@@ -137,7 +135,7 @@ ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(
   geom_point()+
   scale_x_continuous(breaks=seq(min(data_temp_monthly_mean_summer$year), max(data_temp_monthly_mean_summer$year), by = 1))+
   #geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
-  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")
+  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr summer month")
 ```
 
 ## Precipitation data
@@ -212,7 +210,7 @@ precip_month_mean <- round(mean(data_precip_month_mean$pre_mm_mean),2)
 
 ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
   geom_smooth(color = "blue", se = F)+
-  geom_bar(stat = "identity", fill = "#6e6bc4")+
+  geom_bar(stat = "identity", fill = "#6e6bc4", alpha = 0.95)+
   scale_x_continuous(breaks=seq(min(data_precip_month_mean$month), max(data_precip_month_mean$month), by = 1))+
 geom_hline(yintercept = precip_month_mean, linetype="dashed", color = "blue", linewidth =0.25)
 ```
@@ -316,6 +314,7 @@ ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) +
   guides(fill = guide_legend(title = ""))
 
 ```
+
 ```{r}
 library(ggplot2)
 library(dplyr)
