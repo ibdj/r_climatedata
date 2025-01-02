@@ -419,11 +419,11 @@ data_temp_anomaly <- data_temp_monthly_mean |>
 #   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 
-ggplot(monthly_anomalies, aes(x = factor(year), y = factor(month), fill = temperature_anomaly)) +
+ggplot(data_temp_anomaly, aes(x = factor(year), y = factor(month), fill = temperature_anomaly)) +
   geom_tile(color = "white") +
   scale_fill_gradient2(low = rain, high = warm, mid = "white", 
-                       midpoint = 0, limit = c(-max(abs(monthly_anomalies$temperature_anomaly)), 
-                                               max(abs(monthly_anomalies$temperature_anomaly))),
+                       midpoint = 0, limit = c(-max(abs(data_temp_anomaly$temperature_anomaly)), 
+                                               max(abs(data_temp_anomaly$temperature_anomaly))),
                        space = "Lab", name="Temperature Anomaly (°C)") +
   labs(x = "Year", y = "Month", title = "Monthly Temperature Anomalies Heatmap") +
   scale_y_discrete(labels = month.name) +
@@ -446,13 +446,13 @@ ggplot(monthly_anomalies, aes(x = factor(year), y = factor(month), fill = temper
 #| label: fig-yearly-temp-anomaly-trend
 #| fig-cap: !expr glue(" CAPTION ")
 
-ggplot(monthly_anomalies, aes(x = year, y = temperature_anomaly, color = as.factor(month))) +
+ggplot(data_temp_anomaly, aes(x = year, y = temperature_anomaly, color = as.factor(month))) +
   geom_point(aes(color = factor(month))) +  # Color points by month
   geom_smooth(method = lm, se = F)+
   #geom_smooth(method = "lm", se = FALSE, size = 0.4, color = "black") +  # Single trend line in black
   labs(x = "Year", y = "Temperature Anomaly (°C)", color = "Month") +
   theme_minimal()+
-  scale_x_continuous(breaks=seq(min(monthly_anomalies$year), max(monthly_anomalies$year), by = 1))+
+  scale_x_continuous(breaks=seq(min(data_temp_anomaly$year), max(data_temp_anomaly$year), by = 1))+
   theme(axis.text.x = element_text(angle = -45,  hjust=-0))
 #vjust = 0.5,
 
