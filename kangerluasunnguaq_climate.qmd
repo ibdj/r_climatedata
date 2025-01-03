@@ -183,7 +183,9 @@ ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
   geom_bar(stat = "identity", fill = "#6e6bc4")+
   scale_x_continuous(breaks=seq(min(data_precip_sum$year), max(data_precip_sum$year), by = 1))+
 geom_hline(yintercept = precip_year_mean, linetype="dashed", color = "blue", linewidth =0.5)+
-  geom_smooth(method = lm, color = "blue", size = 0.5, se = F)
+  geom_smooth(method = lm, color = "blue", size = 0.5, se = F)+
+  labs(x = "Year", y = "Precipitation (mm)")
+
 ```
 
 ### Monthly precipitation
