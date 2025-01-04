@@ -234,6 +234,9 @@ Figure&nbsp;2: Mean air temperature (°C) pr month, based on data from 2007 to 2
 `.groups` argument.</code></pre>
 </div>
 </div>
+</section>
+<section id="tend-in-mean-temperature-of-warmest-months" class="level3">
+<h3 class="anchored" data-anchor-id="tend-in-mean-temperature-of-warmest-months">Tend in mean temperature of warmest months</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data_temp_monthly_mean_summer, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> mean, <span class="at">color =</span> <span class="fu">as.factor</span>(month)))<span class="sc">+</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">se =</span> F, <span class="at">size =</span> <span class="fl">0.4</span>)<span class="sc">+</span></span>

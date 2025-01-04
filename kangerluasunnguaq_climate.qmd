@@ -124,6 +124,8 @@ data_temp_monthly_mean_summer <- data_temp |>
   summarize(mean = mean(at_c))
 ```
 
+### Tend in mean temperature of warmest months
+
 ```{r}
 #| label: fig-month-summer-mean-temp
 #| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}.")
