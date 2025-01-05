@@ -362,9 +362,12 @@ Figure&nbsp;4: Mean yearly precipitation (mm) from 2008 to 2022. Data from 2007 
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>data_precip_month_mean <span class="ot">&lt;-</span> data_precip_month_sum <span class="sc">|&gt;</span> </span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">|&gt;</span> </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pre_mm_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pre_mm_sum),<span class="dv">2</span>))</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>precip_month_mean <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(data_precip_month_mean<span class="sc">$</span>pre_mm_mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pre_mm_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pre_mm_sum),<span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_string =</span> month.name[month]) <span class="sc">|&gt;</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(pre_mm_mean)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">temp_rank =</span> <span class="fu">row_number</span>())</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>precip_month_mean <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(data_precip_month_mean<span class="sc">$</span>pre_mm_mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data_precip_month_mean, <span class="fu">aes</span>(<span class="at">y =</span> pre_mm_mean, <span class="at">x =</span> month))<span class="sc">+</span></span>
@@ -379,15 +382,14 @@ Figure&nbsp;4: Mean yearly precipitation (mm) from 2008 to 2022. Data from 2007 
 <img src="kangerluasunnguaq_climate_files/figure-html/fig-precipitation-month-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-precipitation-month-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Mean yearly precipitation (mm) from 2007 to 2022. Data from 2007 is excluded because it was only from May - December.
+Figure&nbsp;5: Mean yearly precipitation (mm) from 2007 to 2022. Data from 2007 is excluded because it was only from May - December. Blue dashed line represent monthly mean of 74.4 mm.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>EDIT NOT DONE!!<br>
-On average across the monitoring period the months with most precipitation are -30.2°C (2008-02-11) and 23.2°C (2016-06-10) have been recorded.</p>
-<p>September (134.80 mm), October (103.84 mm) and August (96.93 mm).</p>
+<p>The wettest months are September (134.8 mm), October (103.84 mm), August (96.93 mm).</p>
+<p>The driest months are January (50.03 mm), March (38.42 mm), February (35.57 mm).</p>
 </section>
 <section id="precipitation-split-in-rain-and-snow" class="level3">
 <h3 class="anchored" data-anchor-id="precipitation-split-in-rain-and-snow">Precipitation split in rain and snow</h3>

@@ -225,15 +225,19 @@ data_precip_month_sum <- data_precip |>
 
 data_precip_month_mean <- data_precip_month_sum |> 
   group_by(month) |> 
-  summarise(pre_mm_mean = round(mean(pre_mm_sum),2))
+  summarise(pre_mm_mean = round(mean(pre_mm_sum),2)) |> 
+  mutate(month_string = month.name[month]) |> 
+  arrange(desc(pre_mm_mean)) |> 
+  mutate(temp_rank = row_number())
 
 precip_month_mean <- round(mean(data_precip_month_mean$pre_mm_mean),2)
+
 ```
 
 ```{r}
 #| label: fig-precipitation-month
 #| warning: false
-#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip$year)} to {max(data_precip$year)}. Data from 2007 is excluded because it was only from May - December.")
+#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip$year)} to {max(data_precip$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line represent monthly mean of {precip_month_mean} mm.")
 
 ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
   geom_smooth(color = "blue", se = F)+
@@ -242,10 +246,9 @@ ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
 geom_hline(yintercept = precip_month_mean, linetype="dashed", color = "blue", linewidth =0.25)
 ```
 
-EDIT NOT DONE!!\
-On average across the monitoring period the months with most precipitation are `r min(data_temp$at_c)`°C (`r data_temp$date[which.min(data_temp$at_c)]`) and `r max(data_temp$at_c)`°C (`r data_temp$date[which.max(data_temp$at_c)]`) have been recorded.
+The wettest months are `r data_precip_month_mean$month_string[1]` (`r data_precip_month_mean$pre_mm_mean[1]` mm), `r data_precip_month_mean$month_string[2]` (`r data_precip_month_mean$pre_mm_mean[2]` mm), `r data_precip_month_mean$month_string[3]` (`r data_precip_month_mean$pre_mm_mean[3]` mm).
 
-September (134.80 mm), October (103.84 mm) and August (96.93 mm).
+The driest months are `r data_precip_month_mean$month_string[10]` (`r data_precip_month_mean$pre_mm_mean[10]` mm), `r data_precip_month_mean$month_string[11]` (`r data_precip_month_mean$pre_mm_mean[11]` mm), `r data_precip_month_mean$month_string[12]` (`r data_precip_month_mean$pre_mm_mean[12]` mm).
 
 ### Precipitation split in rain and snow
 
