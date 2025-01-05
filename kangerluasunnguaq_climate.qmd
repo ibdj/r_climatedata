@@ -25,6 +25,8 @@ library(lubridate)
 library(glue)
 library(hms)
 library(knitr)
+library(broom)
+
 opts_chunk$set( size="small")
 
 # colors
@@ -129,18 +131,34 @@ data_temp_monthly_mean_summer <- data_temp |>
 ### Tend in mean temperature of warmest months
 
 ```{r}
+model_temp_warmest <- lm(mean ~ year, data = data_temp_monthly_mean_summer)
+
+summary(model_temp_warmest)
+
+model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
+```
+
+```{r}
 #| label: fig-month-summer-mean-temp
-#| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}.")
+#| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}. P-value for the regression i {round(model_temp_warmest_p_value,3)}.")
 #| message: false
 #| warning: false
 
 ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(month)))+
-  geom_smooth(method = lm, color = "black", se = F, size = 0.4)+
+  geom_smooth(method = lm, color = "gray", se = F, size = 0.4, linetype = 2)+
   geom_point()+
   scale_x_continuous(breaks=seq(min(data_temp_monthly_mean_summer$year), max(data_temp_monthly_mean_summer$year), by = 1))+
   #geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
   labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr summer month")+
   labs(color = "Months")
+```
+
+```{r}
+model_temp_warmest <- lm(mean ~ year, data = data_temp_monthly_mean_summer)
+
+summary(model_temp_warmest)
+
+model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 ```
 
 ## Precipitation data
