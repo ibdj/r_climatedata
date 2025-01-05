@@ -228,9 +228,11 @@ Figure&nbsp;2: Mean air temperature (°C) pr month, based on data from 2007 to 2
 <p>The coldest months are February (-8.97°C), March (-7.97°C), and January (-7.34°C).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>data_temp_monthly_mean_summer <span class="ot">&lt;-</span> data_temp <span class="sc">|&gt;</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(month <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(month <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month, year) <span class="sc">|&gt;</span> </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean =</span> <span class="fu">mean</span>(at_c))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean =</span> <span class="fu">mean</span>(at_c))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>data_temp_mean_warmest <span class="ot">&lt;-</span> <span class="fu">mean</span>(data_temp_monthly_mean_summer<span class="sc">$</span>mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="tend-in-mean-temperature-of-warmest-months" class="level3">
@@ -261,7 +263,7 @@ F-statistic: 0.6745 on 1 and 43 DF,  p-value: 0.416</code></pre>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data_temp_monthly_mean_summer, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> mean, <span class="at">color =</span> <span class="fu">as.factor</span>(month)))<span class="sc">+</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">se =</span> F, <span class="at">size =</span> <span class="fl">0.4</span>)<span class="sc">+</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> lm, <span class="at">color =</span> <span class="st">"gray"</span>, <span class="at">se =</span> F, <span class="at">size =</span> <span class="fl">0.4</span>, <span class="at">linetype =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()<span class="sc">+</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks=</span><span class="fu">seq</span>(<span class="fu">min</span>(data_temp_monthly_mean_summer<span class="sc">$</span>year), <span class="fu">max</span>(data_temp_monthly_mean_summer<span class="sc">$</span>year), <span class="at">by =</span> <span class="dv">1</span>))<span class="sc">+</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+</span></span>
@@ -274,7 +276,7 @@ F-statistic: 0.6745 on 1 and 43 DF,  p-value: 0.416</code></pre>
 <img src="kangerluasunnguaq_climate_files/figure-html/fig-month-summer-mean-temp-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-month-summer-mean-temp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: Mean air temperature (°C) pr for July, August, and June based on data from 2007 to 2022. P-value for the regression i 0.416
+Figure&nbsp;3: Mean air temperature (°C) pr for July, August, and June based on data from 2007 to 2022. P-value for the regression i 0.416. The mean of the warmests months across all years are 9.081°C.
 </figcaption>
 </figure>
 </div>

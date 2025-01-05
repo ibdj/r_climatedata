@@ -123,9 +123,11 @@ The coldest months are `r data_temp_monthly_mean$month_string[12]` (`r data_temp
 #| message: false
 #| warning: false
 data_temp_monthly_mean_summer <- data_temp |> 
-  filter(month %in%  c(6,7,8)) |> 
+  filter(month %in% c(6,7,8)) |> 
   group_by(month, year) |> 
   summarize(mean = mean(at_c))
+
+data_temp_mean_warmest <- mean(data_temp_monthly_mean_summer$mean)
 ```
 
 ### Tend in mean temperature of warmest months
@@ -140,7 +142,7 @@ model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 
 ```{r}
 #| label: fig-month-summer-mean-temp
-#| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}. P-value for the regression i {round(model_temp_warmest_p_value,3)}.")
+#| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}. P-value for the regression i {round(model_temp_warmest_p_value,3)}. The mean of the warmests months across all years are {round(data_temp_mean_warmest,3)}°C.")
 #| message: false
 #| warning: false
 
