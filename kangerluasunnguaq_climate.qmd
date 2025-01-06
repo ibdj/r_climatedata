@@ -102,7 +102,7 @@ data_temp_monthly_mean <- data_temp |>
 
 ```{r}
 #| label: fig-month-mean-temp
-#| fig-cap: !expr glue("Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}.")
+#| fig-cap: !expr glue("Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(year_mean,3)}°C.")
 #| message: false
 #| warning: false
 
