@@ -70,7 +70,8 @@ The mean temperature across all entries is `r year_mean`°C.
 data_temp_annual_mean <- data_temp |> 
   group_by(year) |> 
   filter(year != 2007) |> #excluding 2007 because it is only the months of oct, nov, dec
-  summarize(mean = mean(at_c))
+  summarize(mean = mean(at_c),
+            sd = sd(at_c))
 ```
 
 ```{r}
@@ -332,7 +333,7 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
 
 ```{r}
 #| label: fig-snow-rain
-#| fig-cap: !expr glue(" CAPTION ")
+#| fig-cap: !expr glue("Mean percipitation pr. month over the monitoring period ({min(data_pre_tem_year$year)} - {max(data_pre_tem_year$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 
 ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) + 
   geom_bar(stat = "identity")+
