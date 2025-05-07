@@ -1,31 +1,31 @@
 ---
 title: "macroclimate"
 author: "ibdj"
-date: "2024 11 08"
-format: html
-#format: pdf
-editor: visual
-pdf:
-    documentclass: scrreprt
+date: "2024-11-08"
+format:
+  html:
     toc: true
-    number-sections: true
-    colorlinks: true
+    html-math-method: katex
+    css: styles.css
+    # Uncomment and adjust the following for PDF output if needed
+    # pdf:
+    #   documentclass: scrreprt
+    #   toc: true
+    #   number-sections: true
+    #   colorlinks: true
+editor: visual
 bibliography: references.bib
 ---
 
 ## Macroclimate
 
-Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@asiaqa; @asiaq].
+Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@asiaqa; @asiaq; @asiaqb].
 
 ```{r}
 #| output: FALSE
-library(tidyverse)
-library(janitor)
-library(lubridate)
-library(glue)
-library(hms)
-library(knitr)
-library(broom)
+
+library(pacman)
+p_load(tidyverse, janitor, lubridate, glue, hms,knitr, broom )
 
 opts_chunk$set( size="small")
 
@@ -131,7 +131,7 @@ data_temp_monthly_mean_summer <- data_temp |>
 data_temp_mean_warmest <- mean(data_temp_monthly_mean_summer$mean)
 ```
 
-### Tend in mean temperature of warmest months
+### Trend in mean temperature of warmest months
 
 ```{r}
 model_temp_warmest <- lm(mean ~ year, data = data_temp_monthly_mean_summer)
@@ -203,7 +203,7 @@ The mean annual precipitation is `r precip_year_mean` mm.
 
 ```{r}
 #| label: fig-precipitation-annual
-#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm")
+#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm.")
 
 ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
   geom_bar(stat = "identity", fill = "#6e6bc4")+
@@ -226,7 +226,8 @@ data_precip_month_sum <- data_precip |>
 
 data_precip_month_mean <- data_precip_month_sum |> 
   group_by(month) |> 
-  summarise(pre_mm_mean = round(mean(pre_mm_sum),2)) |> 
+  summarise(pre_mm_mean = round(mean(pre_mm_sum),2),
+         sd = sd(pre_mm_mean)) |> 
   mutate(month_string = month.name[month]) |> 
   arrange(desc(pre_mm_mean)) |> 
   mutate(temp_rank = row_number())
@@ -238,7 +239,7 @@ precip_month_mean <- round(mean(data_precip_month_mean$pre_mm_mean),2)
 ```{r}
 #| label: fig-precipitation-month
 #| warning: false
-#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip$year)} to {max(data_precip$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line represent monthly mean of {precip_month_mean} mm.")
+#| fig-cap: !expr glue("Mean monthly precipitation (mm) including data from {min(data_precip$year)} to {max(data_precip$year)}. Blue dashed line represent monthly mean of {precip_month_mean} mm. ADD SF BARS!")
 
 ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
   geom_smooth(color = "blue", se = F)+
@@ -371,7 +372,7 @@ monthly_prep_anomalies <- data_precip_monthly_mean_sum |>
 
 ```{r}
 #| label: fig-monthly-prep-anomaly
-#| fig-cap: !expr glue(" CAPTION ")
+#| fig-cap: !expr glue("Monthly precipitation anomaly (°C). Stronger colors indicate large derivation from the month mean.")
 
 ggplot(monthly_prep_anomalies, aes(x = factor(year), y = factor(month), fill = prep_anomaly)) +
   geom_tile(color = "white") +
@@ -397,7 +398,7 @@ ggplot(monthly_prep_anomalies, aes(x = factor(year), y = factor(month), fill = p
 
 ```{r}
 #| label: fig-yearly-prep-anomaly-trend
-#| fig-cap: !expr glue(" CAPTION ")
+#| fig-cap: !expr glue("MAKE IN TO SUM OF ANOMOLIES INSTEAS!")
 
 ggplot(monthly_prep_anomalies, aes(x = year, y = prep_anomaly , color = as.factor(month))) +
   geom_point(aes(color = factor(month))) +  # Color points by month
@@ -487,4 +488,81 @@ ggplot(data_temp_anomaly, aes(x = year, y = temperature_anomaly, color = as.fact
   theme(axis.text.x = element_text(angle = -45,  hjust=-0))
 #vjust = 0.5,
 
+```
+
+## PAR data
+
+```{r}
+View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/ration_par/View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_@_200_cm__5min_average_æmol_m2_sec210420241337080578.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE) |> 
+  clean_names() |> 
+  filter(par_mmol_sec_m2 != -9999)
+```
+
+```{r}
+par_monthly_mean <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 |> 
+  filter(solar_elevation > 0) |> 
+  group_by(month = lubridate::month(date, label = TRUE, abbr = FALSE)) |>  # Group by month name (e.g., "Jan")
+  summarize(par_monthly_mean = mean(par_mmol_sec_m2, na.rm = TRUE)) |>  # Calculate mean PAR
+  arrange(desc(par_monthly_mean)) |>  # Sort descending by mean PAR
+  mutate(temp_rank = row_number())   # Add ranks
+
+
+```
+
+```{r}
+
+# Add a month column as a factor with all months
+df <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 %>%
+  mutate(month = factor(month(date, label = TRUE, abbr = FALSE), levels = month.name)) |> 
+  filter(solar_elevation > 0)
+
+# Plot
+ggplot(df, aes(x = month, y = par_mmol_sec_m2)) +
+  geom_boxplot() +
+  xlab("Month") +
+  ylab("PAR (mmol/sec/m2)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The months with the highest mean levels of PAR (when the sun is up, solar elevation \> 0) are `r par_monthly_mean$month[1]` (`r round(par_monthly_mean$par_monthly_mean[1],1)`) `r par_monthly_mean$month[2]` (`r round(par_monthly_mean$par_monthly_mean[2],1)`) `r par_monthly_mean$month[3]` (`r round(par_monthly_mean$par_monthly_mean[3],1)`).
+
+```{r}
+par_highest_mean <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 |> 
+  filter(solar_elevation > 0) |> 
+  group_by(year = year(date), month = lubridate::month(date, label = TRUE, abbr = FALSE)) |>  # Group by month name (e.g., "Jan")
+  filter(month == c("May","June","July")) |> 
+  summarize(par_mean = mean(par_mmol_sec_m2, na.rm = TRUE)) |>  # Calculate mean PAR
+  arrange(desc(par_mean)) |>  # Sort descending by mean PAR
+  mutate(temp_rank = row_number())   # Add ranks
+
+
+```
+
+```{r}
+# Plot
+par_highest_mean <- par_highest_mean %>%
+  mutate(month_num = as.numeric(month))
+
+ggplot(par_highest_mean, aes(x = month_num, y = par_mean)) +
+  geom_point(aes(color = factor(year)), size = 3) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgray", linetype = "dashed") +
+  scale_x_continuous(
+    breaks = 1:12,
+    labels = levels(par_highest_mean$month)
+  ) +
+  xlab("Month") +
+  ylab("PAR (mmol/sec/m2)") +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+  labs(color = "Year")
+```
+
+
+```{r}
+# Convert month to numeric if necessary
+
+# Fit the model
+model <- lm(par_mean ~ month_num, data = par_highest_mean)
+
+# View the summary (includes p-value)
+summary(model)
 ```
