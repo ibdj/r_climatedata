@@ -91,12 +91,33 @@ div.csl-indent {
 <link href="kangerluasunnguaq_climate_files/libs/bootstrap/bootstrap-677b520d69fcc55ab41b4b425631e74d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
+<link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#macroclimate" id="toc-macroclimate" class="nav-link active" data-scroll-target="#macroclimate">Macroclimate</a></li>
+  <li><a href="#temperature-data" id="toc-temperature-data" class="nav-link" data-scroll-target="#temperature-data">Temperature data</a>
+  <ul class="collapse">
+  <li><a href="#mean-annual-temperature" id="toc-mean-annual-temperature" class="nav-link" data-scroll-target="#mean-annual-temperature">Mean annual temperature</a></li>
+  <li><a href="#trend-in-mean-temperature-of-warmest-months" id="toc-trend-in-mean-temperature-of-warmest-months" class="nav-link" data-scroll-target="#trend-in-mean-temperature-of-warmest-months">Trend in mean temperature of warmest months</a></li>
+  </ul></li>
+  <li><a href="#precipitation-data" id="toc-precipitation-data" class="nav-link" data-scroll-target="#precipitation-data">Precipitation data</a>
+  <ul class="collapse">
+  <li><a href="#yearly-precipitation" id="toc-yearly-precipitation" class="nav-link" data-scroll-target="#yearly-precipitation">Yearly precipitation</a></li>
+  <li><a href="#monthly-precipitation" id="toc-monthly-precipitation" class="nav-link" data-scroll-target="#monthly-precipitation">Monthly precipitation</a></li>
+  <li><a href="#precipitation-split-in-rain-and-snow" id="toc-precipitation-split-in-rain-and-snow" class="nav-link" data-scroll-target="#precipitation-split-in-rain-and-snow">Precipitation split in rain and snow</a></li>
+  </ul></li>
+  <li><a href="#par-data" id="toc-par-data" class="nav-link" data-scroll-target="#par-data">PAR data</a></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -132,22 +153,17 @@ div.csl-indent {
 
 <section id="macroclimate" class="level2">
 <h2 class="anchored" data-anchor-id="macroclimate">Macroclimate</h2>
-<p>Background macroclimate of Kangerluarsunnguaq (<a href="https://maps.app.goo.gl/2ereBF15bAWeKRVX9">Kobbefjord, Nuuk 64.13334, -51.34368</a>). Data produced by <a href="https://www.asiaq.gl/en/">Asiaq - Greenland Survey</a> for <a href="https://data.g-e-m.dk">Greenland Ecosystem Monitoring</a> <span class="citation" data-cites="asiaqa asiaq">(<a href="#ref-asiaqa" role="doc-biblioref">Asiaq 2023</a>, <a href="#ref-asiaq" role="doc-biblioref">2020</a>)</span>.</p>
+<p>Background macroclimate of Kangerluarsunnguaq (<a href="https://maps.app.goo.gl/2ereBF15bAWeKRVX9">Kobbefjord, Nuuk 64.13334, -51.34368</a>). Data produced by <a href="https://www.asiaq.gl/en/">Asiaq - Greenland Survey</a> for <a href="https://data.g-e-m.dk">Greenland Ecosystem Monitoring</a> <span class="citation" data-cites="asiaqa asiaq asiaqb">(<a href="#ref-asiaqa" role="doc-biblioref">Asiaq 2023</a>, <a href="#ref-asiaq" role="doc-biblioref">2020a</a>, <a href="#ref-asiaqb" role="doc-biblioref">2020b</a>)</span>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hms)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>opts_chunk<span class="sc">$</span><span class="fu">set</span>( <span class="at">size=</span><span class="st">"small"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># colors</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sleet <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">110</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">107</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">196</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">1</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>rain <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">165</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">1</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>warm <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">165</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pacman)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">p_load</span>(tidyverse, janitor, lubridate, glue, hms,knitr, broom )</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>opts_chunk<span class="sc">$</span><span class="fu">set</span>( <span class="at">size=</span><span class="st">"small"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># colors</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sleet <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">110</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">107</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">196</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">1</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>rain <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">165</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">1</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>warm <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="dv">165</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">0</span><span class="sc">/</span><span class="dv">255</span>, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="temperature-data" class="level2">
@@ -236,8 +252,8 @@ Figure&nbsp;2: Mean air temperature (°C) pr month, based on data from 2007 to 2
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>data_temp_mean_warmest <span class="ot">&lt;-</span> <span class="fu">mean</span>(data_temp_monthly_mean_summer<span class="sc">$</span>mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="tend-in-mean-temperature-of-warmest-months" class="level3">
-<h3 class="anchored" data-anchor-id="tend-in-mean-temperature-of-warmest-months">Tend in mean temperature of warmest months</h3>
+<section id="trend-in-mean-temperature-of-warmest-months" class="level3">
+<h3 class="anchored" data-anchor-id="trend-in-mean-temperature-of-warmest-months">Trend in mean temperature of warmest months</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>model_temp_warmest <span class="ot">&lt;-</span> <span class="fu">lm</span>(mean <span class="sc">~</span> year, <span class="at">data =</span> data_temp_monthly_mean_summer)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -347,7 +363,7 @@ F-statistic: 0.6745 on 1 and 43 DF,  p-value: 0.416</code></pre>
 <img src="kangerluasunnguaq_climate_files/figure-html/fig-precipitation-annual-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-precipitation-annual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Mean yearly precipitation (mm) from 2008 to 2022. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of 887.36 mm
+Figure&nbsp;4: Mean yearly precipitation (mm) from 2008 to 2022. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of 887.36 mm.
 </figcaption>
 </figure>
 </div>
@@ -363,12 +379,13 @@ Figure&nbsp;4: Mean yearly precipitation (mm) from 2008 to 2022. Data from 2007 
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>data_precip_month_mean <span class="ot">&lt;-</span> data_precip_month_sum <span class="sc">|&gt;</span> </span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">|&gt;</span> </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pre_mm_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pre_mm_sum),<span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_string =</span> month.name[month]) <span class="sc">|&gt;</span> </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(pre_mm_mean)) <span class="sc">|&gt;</span> </span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">temp_rank =</span> <span class="fu">row_number</span>())</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>precip_month_mean <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(data_precip_month_mean<span class="sc">$</span>pre_mm_mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">pre_mm_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pre_mm_sum),<span class="dv">2</span>),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">sd =</span> <span class="fu">sd</span>(pre_mm_mean)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_string =</span> month.name[month]) <span class="sc">|&gt;</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(pre_mm_mean)) <span class="sc">|&gt;</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">temp_rank =</span> <span class="fu">row_number</span>())</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>precip_month_mean <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">mean</span>(data_precip_month_mean<span class="sc">$</span>pre_mm_mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data_precip_month_mean, <span class="fu">aes</span>(<span class="at">y =</span> pre_mm_mean, <span class="at">x =</span> month))<span class="sc">+</span></span>
@@ -383,7 +400,7 @@ Figure&nbsp;4: Mean yearly precipitation (mm) from 2008 to 2022. Data from 2007 
 <img src="kangerluasunnguaq_climate_files/figure-html/fig-precipitation-month-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-precipitation-month-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Mean yearly precipitation (mm) from 2007 to 2022. Data from 2007 is excluded because it was only from May - December. Blue dashed line represent monthly mean of 74.4 mm.
+Figure&nbsp;5: Mean monthly precipitation (mm) including data from 2007 to 2022. Blue dashed line represent monthly mean of 74.4 mm. ADD SF BARS!
 </figcaption>
 </figure>
 </div>
@@ -555,7 +572,7 @@ Figure&nbsp;7: Mean percipitation pr. month over the monitoring period (2008 - 2
 <img src="kangerluasunnguaq_climate_files/figure-html/fig-monthly-prep-anomaly-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-monthly-prep-anomaly-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;8: CAPTION
+Figure&nbsp;8: Monthly precipitation anomaly (°C). Stronger colors indicate large derivation from the month mean.
 </figcaption>
 </figure>
 </div>
@@ -581,7 +598,7 @@ Figure&nbsp;8: CAPTION
 <img src="kangerluasunnguaq_climate_files/figure-html/fig-yearly-prep-anomaly-trend-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-yearly-prep-anomaly-trend-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9: CAPTION
+Figure&nbsp;9: MAKE IN TO SUM OF ANOMOLIES INSTEAS!
 </figcaption>
 </figure>
 </div>
@@ -682,13 +699,147 @@ Figure&nbsp;11: CAPTION
 </div>
 </div>
 </div>
-
 </section>
+</section>
+<section id="par-data" class="level2">
+<h2 class="anchored" data-anchor-id="par-data">PAR data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/ration_par/View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_@_200_cm__5min_average_æmol_m2_sec210420241337080578.csv"</span>, <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">escape_double =</span> <span class="cn">FALSE</span>, <span class="at">trim_ws =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(par_mmol_sec_m2 <span class="sc">!=</span> <span class="sc">-</span><span class="dv">9999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 1527263 Columns: 5
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (1): Quality Flag
+dbl  (2): PAR (µmol/sec/m2), solar elevation (°)
+date (1): Date
+time (1): Time
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in warn_micro_mu(string = string, replace = replace): Watch out!  The mu or micro symbol is in the input string, and may have been converted to 'm' while 'u' may have been expected.  Consider adding the following to the `replace` argument:
+The following characters are in the names to clean but are not replaced: \u00b5</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>par_monthly_mean <span class="ot">&lt;-</span> View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <span class="sc">|&gt;</span> </span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(solar_elevation <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>)) <span class="sc">|&gt;</span>  <span class="co"># Group by month name (e.g., "Jan")</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">par_monthly_mean =</span> <span class="fu">mean</span>(par_mmol_sec_m2, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span>  <span class="co"># Calculate mean PAR</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(par_monthly_mean)) <span class="sc">|&gt;</span>  <span class="co"># Sort descending by mean PAR</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">temp_rank =</span> <span class="fu">row_number</span>())   <span class="co"># Add ranks</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a month column as a factor with all months</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <span class="sc">%&gt;%</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">factor</span>(<span class="fu">month</span>(date, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>), <span class="at">levels =</span> month.name)) <span class="sc">|&gt;</span> </span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(solar_elevation <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> par_mmol_sec_m2)) <span class="sc">+</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Month"</span>) <span class="sc">+</span></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"PAR (mmol/sec/m2)"</span>) <span class="sc">+</span></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="kangerluasunnguaq_climate_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The months with the highest mean levels of PAR (when the sun is up, solar elevation &gt; 0) are May (663.1) July (610.3) June (597).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>par_highest_mean <span class="ot">&lt;-</span> View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <span class="sc">|&gt;</span> </span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(solar_elevation <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">year =</span> <span class="fu">year</span>(date), <span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(date, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">FALSE</span>)) <span class="sc">|&gt;</span>  <span class="co"># Group by month name (e.g., "Jan")</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(month <span class="sc">==</span> <span class="fu">c</span>(<span class="st">"May"</span>,<span class="st">"June"</span>,<span class="st">"July"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">par_mean =</span> <span class="fu">mean</span>(par_mmol_sec_m2, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span>  <span class="co"># Calculate mean PAR</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(par_mean)) <span class="sc">|&gt;</span>  <span class="co"># Sort descending by mean PAR</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">temp_rank =</span> <span class="fu">row_number</span>())   <span class="co"># Add ranks</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There were 222 warnings in `filter()`.
+The first warning was:
+ℹ In argument: `month == c("May", "June", "July")`.
+ℹ In group 2: `year = 2008` `month = July`.
+Caused by warning in `==.default`:
+! longer object length is not a multiple of shorter object length
+ℹ Run `dplyr::last_dplyr_warnings()` to see the 221 remaining warnings.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'year'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>par_highest_mean <span class="ot">&lt;-</span> par_highest_mean <span class="sc">%&gt;%</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month_num =</span> <span class="fu">as.numeric</span>(month))</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(par_highest_mean, <span class="fu">aes</span>(<span class="at">x =</span> month_num, <span class="at">y =</span> par_mean)) <span class="sc">+</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">factor</span>(year)), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"darkgray"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>,</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">levels</span>(par_highest_mean<span class="sc">$</span>month)</span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Month"</span>) <span class="sc">+</span></span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"PAR (mmol/sec/m2)"</span>) <span class="sc">+</span></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="kangerluasunnguaq_climate_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert month to numeric if necessary</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(par_mean <span class="sc">~</span> month_num, <span class="at">data =</span> par_highest_mean)</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="co"># View the summary (includes p-value)</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = par_mean ~ month_num, data = par_highest_mean)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-175.217  -57.594   -7.975   67.236  203.410 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   795.51      98.20   8.101 4.05e-10 ***
+month_num     -27.77      16.16  -1.718   0.0931 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 86.98 on 42 degrees of freedom
+Multiple R-squared:  0.06569,   Adjusted R-squared:  0.04345 
+F-statistic: 2.953 on 1 and 42 DF,  p-value: 0.09308</code></pre>
+</div>
+</div>
+
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-asiaq" class="csl-entry" role="listitem">
-Asiaq. 2020. <span>“ClimateBasis Nuuk - Precipitation - Precipitation Accumulated (Mm).”</span> <a href="https://doi.org/10.17897/SXJ8-WA79">https://doi.org/10.17897/SXJ8-WA79</a>.
+Asiaq. 2020a. <span>“ClimateBasis Nuuk - Precipitation - Precipitation Accumulated (Mm).”</span> <a href="https://doi.org/10.17897/SXJ8-WA79">https://doi.org/10.17897/SXJ8-WA79</a>.
+</div>
+<div id="ref-asiaqb" class="csl-entry" role="listitem">
+———. 2020b. <span>“ClimateBasis Nuuk - Radiation - Photosyntetic Active Radiation @ 200 Cm - 5min Average (Μmol/M2/Sec).”</span> <a href="https://doi.org/10.17897/8Z2W-D993">https://doi.org/10.17897/8Z2W-D993</a>.
 </div>
 <div id="ref-asiaqa" class="csl-entry" role="listitem">
 ———. 2023. <span>“Air Temperature @ 200 Cm - 30 Min Average (°c).”</span> <a href="https://doi.org/10.17897/PGN3-7597">https://doi.org/10.17897/PGN3-7597</a>.
