@@ -18,7 +18,7 @@ execute:
 bibliography: references.bib
 ---
 
-## Macroclimate
+# Macroclimate
 
 Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@asiaqa; @asiaq; @asiaqb].
 
@@ -37,7 +37,7 @@ rain <- rgb(0/255, 0/255, 165/255, 1)
 warm <- rgb(165/255, 0/255, 0/255, 1)
 ```
 
-## Temperature data
+# Temperature data
 
 ```{r}
 #| label: importing-temp-data
@@ -56,7 +56,7 @@ The imported data has entries between `r min(data_temp$year)` and `r max(data_te
 
 Temperatures between `r min(data_temp$at_c)`°C (`r data_temp$date[which.min(data_temp$at_c)]`) and `r max(data_temp$at_c)`°C (`r data_temp$date[which.max(data_temp$at_c)]`) have been recorded.
 
-### Mean annual temperature
+## Mean annual temperature
 
 ```{r}
 #| label: caluclating-year-mean
@@ -138,7 +138,7 @@ data_temp_monthly_mean_summer <- data_temp |>
 data_temp_mean_warmest <- mean(data_temp_monthly_mean_summer$mean)
 ```
 
-### Trend in mean temperature of warmest months
+## Trend in mean temperature of warmest months
 
 ```{r}
 #| label: linear-regression-varmest-months
@@ -176,7 +176,7 @@ summary(model_temp_warmest)
 model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 ```
 
-## Precipitation data
+# Precipitation data
 
 ```{r}
 #| label: importing-precip
@@ -191,7 +191,7 @@ data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Map
          month_string = month.name[month])
 ```
 
-### Yearly precipitation
+## Yearly precipitation
 
 ```{r}
 #| label: precip-mean-annual
@@ -226,7 +226,7 @@ geom_hline(yintercept = precip_year_mean, linetype="dashed", color = "blue", lin
 
 ```
 
-### Monthly precipitation
+## Monthly precipitation
 
 ```{r}
 #| label: precip-mean-monthly
@@ -264,7 +264,7 @@ The wettest months are `r data_precip_month_mean$month_string[1]` (`r data_preci
 
 The driest months are `r data_precip_month_mean$month_string[10]` (`r data_precip_month_mean$pre_mm_mean[10]` mm), `r data_precip_month_mean$month_string[11]` (`r data_precip_month_mean$pre_mm_mean[11]` mm), `r data_precip_month_mean$month_string[12]` (`r data_precip_month_mean$pre_mm_mean[12]` mm).
 
-### Precipitation type
+## Precipitation type
 
 ```{r}
 #| label: temp-data-hourly
@@ -491,7 +491,7 @@ ggplot(data_temp_anomaly, aes(x = year, y = temperature_anomaly, color = as.fact
 
 ```
 
-## PAR data
+# PAR data
 
 ```{r}
 par <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/ration_par/View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_@_200_cm__5min_average_æmol_m2_sec210420241337080578.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE) |> 
@@ -592,7 +592,7 @@ ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
   theme_minimal()
 ```
 
-### Highest monthly means
+## Highest monthly means
 The months with the highest mean levels of PAR (when the sun is up, solar elevation \> 0) are `r par_monthly_mean$month[1]` (`r round(par_monthly_mean$par_monthly_mean[1],1)`) `r par_monthly_mean$month[2]` (`r round(par_monthly_mean$par_monthly_mean[2],1)`) `r par_monthly_mean$month[3]` (`r round(par_monthly_mean$par_monthly_mean[3],1)`).
 
 ```{r}
@@ -692,23 +692,23 @@ summary(model_above)
 Lookings to see if CHELSA data shoc the same pattern of minimal change as the local data. Using this guide to optain data: https://gitlabext.wsl.ch/karger/rchelsa
 
 ```{r}
-
-# Install 'rchelsa' in R:
-install.packages("devtools")
-library(devtools)
-install_git("https://gitlabext.wsl.ch/karger/rchelsa.git")
+# 
+# # Install 'rchelsa' in R:
+# # https://github.com/inSileco/rchelsa
+# install.packages("remotes")
+# remotes::install_github("inSileco/rchelsa")
 
 
 ```
 
 ```{r}
 
-coords <- data.frame(lon =-51.34361362337628, lat = 64.13329344096005)
-startdate <- as.Date("2008-01-01")
-enddate   <- as.Date("2022-12-31")
-tas <- getChelsa("tas", coords = coords, startdate = startdate, enddate = enddate)
-
-getMetadata()
+# coords <- data.frame(lon =-51.34361362337628, lat = 64.13329344096005)
+# startdate <- as.Date("2008-01-01")
+# enddate   <- as.Date("2022-12-31")
+# tas <- getChelsa("tas", coords = coords, startdate = startdate, enddate = enddate)
+# 
+# getMetadata()
 ```
 
 
