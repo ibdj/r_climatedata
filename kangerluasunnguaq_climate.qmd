@@ -9,6 +9,7 @@ format:
     fig-height: 5
     documentclass: scrartcl
     toc: true
+    lof: true
     number-sections: true
     colorlinks: true
 editor: visual
@@ -97,6 +98,7 @@ The coldest months are `r data_temp_monthly_mean$month_string[12]` (`r data_temp
 
 ```{r}
 #| label: fig-month-mean-temp
+#| fig-scap: "Mean air temperature (°C) pr month"
 #| fig-cap: !expr glue("Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(year_mean,3)}°C.")
 #| message: false
 #| warning: false
@@ -114,6 +116,7 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
 
 ```{r}
 #| label: fig-annual-mean-temp
+#| fig-scap: "Mean air temperature pr year (°C)"
 #| fig-cap: !expr glue("Mean air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)}. Data from 2007 is excluded because data is only from October, November and December. Blue dashed line indicate over all mean of {year_mean}°C. Solid blue is trend line.")
 #| message: false
 #| warning: false
@@ -127,7 +130,7 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   labs(x = "Year", y = "Mean temperature (°C)", title = "Annual mean temperature, Kangerluassunguaq")
 ```
 {{< pagebreak >}}
-## Trend in mean temperature of warmest months
+## Mean temperature of warmest months
 
 ```{r}
 #| label: mean-temp-warmest-months
@@ -158,13 +161,14 @@ model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 
 ```{r}
 #| label: fig-month-summer-mean-temp
+#| fig-scap: "Mean air temperature pr year (°C) for warmest months"
 #| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}. P-value for the regression i {round(model_temp_warmest_p_value,3)}. The mean of the warmests months across all years are {round(data_temp_mean_warmest,3)}°C.")
 #| message: false
 #| warning: false
 
 ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(month)))+
-  geom_smooth(method = lm, color = "gray", se = F, size = 0.4, linetype = 2)+
-  geom_point()+
+  geom_smooth(method = lm, color = "gray", se = F, size = 1, linetype = 2)+
+  geom_point(size = 2)+
   scale_x_continuous(breaks=seq(min(data_temp_monthly_mean_summer$year), max(data_temp_monthly_mean_summer$year), by = 1))+
   #geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
   labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr summer month")+
@@ -206,6 +210,7 @@ data_precip_sum <- data_precip |>
 ```
 
 ```{r}
+#| label: precip-year-mean
 #| echo: false
 
 data_precip_mean <- data_precip_sum |> 
@@ -218,6 +223,7 @@ The mean annual precipitation is `r precip_year_mean` mm.
 
 ```{r}
 #| label: fig-precipitation-annual
+#| fig-scap: "Mean yearly precipitation (mm)"
 #| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm.")
 
 ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
@@ -253,8 +259,9 @@ precip_month_mean <- round(mean(data_precip_month_mean$pre_mm_mean),2)
 
 ```{r}
 #| label: fig-precipitation-month
-#| warning: false
+#| fig-scap: "Mean monthly precipitation (mm)"
 #| fig-cap: !expr glue("Mean monthly precipitation (mm) including data from {min(data_precip$year)} to {max(data_precip$year)}. Blue dashed line represent monthly mean of {precip_month_mean} mm. ADD SF BARS!")
+#| warning: false
 
 ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
   geom_smooth(color = "blue", se = F)+
@@ -336,6 +343,7 @@ data_pre_tem_year <- data_pre_tem_joined_monthly |>
 
 ```{r}
 #| label: fig-snow-rain-year
+#| fig-scap: "Mean monthly distribution of types of precipitation (mm)"
 #| fig-cap: !expr glue("Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_precip$year)} to {max(data_precip$year)}. Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 
 ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) + 
@@ -349,6 +357,7 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
 
 ```{r}
 #| label: fig-snow-rain
+#| fig-scap: "Mean percipitation pr. month"
 #| fig-cap: !expr glue("Mean percipitation pr. month over the monitoring period ({min(data_pre_tem_year$year)} - {max(data_pre_tem_year$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 
 ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) + 
@@ -387,6 +396,7 @@ monthly_prep_anomalies <- data_precip_monthly_mean_sum |>
 
 ```{r}
 #| label: fig-monthly-prep-anomaly
+#| fig-scap: "Monthly precipitation anomaly (°C)"
 #| fig-cap: !expr glue("Monthly precipitation anomaly (°C). Stronger colors indicate large derivation from the month mean.")
 
 ggplot(monthly_prep_anomalies, aes(x = factor(year), y = factor(month), fill = prep_anomaly)) +
@@ -452,6 +462,7 @@ data_temp_anomaly <- data_temp_monthly_mean |>
 
 ```{r}
 #| label: fig-monthly-temp-anomaly
+#| fig-scap: "Monthly Temperature Anomalies Heatmap"
 #| fig-cap: !expr glue("Monthly Temperature Anomalies Heatmap. The stronger the color the bigger the difference from mean temperature of the respective month across all monitored years (°C).")
 
 
@@ -480,7 +491,8 @@ ggplot(data_temp_anomaly, aes(x = factor(year), y = factor(month), fill = temper
 
 ```{r}
 #| label: fig-yearly-temp-anomaly-trend
-#| fig-cap: !expr glue("")
+#| fig-scap: "MAKE SUM OF ANOMOLIES INSTEAD"
+#| fig-cap: !expr glue("MAKE SUM OF ANOMOLIES INSTEAD")
 
 ggplot(data_temp_anomaly, aes(x = year, y = temperature_anomaly, color = as.factor(month))) +
   geom_point(aes(color = factor(month))) +  # Color points by month
@@ -519,6 +531,7 @@ par_monthly_mean <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_r
 
 ```{r}
 #| label: fig-par-monthly-mean
+#| fig-scap: "Monthly mean PAR"
 #| fig-cap: !expr glue("Monthly mean PAR from {min(par$year)} to {max(par$year)}. Calculations based on PAR values only when the sun is up (solar elevation > 0).")
 #| message: false
 #| warning: false
@@ -535,6 +548,7 @@ ggplot(par, aes(x = month, y = par_mmol_sec_m2)) +
 
 ```{r}
 #| label: fig-par-anomolies-heatmap
+#| fig-scap: "Monthly PAR anomaly"
 #| fig-cap: !expr glue("Anomolies (difference from mean) of respective month. Stronger color indication bigger difference from monthly mean across entire period.")
 #| message: false
 #| warning: false
@@ -585,6 +599,7 @@ par_anomalities_abs <- par_monthly_anomalies |>
 
 ```{r}
 #| label: fig-par-abs-anomolies
+#| fig-scap: "Absolut values of anomolies of PAR"
 #| fig-cap: !expr glue("Absolut values of anomolies (difference from mean) of respective month.")
 #| message: false
 #| warning: false
@@ -600,20 +615,23 @@ ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
 
 ## Highest monthly means
 
-The months with the highest mean levels of PAR (when the sun is up, solar elevation \> 0) are `r par_monthly_mean$month[1]` (`r round(par_monthly_mean$par_monthly_mean[1],1)`) `r par_monthly_mean$month[2]` (`r round(par_monthly_mean$par_monthly_mean[2],1)`) `r par_monthly_mean$month[3]` (`r round(par_monthly_mean$par_monthly_mean[3],1)`).
+The months with the highest mean levels of PAR (when the sun is up, solar elevation \> 0) are `r par_monthly_mean$month[1]` (`r round(par_monthly_mean$par_monthly_mean[1],1)`), `r par_monthly_mean$month[2]` (`r round(par_monthly_mean$par_monthly_mean[2],1)`), `r par_monthly_mean$month[3]` (`r round(par_monthly_mean$par_monthly_mean[3],1)`).
 
 ```{r}
+#| label: par-highest-mean
+
 par_highest_mean <- par |> 
   group_by(year, month) |>  # Group by month name (e.g., "Jan")
   filter(month == c("May","June","July")) |> 
   summarize(par_mean = mean(par_mmol_sec_m2, na.rm = TRUE)) |>  # Calculate mean PAR
   arrange(desc(par_mean)) |>  # Sort descending by mean PAR
   mutate(temp_rank = row_number())   # Add ranks
-
-
 ```
 
 ```{r}
+#| label: fig-par-month-highest-means
+#| fig-scap: "Mean of months with highest PAR"
+#| fig-cap: !expr glue("Mean of months with highest PAR.")
 # Plot
 par_highest_mean <- par_highest_mean %>%
   mutate(month_num = as.numeric(month))
@@ -632,6 +650,7 @@ ggplot(par_highest_mean, aes(x = month_num, y = par_mean)) +
 ```
 
 ```{r}
+#| label: regression-par-month
 # Convert month to numeric if necessary
 
 # Fit the model
@@ -642,6 +661,8 @@ summary(model)
 ```
 
 ```{r}
+#| label: slettes??
+
 # measurements above mean
 # Step 1: Calculate the monthly mean and add it to the dataframe
 above_2000 <- par |> 
@@ -667,7 +688,11 @@ summary(model_above)
 
 ```
 
+## Absolute values of anomolies
 ```{r}
+#| label: fig-par-high-values
+#| fig-scap: "Number of measurements of PAR above 2000"
+#| fig-cap: !expr glue("Number of measurements of PAR above 2000.")
 # measurements above mean
 # Step 1: Calculate the monthly mean and add it to the dataframe
 above_2000 <- par |> 
@@ -675,15 +700,12 @@ above_2000 <- par |>
   filter(par_mmol_sec_m2 > 2000) |> 
   summarize(above_2000 = n())
 
-
-
 # Step 4: Plot
 ggplot(above_2000, aes(x = year, y = above_2000)) +
   geom_point(color = "darkgreen", alpha = 0.8)+
   geom_smooth(method = "lm", linetype = "dashed")+
   xlab("Year") +
   ylab("Number of measurements above 2000")
-
 
 # Fit the model
 model_above <- lm(above_2000 ~ year, data = above_2000)
