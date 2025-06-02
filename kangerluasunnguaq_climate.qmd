@@ -1,7 +1,8 @@
 ---
 title: "macroclimate"
 author: "ibdj"
-date: "2024-11-08"
+date: last-modified
+date-format: "YYYY-MM-DD HH:mm"
 format:
   pdf:
     fig-pos: "H"
@@ -28,8 +29,9 @@ Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.3
 #| label: importing-packages
 #| output: FALSE
 
+install.packages("rmarkdown","pacman","tidyverse")
 library(pacman)
-p_load(tidyverse, janitor, lubridate, glue, hms,knitr, broom )
+pacman::p_load(tidyverse, janitor, lubridate, glue, hms,knitr, broom)
 
 opts_chunk$set( size="small")
 
@@ -55,6 +57,7 @@ data_temp <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappi
 ```
 
 ```{r}
+#| label: temp-mean-monthly
 
 data_temp_monthly_mean <- data_temp |> 
   group_by(month) |> 
@@ -176,6 +179,8 @@ ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(
 ```
 
 ```{r}
+#| label: regression-warmest-temp-months
+
 model_temp_warmest <- lm(mean ~ year, data = data_temp_monthly_mean_summer)
 
 summary(model_temp_warmest)
@@ -372,9 +377,7 @@ ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) +
 ```
 
 ```{r}
-library(ggplot2)
-library(dplyr)
-library(lubridate)
+#| label: data-precip-anomalies
 
 # Data prepping for precip anomalies heat map
 
@@ -438,10 +441,7 @@ ggplot(monthly_prep_anomalies, aes(x = year, y = prep_anomaly , color = as.facto
 ```
 
 ```{r}
-library(ggplot2)
-library(dplyr)
-library(lubridate)
-
+#| label: data-monthly-temp-anomaly
 # Data prepping for temperature anomalies heat map
 
 data_temp_monthly_mean <- data_temp |> 
@@ -509,6 +509,9 @@ ggplot(data_temp_anomaly, aes(x = year, y = temperature_anomaly, color = as.fact
 # PAR data
 
 ```{r}
+#| label: data-par-importing
+
+
 par <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/ration_par/View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_@_200_cm__5min_average_æmol_m2_sec210420241337080578.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE) |> 
   clean_names() |> 
   filter(par_mmol_sec_m2 != -9999,
@@ -517,9 +520,10 @@ par <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_
          month = factor(month(date, label = TRUE, abbr = FALSE), levels = month.name))
 ```
 
-### Monthly means
+## Monthly means
 
 ```{r}
+#| label: data-par-mean-monthly
 par_monthly_mean <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 |> 
   filter(solar_elevation > 0) |> 
   group_by(month = lubridate::month(date, label = TRUE, abbr = FALSE)) |>  # Group by month name (e.g., "Jan")
@@ -544,7 +548,7 @@ ggplot(par, aes(x = month, y = par_mmol_sec_m2)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-### Anomolies
+## Anomolies
 
 ```{r}
 #| label: fig-par-anomolies-heatmap
@@ -660,34 +664,6 @@ model <- lm(par_mean ~ month_num, data = par_highest_mean)
 summary(model)
 ```
 
-```{r}
-#| label: slettes??
-
-# measurements above mean
-# Step 1: Calculate the monthly mean and add it to the dataframe
-above_2000 <- par |> 
-  group_by(month,year) |> 
-  filter(par_mmol_sec_m2 > 2000) |> 
-  summarize(above_2000 = n())
-
-
-
-# Step 4: Plot
-ggplot(above_2000, aes(x = year, y = above_2000)) +
-  geom_point(color = "darkgreen", alpha = 0.8)+
-  geom_smooth(method = "lm", linetype = "dashed")+
-  xlab("Year") +
-  ylab("Number of measurements above 2000")
-
-
-# Fit the model
-model_above <- lm(above_2000 ~ year, data = above_2000)
-
-# View the summary (includes p-value)
-summary(model_above)
-
-```
-
 ## Absolute values of anomolies
 ```{r}
 #| label: fig-par-high-values
@@ -715,28 +691,19 @@ summary(model_above)
 
 ```
 
-# CHELSA climate data
+# Historic climate context
 
 Lookings to see if CHELSA data shoc the same pattern of minimal change as the local data. Using this guide to optain data: https://gitlabext.wsl.ch/karger/rchelsa
 
 ```{r}
-# 
+#| label: data-global-climate-data-import
+
 # # Install 'rchelsa' in R:
 # # https://github.com/inSileco/rchelsa
 # install.packages("remotes")
 # remotes::install_github("inSileco/rchelsa")
 
-
 ```
 
-```{r}
 
-# coords <- data.frame(lon =-51.34361362337628, lat = 64.13329344096005)
-# startdate <- as.Date("2008-01-01")
-# enddate   <- as.Date("2022-12-31")
-# tas <- getChelsa("tas", coords = coords, startdate = startdate, enddate = enddate)
-# 
-# getMetadata()
-```
-
-## References
+# References
