@@ -115,7 +115,7 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")
 ```
 
-\[text\]
+
 
 ```{r}
 #| label: fig-annual-mean-temp
@@ -186,6 +186,56 @@ model_temp_warmest <- lm(mean ~ year, data = data_temp_monthly_mean_summer)
 summary(model_temp_warmest)
 
 model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
+```
+
+## Temperature anomaly
+```{r}
+#| label: data-monthly-temp-anomaly
+# Data prepping for temperature anomalies heat map
+
+data_temp_monthly_mean <- data_temp |> 
+  group_by(year, month) |> 
+  summarise(monthly_mean = mean(at_c, na.rm = TRUE)) |> 
+  ungroup()
+
+data_temp_monthly_mean_overall <- data_temp_monthly_mean |> 
+  group_by(month) |> 
+  summarise(overall_monthly_mean = mean(monthly_mean, na.rm = TRUE)) |> 
+  ungroup()
+
+data_temp_anomaly <- data_temp_monthly_mean |> 
+  left_join(data_temp_monthly_mean_overall, by = "month") |> 
+  mutate(temperature_anomaly = monthly_mean - overall_monthly_mean)
+
+```
+
+```{r}
+#| label: fig-monthly-temp-anomaly
+#| fig-scap: "Monthly Temperature Anomalies Heatmap"
+#| fig-cap: !expr glue("Monthly Temperature Anomalies Heatmap. The stronger the color the bigger the difference from mean temperature of the respective month across all monitored years (°C).")
+
+
+ggplot(data_temp_anomaly, aes(x = factor(year), y = factor(month), fill = temperature_anomaly)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = rain, high = warm, mid = "white", 
+                       midpoint = 0, limit = c(-max(abs(data_temp_anomaly$temperature_anomaly)), 
+                                               max(abs(data_temp_anomaly$temperature_anomaly))),
+                       space = "Lab", name="Temperature Anomaly (°C)") +
+  labs(x = "Year", y = "Month", title = "Monthly Temperature Anomalies Heatmap") +
+  scale_y_discrete(labels = month.name) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+    legend.position = "right",
+    legend.direction = "vertical",
+    legend.title = element_text(angle = 90, hjust = 0.5, vjust = 1, size = 10),
+    legend.text = element_text(angle = 90, hjust = 1),
+    legend.key.height = unit(1, "cm"),
+    legend.key.width = unit(0.5, "cm"),
+    legend.box.just = "bottom") +
+ guides(fill = guide_colorbar(title.position = "left", label.position = "left"))
+
+
 ```
 
 # Precipitation data
@@ -440,54 +490,7 @@ ggplot(monthly_prep_anomalies, aes(x = year, y = prep_anomaly , color = as.facto
 
 ```
 
-```{r}
-#| label: data-monthly-temp-anomaly
-# Data prepping for temperature anomalies heat map
 
-data_temp_monthly_mean <- data_temp |> 
-  group_by(year, month) |> 
-  summarise(monthly_mean = mean(at_c, na.rm = TRUE)) |> 
-  ungroup()
-
-data_temp_monthly_mean_overall <- data_temp_monthly_mean |> 
-  group_by(month) |> 
-  summarise(overall_monthly_mean = mean(monthly_mean, na.rm = TRUE)) |> 
-  ungroup()
-
-data_temp_anomaly <- data_temp_monthly_mean |> 
-  left_join(data_temp_monthly_mean_overall, by = "month") |> 
-  mutate(temperature_anomaly = monthly_mean - overall_monthly_mean)
-
-```
-
-```{r}
-#| label: fig-monthly-temp-anomaly
-#| fig-scap: "Monthly Temperature Anomalies Heatmap"
-#| fig-cap: !expr glue("Monthly Temperature Anomalies Heatmap. The stronger the color the bigger the difference from mean temperature of the respective month across all monitored years (°C).")
-
-
-ggplot(data_temp_anomaly, aes(x = factor(year), y = factor(month), fill = temperature_anomaly)) +
-  geom_tile(color = "white") +
-  scale_fill_gradient2(low = rain, high = warm, mid = "white", 
-                       midpoint = 0, limit = c(-max(abs(data_temp_anomaly$temperature_anomaly)), 
-                                               max(abs(data_temp_anomaly$temperature_anomaly))),
-                       space = "Lab", name="Temperature Anomaly (°C)") +
-  labs(x = "Year", y = "Month", title = "Monthly Temperature Anomalies Heatmap") +
-  scale_y_discrete(labels = month.name) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-    legend.position = "right",
-    legend.direction = "vertical",
-    legend.title = element_text(angle = 90, hjust = 0.5, vjust = 1, size = 10),
-    legend.text = element_text(angle = 90, hjust = 1),
-    legend.key.height = unit(1, "cm"),
-    legend.key.width = unit(0.5, "cm"),
-    legend.box.just = "bottom") +
- guides(fill = guide_colorbar(title.position = "left", label.position = "left"))
-
-
-```
 
 ```{r}
 #| label: fig-yearly-temp-anomaly-trend
@@ -548,6 +551,80 @@ ggplot(par, aes(x = month, y = par_mmol_sec_m2)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+
+## Highest monthly means
+
+The months with the highest mean levels of PAR (when the sun is up, solar elevation \> 0) are `r par_monthly_mean$month[1]` (`r round(par_monthly_mean$par_monthly_mean[1],1)`), `r par_monthly_mean$month[2]` (`r round(par_monthly_mean$par_monthly_mean[2],1)`), `r par_monthly_mean$month[3]` (`r round(par_monthly_mean$par_monthly_mean[3],1)`).
+
+```{r}
+#| label: par-highest-mean
+
+par_highest_mean <- par |> 
+  group_by(year, month) |>  # Group by month name (e.g., "Jan")
+  filter(month == c("May","June","July")) |> 
+  summarize(par_mean = mean(par_mmol_sec_m2, na.rm = TRUE)) |>  # Calculate mean PAR
+  arrange(desc(par_mean)) |>  # Sort descending by mean PAR
+  mutate(temp_rank = row_number())   # Add ranks
+```
+
+```{r}
+#| label: fig-par-month-highest-means
+#| fig-scap: "Mean of months with highest PAR"
+#| fig-cap: !expr glue("Mean of months with highest PAR.")
+# Plot
+par_highest_mean <- par_highest_mean %>%
+  mutate(month_num = as.numeric(month))
+
+ggplot(par_highest_mean, aes(x = month_num, y = par_mean)) +
+  geom_point(aes(color = factor(year)), size = 3) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgray", linetype = "dashed") +
+  scale_x_continuous(
+    breaks = 1:12,
+    labels = levels(par_highest_mean$month)
+  ) +
+  xlab("Month") +
+  ylab("PAR (mmol/sec/m2)") +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+  labs(color = "Year")
+```
+## Observations above 2000
+```{r}
+#| label: fig-par-high-values
+#| fig-scap: "Number of measurements of PAR above 2000"
+#| fig-cap: !expr glue("Number of measurements of PAR above 2000.")
+# measurements above mean
+# Step 1: Calculate the monthly mean and add it to the dataframe
+above_2000 <- par |> 
+  group_by(month,year) |> 
+  filter(par_mmol_sec_m2 > 2000) |> 
+  summarize(above_2000 = n())
+
+# Step 4: Plot
+ggplot(above_2000, aes(x = year, y = above_2000)) +
+  geom_point(color = "darkgreen", alpha = 0.8)+
+  geom_smooth(method = "lm", linetype = "dashed")+
+  xlab("Year") +
+  ylab("Number of measurements above 2000")
+
+# Fit the model
+model_above <- lm(above_2000 ~ year, data = above_2000)
+
+# View the summary (includes p-value)
+summary(model_above)
+
+```
+
+```{r}
+#| label: regression-par-month
+# Convert month to numeric if necessary
+
+# Fit the model
+model <- lm(par_mean ~ month_num, data = par_highest_mean)
+
+# View the summary (includes p-value)
+summary(model)
+```
+
 ## Anomolies
 
 ```{r}
@@ -591,8 +668,10 @@ ggplot(par_monthly_anomalies, aes(x = factor(year), y = factor(month), fill = an
 
 ```
 
+## Absolute values of anomolies
+
 ```{r}
-#| label: absolut-abnormalities-par
+#| label: data-absolut-abnormalities-par
 #| message: false
 #| warning: false
 
@@ -617,79 +696,6 @@ ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
   theme_minimal()
 ```
 
-## Highest monthly means
-
-The months with the highest mean levels of PAR (when the sun is up, solar elevation \> 0) are `r par_monthly_mean$month[1]` (`r round(par_monthly_mean$par_monthly_mean[1],1)`), `r par_monthly_mean$month[2]` (`r round(par_monthly_mean$par_monthly_mean[2],1)`), `r par_monthly_mean$month[3]` (`r round(par_monthly_mean$par_monthly_mean[3],1)`).
-
-```{r}
-#| label: par-highest-mean
-
-par_highest_mean <- par |> 
-  group_by(year, month) |>  # Group by month name (e.g., "Jan")
-  filter(month == c("May","June","July")) |> 
-  summarize(par_mean = mean(par_mmol_sec_m2, na.rm = TRUE)) |>  # Calculate mean PAR
-  arrange(desc(par_mean)) |>  # Sort descending by mean PAR
-  mutate(temp_rank = row_number())   # Add ranks
-```
-
-```{r}
-#| label: fig-par-month-highest-means
-#| fig-scap: "Mean of months with highest PAR"
-#| fig-cap: !expr glue("Mean of months with highest PAR.")
-# Plot
-par_highest_mean <- par_highest_mean %>%
-  mutate(month_num = as.numeric(month))
-
-ggplot(par_highest_mean, aes(x = month_num, y = par_mean)) +
-  geom_point(aes(color = factor(year)), size = 3) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkgray", linetype = "dashed") +
-  scale_x_continuous(
-    breaks = 1:12,
-    labels = levels(par_highest_mean$month)
-  ) +
-  xlab("Month") +
-  ylab("PAR (mmol/sec/m2)") +
-  theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
-  labs(color = "Year")
-```
-
-```{r}
-#| label: regression-par-month
-# Convert month to numeric if necessary
-
-# Fit the model
-model <- lm(par_mean ~ month_num, data = par_highest_mean)
-
-# View the summary (includes p-value)
-summary(model)
-```
-
-## Absolute values of anomolies
-```{r}
-#| label: fig-par-high-values
-#| fig-scap: "Number of measurements of PAR above 2000"
-#| fig-cap: !expr glue("Number of measurements of PAR above 2000.")
-# measurements above mean
-# Step 1: Calculate the monthly mean and add it to the dataframe
-above_2000 <- par |> 
-  group_by(month,year) |> 
-  filter(par_mmol_sec_m2 > 2000) |> 
-  summarize(above_2000 = n())
-
-# Step 4: Plot
-ggplot(above_2000, aes(x = year, y = above_2000)) +
-  geom_point(color = "darkgreen", alpha = 0.8)+
-  geom_smooth(method = "lm", linetype = "dashed")+
-  xlab("Year") +
-  ylab("Number of measurements above 2000")
-
-# Fit the model
-model_above <- lm(above_2000 ~ year, data = above_2000)
-
-# View the summary (includes p-value)
-summary(model_above)
-
-```
 
 # Historic climate context
 
