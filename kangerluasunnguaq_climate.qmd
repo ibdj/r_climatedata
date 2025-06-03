@@ -258,7 +258,7 @@ data_temp_anomaly_abs <- data_temp_anomaly|>
 #| warning: false
 
 ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
-  geom_point() +
+  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
   geom_smooth(method = "lm")+
   xlab("Year") +
   ylab("Absolute anomolies, temp") +
@@ -526,7 +526,7 @@ data_prep_anomaly_abs <- monthly_prep_anomalies|>
 #| warning: false
 
 ggplot(data_prep_anomaly_abs, aes(x = year, y = abs_anomo)) +
-  geom_point() +
+  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
   geom_smooth(method = "lm")+
   xlab("Year") +
   ylab("Absolute anomolies, prep") +
@@ -714,11 +714,12 @@ par_anomalities_abs <- par_monthly_anomalies |>
 #| warning: false
 
 ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
-  geom_point() +
+  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
   geom_smooth(method = "lm")+
   xlab("Year") +
   ylab("Absolute anomolies, PAR (mmol/sec/m2)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_continuous(breaks=seq(min(par_anomalities_abs$year), max(par_anomalities_abs$year), by = 1))+
   theme_minimal()
 ```
 
