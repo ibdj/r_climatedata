@@ -126,7 +126,7 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
 
 ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   geom_smooth(method = lm, color = "blue", se = F)+
-  geom_point()+
+  geom_point(size = 2)+
   geom_line(size = 0.25, color = "black", linetype="dotted")+
   scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
   geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
@@ -188,7 +188,7 @@ summary(model_temp_warmest)
 model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 ```
 
-## Temperature anomaly
+## Temperature anomolies
 ```{r}
 #| label: data-monthly-temp-anomaly
 # Data prepping for temperature anomalies heat map
@@ -237,6 +237,36 @@ ggplot(data_temp_anomaly, aes(x = factor(year), y = factor(month), fill = temper
 
 
 ```
+
+## Absolute values of anomolies
+
+```{r}
+#| label: data-absolut-abnormalities-temp
+#| message: false
+#| warning: false
+
+data_temp_anomaly_abs <- data_temp_anomaly|> 
+  mutate(abs_anomo = abs(temperature_anomaly))
+
+```
+
+```{r}
+#| label: fig-temp-abs-anomolies
+#| fig-scap: "Absolut values of anomolies of PAR"
+#| fig-cap: !expr glue("Absolut values of anomolies (difference from mean) of respective month.")
+#| message: false
+#| warning: false
+
+ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
+  geom_point() +
+  geom_smooth(method = "lm")+
+  xlab("Year") +
+  ylab("Absolute anomolies, temp") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_continuous(breaks=seq(min(data_temp_anomaly_abs$year), max(data_temp_anomaly_abs$year), by = 1))+
+  theme_minimal()
+```
+
 
 # Precipitation data
 
@@ -426,6 +456,8 @@ ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) +
 
 ```
 
+## Precipitation anomalies
+
 ```{r}
 #| label: data-precip-anomalies
 
@@ -474,39 +506,33 @@ ggplot(monthly_prep_anomalies, aes(x = factor(year), y = factor(month), fill = p
 
 ```
 
-```{r}
-#| label: fig-yearly-prep-anomaly-trend
-#| fig-cap: !expr glue("MAKE IN TO SUM OF ANOMOLIES INSTEAS!")
+## Absolute values of anomolies
 
-ggplot(monthly_prep_anomalies, aes(x = year, y = prep_anomaly , color = as.factor(month))) +
-  geom_point(aes(color = factor(month))) +  # Color points by month
-  geom_smooth(method = lm, se = F)+
-  #geom_smooth(method = "lm", se = FALSE, size = 0.4, color = "black") +  # Single trend line in black
-  labs(x = "Year", y = "Temperature Anomaly (°C)", color = "Month") +
-  theme_minimal()+
-  scale_x_continuous(breaks=seq(min(monthly_prep_anomalies$year), max(monthly_prep_anomalies$year), by = 1))+
-  theme(axis.text.x = element_text(angle = -45,  hjust=-0))
-#vjust = 0.5,
+```{r}
+#| label: data-absolut-abnormalities-prep
+#| message: false
+#| warning: false
+
+data_prep_anomaly_abs <- monthly_prep_anomalies|> 
+  mutate(abs_anomo = abs(prep_anomaly))
 
 ```
 
-
-
 ```{r}
-#| label: fig-yearly-temp-anomaly-trend
-#| fig-scap: "MAKE SUM OF ANOMOLIES INSTEAD"
-#| fig-cap: !expr glue("MAKE SUM OF ANOMOLIES INSTEAD")
+#| label: fig-prep-abs-anomolies
+#| fig-scap: "Absolut values of anomolies of PAR"
+#| fig-cap: !expr glue("Absolut values of anomolies (difference from mean) of respective month.")
+#| message: false
+#| warning: false
 
-ggplot(data_temp_anomaly, aes(x = year, y = temperature_anomaly, color = as.factor(month))) +
-  geom_point(aes(color = factor(month))) +  # Color points by month
-  geom_smooth(method = lm, se = F)+
-  #geom_smooth(method = "lm", se = FALSE, size = 0.4, color = "black") +  # Single trend line in black
-  labs(x = "Year", y = "Temperature Anomaly (°C)", color = "Month") +
-  theme_minimal()+
-  scale_x_continuous(breaks=seq(min(data_temp_anomaly$year), max(data_temp_anomaly$year), by = 1))+
-  theme(axis.text.x = element_text(angle = -45,  hjust=-0))
-#vjust = 0.5,
-
+ggplot(data_prep_anomaly_abs, aes(x = year, y = abs_anomo)) +
+  geom_point() +
+  geom_smooth(method = "lm")+
+  xlab("Year") +
+  ylab("Absolute anomolies, prep") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_continuous(breaks=seq(min(data_prep_anomaly_abs$year), max(data_prep_anomaly_abs$year), by = 1))+
+  theme_minimal()
 ```
 
 # PAR data
@@ -625,7 +651,7 @@ model <- lm(par_mean ~ month_num, data = par_highest_mean)
 summary(model)
 ```
 
-## Anomolies
+## PAR anomalies
 
 ```{r}
 #| label: fig-par-anomolies-heatmap
