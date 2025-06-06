@@ -115,8 +115,6 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")
 ```
 
-
-
 ```{r}
 #| label: fig-annual-mean-temp
 #| fig-scap: "Mean air temperature pr year (°C)"
@@ -132,8 +130,8 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
   labs(x = "Year", y = "Mean temperature (°C)", title = "Annual mean temperature, Kangerluassunguaq")
 ```
-{{< pagebreak >}}
-## Mean temperature of warmest months
+
+{{< pagebreak >}} \## Mean temperature of warmest months
 
 ```{r}
 #| label: mean-temp-warmest-months
@@ -188,7 +186,8 @@ summary(model_temp_warmest)
 model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 ```
 
-## Temperature anomolies
+## Temperature anomalies
+
 ```{r}
 #| label: data-monthly-temp-anomaly
 # Data prepping for temperature anomalies heat map
@@ -266,7 +265,6 @@ ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
   scale_x_continuous(breaks=seq(min(data_temp_anomaly_abs$year), max(data_temp_anomaly_abs$year), by = 1))+
   theme_minimal()
 ```
-
 
 # Precipitation data
 
@@ -577,7 +575,6 @@ ggplot(par, aes(x = month, y = par_mmol_sec_m2)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-
 ## Highest monthly means
 
 The months with the highest mean levels of PAR (when the sun is up, solar elevation \> 0) are `r par_monthly_mean$month[1]` (`r round(par_monthly_mean$par_monthly_mean[1],1)`), `r par_monthly_mean$month[2]` (`r round(par_monthly_mean$par_monthly_mean[2],1)`), `r par_monthly_mean$month[3]` (`r round(par_monthly_mean$par_monthly_mean[3],1)`).
@@ -587,6 +584,17 @@ The months with the highest mean levels of PAR (when the sun is up, solar elevat
 
 par_highest_mean <- par |> 
   group_by(year, month) |>  # Group by month name (e.g., "Jan")
+  filter(month %in% c("May","June","July")) |> 
+  summarize(par_mean = mean(par_mmol_sec_m2, na.rm = TRUE)) |>  # Calculate mean PAR
+  arrange(desc(par_mean)) |>  # Sort descending by mean PAR
+  mutate(temp_rank = row_number()) |>   # Add ranks
+  mutate(month_num = match(month, month.name))
+```
+```{r}
+#| label: par-highest-mean2
+
+par_highest_mean2 <- par |> 
+  group_by(year) |>  # Group by month name (e.g., "Jan")
   filter(month == c("May","June","July")) |> 
   summarize(par_mean = mean(par_mmol_sec_m2, na.rm = TRUE)) |>  # Calculate mean PAR
   arrange(desc(par_mean)) |>  # Sort descending by mean PAR
@@ -598,22 +606,116 @@ par_highest_mean <- par |>
 #| fig-scap: "Mean of months with highest PAR"
 #| fig-cap: !expr glue("Mean of months with highest PAR.")
 # Plot
-par_highest_mean <- par_highest_mean %>%
-  mutate(month_num = as.numeric(month))
 
-ggplot(par_highest_mean, aes(x = month_num, y = par_mean)) +
-  geom_point(aes(color = factor(year)), size = 3) +
+
+ggplot(par_highest_mean, aes(x = year, y = par_mean)) +
+  geom_point(aes(color = factor(month_num)), size = 3) +
   geom_smooth(method = "lm", se = TRUE, color = "darkgray", linetype = "dashed") +
-  scale_x_continuous(
-    breaks = 1:12,
-    labels = levels(par_highest_mean$month)
-  ) +
+  #scale_x_continuous(
+  #  breaks = 1:12,
+  #  labels = levels(par_highest_mean$month)
+  #) +
+  xlab("") +
+  ylab("Mean PAR (mmol/sec/m2)") +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
+  labs(color = "Month")+
+   geom_point(
+    data = par_highest_mean2,
+    aes(x = year, y = par_mean),
+    shape = 17,  # Triangle marker
+    size = 3,
+    color = "black"
+  ) + 
+  annotate("text", x = 2017, y = max(par_highest_mean$par_mean), 
+           label = "▲ = Mean of all three months", hjust = 0, size = 4)+
+  scale_x_continuous(breaks=seq(min(par_highest_mean$year), max(par_highest_mean$year), by = 1))
+
+```
+
+```{r}
+#| label: regression-par-month
+# Convert month to numeric if necessary
+
+# Fit the model
+model <- lm(par_mean ~ year, data = par_highest_mean)
+
+# View the summary (includes p-value)
+summary(model)
+```
+
+## Mean pr month
+
+```{r}
+#| label: fig-par-month-highest-means2
+#| fig-scap: "Mean of months with highest PAR"
+#| fig-cap: !expr glue("Mean of months with highest PAR.")
+# Plot
+
+ggplot(par_highest_mean2, aes(x = year, y = par_mean)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgray", linetype = "dashed") +
+  #scale_x_continuous(
+  #  breaks = 1:12,
+  #  labels = levels(par_highest_mean$month)
+  #) +
   xlab("Month") +
   ylab("PAR (mmol/sec/m2)") +
   theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
   labs(color = "Year")
 ```
+
+Test 2 in one
+
+```{r}
+# Combined plot with both monthly & annual data
+ggplot() +
+  # Monthly data (colored points + dashed trend)
+  geom_point(
+    data = par_highest_mean, 
+    aes(x = year, y = par_mean, color = factor(month_num)),
+    size = 3,
+    alpha = 0.7  # Added transparency for overlapping points
+  ) +
+  geom_smooth(
+    data = par_highest_mean,
+    aes(x = year, y = par_mean),
+    method = "lm", 
+    se = TRUE, 
+    color = "darkgray", 
+    linetype = "dashed"
+  ) +
+  
+  # Annual data (triangle markers + solid trend)
+  geom_point(
+    data = par_highest_mean2,
+    aes(x = year, y = par_mean),
+    shape = 17,  # Triangle marker
+    size = 4,
+    color = "black"
+  ) +
+  geom_smooth(
+    data = par_highest_mean2,
+    aes(x = year, y = par_mean),
+    method = "lm",
+    se = TRUE,
+    color = "#E69F00",  # Distinct orange color
+    linetype = "solid"
+  ) +
+  
+  # Cosmetic improvements
+  scale_color_viridis_d(name = "Month") +  # Better color palette
+  labs(
+    x = "Year",  # Corrected from original "Month" label
+    y = "PAR (mmol/sec/m²)",
+    title = "PAR Trends with Monthly Variation and Annual Means"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+
 ## Observations above 2000
+
 ```{r}
 #| label: fig-par-high-values
 #| fig-scap: "Number of measurements of PAR above 2000"
@@ -640,16 +742,7 @@ summary(model_above)
 
 ```
 
-```{r}
-#| label: regression-par-month
-# Convert month to numeric if necessary
 
-# Fit the model
-model <- lm(par_mean ~ month_num, data = par_highest_mean)
-
-# View the summary (includes p-value)
-summary(model)
-```
 
 ## PAR anomalies
 
@@ -723,7 +816,6 @@ ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
   theme_minimal()
 ```
 
-
 # Historic climate context
 
 Lookings to see if CHELSA data shoc the same pattern of minimal change as the local data. Using this guide to optain data: https://gitlabext.wsl.ch/karger/rchelsa
@@ -737,6 +829,5 @@ Lookings to see if CHELSA data shoc the same pattern of minimal change as the lo
 # remotes::install_github("inSileco/rchelsa")
 
 ```
-
 
 # References
