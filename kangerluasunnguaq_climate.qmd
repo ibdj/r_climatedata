@@ -31,7 +31,7 @@ Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.3
 
 install.packages("rmarkdown","pacman","tidyverse")
 library(pacman)
-pacman::p_load(tidyverse, janitor, lubridate, glue, hms,knitr, broom)
+pacman::p_load(tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc)
 
 opts_chunk$set( size="small")
 
@@ -128,7 +128,12 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   geom_line(size = 0.25, color = "black", linetype="dotted")+
   scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
   geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
-  labs(x = "Year", y = "Mean temperature (°C)", title = "Annual mean temperature, Kangerluassunguaq")
+  labs(x = "Year", y = "Mean temperature (°C)", title = "Annual mean temperature, Kangerluassunguaq")+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 ```
 
 {{< pagebreak >}} \## Mean temperature of warmest months
@@ -173,7 +178,12 @@ ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(
   scale_x_continuous(breaks=seq(min(data_temp_monthly_mean_summer$year), max(data_temp_monthly_mean_summer$year), by = 1))+
   #geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
   labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr summer month")+
-  labs(color = "Months")
+  labs(color = "Months")+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 ```
 
 ```{r}
@@ -263,7 +273,12 @@ ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
   ylab("Absolute anomolies, temp") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_continuous(breaks=seq(min(data_temp_anomaly_abs$year), max(data_temp_anomaly_abs$year), by = 1))+
-  theme_minimal()
+  theme_minimal()+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 ```
 
 # Precipitation data
@@ -314,7 +329,12 @@ ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
   scale_x_continuous(breaks=seq(min(data_precip_sum$year), max(data_precip_sum$year), by = 1))+
 geom_hline(yintercept = precip_year_mean, linetype="dashed", color = "blue", linewidth =0.5)+
   geom_smooth(method = lm, color = "blue", size = 0.5, se = F)+
-  labs(x = "Year", y = "Precipitation (mm)")
+  labs(x = "Year", y = "Precipitation (mm)")+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 
 ```
 
@@ -450,7 +470,12 @@ ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) +
   scale_fill_manual(values = c(rain,sleet ,"#b3b3b3"))+
   geom_smooth(aes(color = precip_type), method = "lm", se = FALSE, show.legend = FALSE, size = 0.5) + 
   scale_color_manual(values = c(rain, sleet, "#b3b3b3")) +
-  guides(fill = guide_legend(title = ""))
+  guides(fill = guide_legend(title = ""))+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 
 ```
 
@@ -530,7 +555,12 @@ ggplot(data_prep_anomaly_abs, aes(x = year, y = abs_anomo)) +
   ylab("Absolute anomolies, prep") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_continuous(breaks=seq(min(data_prep_anomaly_abs$year), max(data_prep_anomaly_abs$year), by = 1))+
-  theme_minimal()
+  theme_minimal()+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 ```
 
 # PAR data
@@ -604,13 +634,13 @@ par_highest_mean2 <- par |>
 ```{r}
 #| label: fig-par-month-highest-means
 #| fig-scap: "Mean of months with highest PAR"
-#| fig-cap: !expr glue("Mean of months with highest PAR.")
+#| fig-cap: !expr glue("Mean of months with highest PAR. ")
 # Plot
 
 
 ggplot(par_highest_mean, aes(x = year, y = par_mean)) +
   geom_point(aes(color = factor(month_num)), size = 3) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkgray", linetype = "dashed") +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgray") +
   #scale_x_continuous(
   #  breaks = 1:12,
   #  labels = levels(par_highest_mean$month)
@@ -628,9 +658,15 @@ ggplot(par_highest_mean, aes(x = year, y = par_mean)) +
   ) + 
   annotate("text", x = 2017, y = max(par_highest_mean$par_mean), 
            label = "▲ = Mean of all three months", hjust = 0, size = 4)+
-  scale_x_continuous(breaks=seq(min(par_highest_mean$year), max(par_highest_mean$year), by = 1))
+  scale_x_continuous(breaks=seq(min(par_highest_mean$year), max(par_highest_mean$year), by = 1))+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 
 ```
+Data indicate that high-radiation months have gotten less radiant during the monitoring period (see @fig-par-month-highest-means).
 
 ```{r}
 #| label: regression-par-month
@@ -644,75 +680,6 @@ summary(model)
 ```
 
 ## Mean pr month
-
-```{r}
-#| label: fig-par-month-highest-means2
-#| fig-scap: "Mean of months with highest PAR"
-#| fig-cap: !expr glue("Mean of months with highest PAR.")
-# Plot
-
-ggplot(par_highest_mean2, aes(x = year, y = par_mean)) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkgray", linetype = "dashed") +
-  #scale_x_continuous(
-  #  breaks = 1:12,
-  #  labels = levels(par_highest_mean$month)
-  #) +
-  xlab("Month") +
-  ylab("PAR (mmol/sec/m2)") +
-  theme(axis.text.x = element_text(angle = 0, hjust = 0.5)) +
-  labs(color = "Year")
-```
-
-Test 2 in one
-
-```{r}
-# Combined plot with both monthly & annual data
-ggplot() +
-  # Monthly data (colored points + dashed trend)
-  geom_point(
-    data = par_highest_mean, 
-    aes(x = year, y = par_mean, color = factor(month_num)),
-    size = 3,
-    alpha = 0.7  # Added transparency for overlapping points
-  ) +
-  geom_smooth(
-    data = par_highest_mean,
-    aes(x = year, y = par_mean),
-    method = "lm", 
-    se = TRUE, 
-    color = "darkgray", 
-    linetype = "dashed"
-  ) +
-  
-  # Annual data (triangle markers + solid trend)
-  geom_point(
-    data = par_highest_mean2,
-    aes(x = year, y = par_mean),
-    shape = 17,  # Triangle marker
-    size = 4,
-    color = "black"
-  ) +
-  geom_smooth(
-    data = par_highest_mean2,
-    aes(x = year, y = par_mean),
-    method = "lm",
-    se = TRUE,
-    color = "#E69F00",  # Distinct orange color
-    linetype = "solid"
-  ) +
-  
-  # Cosmetic improvements
-  scale_color_viridis_d(name = "Month") +  # Better color palette
-  labs(
-    x = "Year",  # Corrected from original "Month" label
-    y = "PAR (mmol/sec/m²)",
-    title = "PAR Trends with Monthly Variation and Annual Means"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
-```
 
 ## Observations above 2000
 
