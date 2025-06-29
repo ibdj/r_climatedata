@@ -315,9 +315,15 @@ data_precip_mean <- data_precip_sum |>
   summarize(mean = mean(pre_mm_sum))
 
 precip_year_mean <- round(mean(data_precip_mean$mean),2)
+
+data_precip_mean_year <- data_precip  |> 
+  group_by(year) |> 
+  summarise(yearly_precip = sum(pre_mm, na.rm = TRUE)) |> 
+  summarise(mean_precip = mean(yearly_precip, na.rm = TRUE))  |> 
+  pull(mean_precip)
 ```
 
-The mean annual precipitation is `r precip_year_mean` mm.
+The mean annual precipitation is `r precip_year_mean` mm. `r data_precip_mean_year`
 
 ```{r}
 #| label: fig-precipitation-annual
@@ -373,7 +379,7 @@ ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
 geom_hline(yintercept = precip_month_mean, linetype="dashed", color = "blue", linewidth =0.25)
 ```
 
-The months with the most precipitation are `r data_precip_month_mean$month_string[1]` (`r data_precip_month_mean$pre_mm_mean[1]` mm), `r data_precip_month_mean$month_string[2]` (`r data_precip_month_mean$pre_mm_mean[2]` mm), `r data_precip_month_mean$month_string[3]` (`r data_precip_month_mean$pre_mm_mean[3]` mm).
+The months with the most precipitation are `r data_precip_month_mean$month_string[1]` (`r data_precip_month_mean$pre_mm_mean[1]` mm), `r data_precip_month_mean$month_string[2]` (`r data_precip_month_mean$pre_mm_mean[2]` mm), `r data_precip_month_mean$month_string[3]` (`r data_precip_month_mean$pre_mm_mean[3]` mm), which account for `r data_precip_month_mean$pre_mm_mean[1]+data_precip_month_mean$pre_mm_mean[2]+data_precip_month_mean$pre_mm_mean[3]` mm or `r  round((data_precip_month_mean$pre_mm_mean[1]+data_precip_month_mean$pre_mm_mean[2]+data_precip_month_mean$pre_mm_mean[3])/precip_year_mean*100,2)` % of the yearly precipitation.
 
 The months with the least precipitation are `r data_precip_month_mean$month_string[10]` (`r data_precip_month_mean$pre_mm_mean[10]` mm), `r data_precip_month_mean$month_string[11]` (`r data_precip_month_mean$pre_mm_mean[11]` mm), `r data_precip_month_mean$month_string[12]` (`r data_precip_month_mean$pre_mm_mean[12]` mm).
 
@@ -457,6 +463,16 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
   guides(fill = guide_legend(title = ""))
 
 ```
+```{r}
+#| label: data-type-distribution
+
+data_precip_type_dist <- data_pre_tem_monthly |> 
+  group_by(precip_type) |> 
+  summarise(sum_pr_type = sum(mean))
+
+```
+
+Out of `r precip_year_mean` ( `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"]`) mm mean annual precipitation, rain accounts for `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]` mm, snow accounts for `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]` mm, and sleet for the remaining `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"]` mm.
 
 ```{r}
 #| label: fig-snow-rain
