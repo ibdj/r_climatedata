@@ -472,7 +472,7 @@ data_precip_type_dist <- data_pre_tem_monthly |>
 
 ```
 
-Out of `r precip_year_mean` ( `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"]`) mm mean annual precipitation, rain accounts for `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]` mm, snow accounts for `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]` mm, and sleet for the remaining `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"]` mm.
+Out of `r precip_year_mean` (`r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"]`) mm mean annual precipitation, rain accounts for `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]` mm (`r round(data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]/(data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"])*100,1)` %), snow accounts for `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]` mm ((`r round(data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]/(data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"])*100,1)` %)), and sleet for the remaining `r data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"]` mm (`r round(data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"]/(data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "rain"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "snow"]+data_precip_type_dist$sum_pr_type[data_precip_type_dist$precip_type == "sleet"])*100,1)` %).
 
 ```{r}
 #| label: fig-snow-rain
@@ -797,6 +797,39 @@ ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_continuous(breaks=seq(min(par_anomalities_abs$year), max(par_anomalities_abs$year), by = 1))+
   theme_minimal()
+```
+# Degree days
+
+The number of degree days (days with a mean temperature > 0°C) has not changed significantly during th emonitoring period. 
+
+```{r}
+#| label: data-degree-days
+
+data_degree_days <- data_temp |> 
+  group_by(date, year, month, doy, month_string) |> 
+  summarise(day_mean = mean(at_c))
+
+```
+```{r}
+#| label: fig-degree-day
+#| fig-scap: "Degree days"
+#| fig-cap: !expr glue("Degree days, days with mean temperature above 0°C")
+#| message: false
+#| warning: false
+
+ggplot(data_degree_days |> filter(day_mean > 0) |> filter(year > 2007), aes(x = year, y = day_mean)) +
+  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
+  geom_smooth(method = "lm")+
+  xlab("Year") +
+  ylab("Number of degree days") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_continuous(breaks=seq(min(data_degree_days$year), max(data_degree_days$year), by = 1))+
+  theme_minimal()+
+   stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 ```
 
 # Historic climate context
