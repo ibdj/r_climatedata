@@ -559,7 +559,7 @@ data_prep_anomaly_abs <- monthly_prep_anomalies|>
 
 ```{r}
 #| label: fig-prep-abs-anomolies
-#| fig-scap: "Absolut values of anomolies of PAR"
+#| fig-scap: "Absolut values of anomolies of precipitation"
 #| fig-cap: !expr glue("Absolut values of anomolies (difference from mean) of respective month.")
 #| message: false
 #| warning: false
@@ -593,7 +593,68 @@ par <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_
          month = factor(month(date, label = TRUE, abbr = FALSE), levels = month.name))
 ```
 
+```{r}
+#| label: fig-par-yearly-mean
+#| fig-scap: "Yearly mean PAR"
+#| fig-cap: !expr glue("Monthly mean PAR from {min(par$year)} to {max(par$year)}. Calculations based on PAR values only when the sun is up (solar elevation > 0).")
+#| message: false
+#| warning: false
+
+par_yearly_mean <- par |> 
+  filter(solar_elevation > 0) |> 
+  group_by(year) |> 
+  summarise(mean = mean(par_mmol_sec_m2))
+
+par_yearly_mean2 <- par |> 
+  filter(solar_elevation > 0) |> 
+  group_by(month, year) |> 
+  summarise(mean = mean(par_mmol_sec_m2))
+
+# Plot
+ggplot(par_yearly_mean, aes(x = year, y = mean)) +
+  #geom_point(data = par_yearly_mean2, aes(x = year, y = mean, color = month))+
+  geom_smooth(method = "lm")+
+  geom_point(size = 3)+
+  xlab("Month") +
+  ylab("PAR (mmol/sec/m2)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )+
+  scale_x_continuous(breaks=seq(min(par_yearly_mean$year), max(par_yearly_mean$year), by = 1))
+```
+
+```{r}
+#| label: fig-par-yearly-mean2
+#| fig-scap: "Yearly mean PAR"
+#| fig-cap: !expr glue("Monthly mean PAR from {min(par$year)} to {max(par$year)}. Calculations based on PAR values only when the sun is up (solar elevation > 0).")
+#| message: false
+#| warning: false
+
+par_yearly_mean2 <- par |> 
+  filter(solar_elevation > 0) |> 
+  group_by(month, year) |> 
+  summarise(mean = mean(par_mmol_sec_m2))
+
+# Plot
+ggplot(par_yearly_mean2, aes(x = year, y = mean, color = month)) +
+  geom_smooth(method = "lm")+
+  geom_point(size = 3)+
+  xlab("Month") +
+  ylab("PAR (mmol/sec/m2)") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )+
+  scale_x_continuous(breaks=seq(min(par_yearly_mean$year), max(par_yearly_mean$year), by = 1))
+```
+
 ## Monthly means
+
 
 ```{r}
 #| label: data-par-mean-monthly
@@ -807,9 +868,16 @@ The number of degree days (days with a mean temperature > 0°C) has not changed 
 
 data_degree_days <- data_temp |> 
   group_by(date, year, month, doy, month_string) |> 
-  summarise(day_mean = mean(at_c))
+  summarise(mean = mean(at_c)) |> 
+  filter(mean > 0)
+  
+data_degree_days_count <- data_degree_days |> 
+  group_by(year) |> 
+summarise(n_days = n(), .groups = 'drop')
 
 ```
+
+
 ```{r}
 #| label: fig-degree-day
 #| fig-scap: "Degree days"
@@ -817,14 +885,15 @@ data_degree_days <- data_temp |>
 #| message: false
 #| warning: false
 
-ggplot(data_degree_days |> filter(day_mean > 0) |> filter(year > 2007), aes(x = year, y = day_mean)) +
+ggplot(data_degree_days_count |> filter(year > 2007), aes(x = year, y = n_days)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm")+
+  geom_smooth(method = "lm", )+
   xlab("Year") +
   ylab("Number of degree days") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_continuous(breaks=seq(min(data_degree_days$year), max(data_degree_days$year), by = 1))+
   theme_minimal()+
+  #ylim(0,255)+
    stat_poly_eq(
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
       formula = y ~ x,
