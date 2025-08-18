@@ -29,9 +29,9 @@ Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.3
 #| label: importing-packages
 #| output: FALSE
 
-install.packages("rmarkdown","pacman","tidyverse")
+#install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc)
+pacman::p_load(ggplot2, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml)
 
 opts_chunk$set( size="small")
 
@@ -268,14 +268,14 @@ data_temp_anomaly_abs <- data_temp_anomaly|>
 
 ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm")+
-  xlab("Year") +
+  geom_smooth(method = "lm", se = FALSE)+
+  xlab("") +
   ylab("Absolute anomolies, temp") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_continuous(breaks=seq(min(data_temp_anomaly_abs$year), max(data_temp_anomaly_abs$year), by = 1))+
   theme_minimal()+
   stat_poly_eq(
-      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      aes(label = paste(..p.value.label.., ..rr.label.., ..eq.label..,sep = "~~~")),
       formula = y ~ x,
       parse = TRUE
     )
@@ -567,13 +567,13 @@ data_prep_anomaly_abs <- monthly_prep_anomalies|>
 ggplot(data_prep_anomaly_abs, aes(x = year, y = abs_anomo)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
   geom_smooth(method = "lm")+
-  xlab("Year") +
+  xlab("") +
   ylab("Absolute anomolies, prep") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_continuous(breaks=seq(min(data_prep_anomaly_abs$year), max(data_prep_anomaly_abs$year), by = 1))+
   theme_minimal()+
   stat_poly_eq(
-      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      aes(label = paste(..p.value.label.., ..rr.label.., ..eq.label.., sep = "~~~")),
       formula = y ~ x,
       parse = TRUE
     )
@@ -853,11 +853,16 @@ par_anomalities_abs <- par_monthly_anomalies |>
 ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
   geom_smooth(method = "lm")+
-  xlab("Year") +
+  xlab("") +
   ylab("Absolute anomolies, PAR (mmol/sec/m2)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_continuous(breaks=seq(min(par_anomalities_abs$year), max(par_anomalities_abs$year), by = 1))+
-  theme_minimal()
+  theme_minimal()+
+  stat_poly_eq(
+      aes(label = paste(..p.value.label.., ..rr.label.., ..eq.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 ```
 # Degree days
 
@@ -896,6 +901,80 @@ ggplot(data_degree_days_count |> filter(year > 2007), aes(x = year, y = n_days))
   #ylim(0,255)+
    stat_poly_eq(
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
+```
+##Degree days anomilies (in number of days)
+
+```{r}
+#| label: fig-degree-day-anomolies
+#| fig-scap: "Degree days"
+#| fig-cap: !expr glue("Degree days, days with mean temperature above 0°C")
+#| message: false
+#| warning: false
+
+
+data_degree_days_monthly_counts <- data_degree_days %>%
+  group_by(year, month_string, month) %>%
+  summarise(n_days = n(), .groups = "drop")
+
+
+data_degree_days_monthly_mean <- data_degree_days_monthly_counts %>%
+  group_by(month_string, month) %>%
+  summarise(mean_n_days = mean(n_days, na.rm = TRUE), .groups = "drop")
+
+data_degree_days_anomolies <- data_degree_days_monthly_counts %>%
+  left_join(data_degree_days_monthly_mean, by = c("month_string","month")) %>%
+  mutate(deviation = n_days - mean_n_days,
+         abs_deviation = abs(deviation))
+
+
+library(ggplot2)
+
+# Ensure proper month ordering if desired
+data_degree_days_anomolies$month_string <- factor(
+  data_degree_days_anomolies$month_string, 
+  levels = c("January","February","March","April","May","June","July",
+             "August","September","October","November","December")
+)
+
+ggplot(data_degree_days_anomolies, aes(x = month_string, y = factor(year), fill = deviation)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(
+    low = "gray", mid = "white", high = "orange", midpoint = 0, 
+    name = "Deviation\nfrom mean"
+  ) +
+  labs(
+    title = "Degree Day Anomalies by Month-Year",
+    x = "Month",
+    y = "Year"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+##Absolute numers of variation in degree days
+
+```{r}
+#| label: fig-degree-day-abs-anomilies
+#| fig-scap: "Degree days"
+#| fig-cap: !expr glue("Absolute numers of deviation from mean number of degree days")
+#| message: false
+#| warning: false
+
+ggplot(data_degree_days_anomolies |> filter(year > 2007), aes(x = year, y = abs_deviation)) +
+  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
+  geom_smooth(method = "lm", )+
+  xlab("") +
+  ylab("Number of degree days variation") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_continuous(breaks=seq(min(data_degree_days$year), max(data_degree_days$year), by = 1))+
+  theme_minimal()+
+  #ylim(0,255)+
+   stat_poly_eq(
+      aes(label = paste(..p.value.label.., ..rr.label.., ..eq.label.., sep = "~~~")),
       formula = y ~ x,
       parse = TRUE
     )
