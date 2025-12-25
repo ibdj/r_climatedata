@@ -987,6 +987,16 @@ ggplot(data_degree_days_anomolies |> filter(year > 2007), aes(x = year, y = abs_
 
 Lookings to see if CHELSA data shoc the same pattern of minimal change as the local data. Using this guide to optain data: https://gitlabext.wsl.ch/karger/rchelsa
 
+```{r}
+#| label: data-global-climate-data-import
+
+# # Install 'rchelsa' in R:
+# # https://github.com/inSileco/rchelsa
+# install.packages("remotes")
+# remotes::install_github("inSileco/rchelsa")
+
+```
+
 ## DMI
 
 Looking at the historic weather data from DMI from Nuuk. I.e. not the exact location of Kangerluarsunnguaq, but Nuuk. Hoping to illustrate over all trends.
@@ -999,15 +1009,19 @@ Looking at the historic weather data from DMI from Nuuk. I.e. not the exact loca
 
 -   For temp
 
--   Only for year or monthly trends too? test
+-   Only for year or monthly trends too?
+
+-   Station Nuuk is (3)4250
 
 ```{r}
-#| label: data-global-climate-data-import
+#| label: data-import-dmi-historic data
+#| message: false
+#| warning: false
 
-# # Install 'rchelsa' in R:
-# # https://github.com/inSileco/rchelsa
-# install.packages("remotes")
-# remotes::install_github("inSileco/rchelsa")
+
+gr_monthly_all_1784_2020 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep21-04/gr_monthly_all_1784_2020.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+nuuk_data <- gr_monthly_all_1784_2020 %>% filter(stat_no = 4250)
 
 ```
 
