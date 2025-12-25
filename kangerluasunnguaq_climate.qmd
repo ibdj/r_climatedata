@@ -463,6 +463,7 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
   guides(fill = guide_legend(title = ""))
 
 ```
+
 ```{r}
 #| label: data-type-distribution
 
@@ -655,7 +656,6 @@ ggplot(par_yearly_mean2, aes(x = year, y = mean, color = month)) +
 
 ## Monthly means
 
-
 ```{r}
 #| label: data-par-mean-monthly
 par_monthly_mean <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 |> 
@@ -697,6 +697,7 @@ par_highest_mean <- par |>
   mutate(temp_rank = row_number()) |>   # Add ranks
   mutate(month_num = match(month, month.name))
 ```
+
 ```{r}
 #| label: par-highest-mean2
 
@@ -743,6 +744,7 @@ ggplot(par_highest_mean, aes(x = year, y = par_mean)) +
     )
 
 ```
+
 Data indicate that high-radiation months have gotten less radiant during the monitoring period (see @fig-par-month-highest-means).
 
 ```{r}
@@ -785,8 +787,6 @@ model_above <- lm(above_2000 ~ year, data = above_2000)
 summary(model_above)
 
 ```
-
-
 
 ## PAR anomalies
 
@@ -864,9 +864,10 @@ ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
       parse = TRUE
     )
 ```
+
 # Degree days
 
-The number of degree days (days with a mean temperature > 0°C) has not changed significantly during th emonitoring period. 
+The number of degree days (days with a mean temperature \> 0°C) has not changed significantly during th emonitoring period.
 
 ```{r}
 #| label: data-degree-days
@@ -881,7 +882,6 @@ data_degree_days_count <- data_degree_days |>
 summarise(n_days = n(), .groups = 'drop')
 
 ```
-
 
 ```{r}
 #| label: fig-degree-day
@@ -905,6 +905,7 @@ ggplot(data_degree_days_count |> filter(year > 2007), aes(x = year, y = n_days))
       parse = TRUE
     )
 ```
+
 ##Degree days anomilies (in number of days)
 
 ```{r}
@@ -982,7 +983,23 @@ ggplot(data_degree_days_anomolies |> filter(year > 2007), aes(x = year, y = abs_
 
 # Historic climate context
 
+## CHELSA
+
 Lookings to see if CHELSA data shoc the same pattern of minimal change as the local data. Using this guide to optain data: https://gitlabext.wsl.ch/karger/rchelsa
+
+## DMI
+
+Looking at the historic weather data from DMI from Nuuk. I.e. not the exact location of Kangerluarsunnguaq, but Nuuk. Hoping to illustrate over all trends.
+
+-   How does the data look, when compared during the monitoring period \> 2007 for Nuuk?
+
+-   What are the trends during the historic period?
+
+-   For rain
+
+-   For temp
+
+-   Only for year or monthly trends too?
 
 ```{r}
 #| label: data-global-climate-data-import
