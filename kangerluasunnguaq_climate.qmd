@@ -999,7 +999,7 @@ Looking at the historic weather data from DMI from Nuuk. I.e. not the exact loca
 
 -   For temp
 
--   Only for year or monthly trends too?
+-   Only for year or monthly trends too? test
 
 ```{r}
 #| label: data-global-climate-data-import
