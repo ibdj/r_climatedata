@@ -19,3 +19,4 @@ use_github()
 
 git_default_branch_rename()
 
+gitcreds::gitcreds_set()
