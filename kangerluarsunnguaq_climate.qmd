@@ -2,7 +2,7 @@
 title: "macroclimate"
 author: "ibdj"
 date: last-modified
-date-format: "YYYY-MM-DD HH:mm"
+date-format: "YYYY-MM-DD"
 format:
   pdf:
     fig-pos: "H"
@@ -29,7 +29,7 @@ Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.3
 #| label: importing-packages
 #| output: FALSE
 
-#install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
+install.packages("rmarkdown","pacman","tidyverse","yaml","xfun", dependencies = TRUE)
 library(pacman)
 pacman::p_load(ggplot2, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml)
 
