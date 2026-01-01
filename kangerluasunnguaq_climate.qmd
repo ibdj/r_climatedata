@@ -1024,7 +1024,8 @@ Looking at the historic weather data from DMI from Nuuk. I.e. not the exact loca
 
 gr_monthly_all_1784_2020 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep21-04/gr_monthly_all_1784_2020.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
 
-nuuk_dmi_temp <- gr_monthly_all_1784_2020 %>% filter(stat_no == 4250)
+nuuk_dmi_temp <- gr_monthly_all_1784_2020 |>
+  filter(stat_no == 4250, annual != "null")
 
 gr_daily_601_precip <- read_excel("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep21-04/gr_daily_601.xlsx")
 
@@ -1032,6 +1033,15 @@ dmi_precip_yearly <- gr_daily_601_preceip |>
   group_by(year) |> 
   reframe(sum = sum(elem_val))
 
+```
+
+```{r}
+{r}
+#| label: fig-annual-temp-historis
+#| fig-scap: "Annual historic temperature"
+#| fig-cap: !expr glue("Annual historic temperature in °C.")
+#| message: false
+#| warning: false
 ```
 
 # References
