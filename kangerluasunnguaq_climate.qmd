@@ -13,6 +13,7 @@ format:
     lof: true
     number-sections: true
     colorlinks: true
+    link-citations: true
 editor: visual
 execute: 
   echo: false
@@ -23,7 +24,7 @@ bibliography: references.bib
 
 # Macroclimate
 
-Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@asiaqa; @asiaq; @asiaqb].
+Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@gem2020d; @gem2020c; @gem2020b] and DMI [@cappelen2021].
 
 ```{r}
 #| label: importing-packages
@@ -31,7 +32,7 @@ Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.3
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl)
+pacman::p_load(ggplot2, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo)
 
 opts_chunk$set( size="small")
 
@@ -735,7 +736,7 @@ ggplot(par_highest_mean, aes(x = year, y = par_mean)) +
     color = "black"
   ) + 
   annotate("text", x = 2017, y = max(par_highest_mean$par_mean), 
-           label = "▲ = Mean of all three months", hjust = 0, size = 4)+
+           label = "U+25B2 = Mean of all three months", hjust = 0, size = 4)+
   scale_x_continuous(breaks=seq(min(par_highest_mean$year), max(par_highest_mean$year), by = 1))+
   stat_poly_eq(
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
@@ -956,7 +957,7 @@ ggplot(data_degree_days_anomolies, aes(x = month_string, y = factor(year), fill 
 
 ```
 
-##Absolute numers of variation in degree days
+##Absolute numbers of variation in degree days
 
 ```{r}
 #| label: fig-degree-day-abs-anomilies
@@ -1015,33 +1016,92 @@ Looking at the historic weather data from DMI from Nuuk. I.e. not the exact loca
 
 -   601 is accumulated precipitation
 
+-   for 25-08: 101 is Mean air temperature (°C; 2 meters above ground).
+
 ```{r}
-#| label: data-import-dmi-historic data
+#| label: data-import-dmi-historic-data
 #| message: false
 #| warning: false
 
 #station 4250 er Nuuk
 
-gr_monthly_all_1784_2020 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep21-04/gr_monthly_all_1784_2020.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+gr_monthly_all_1784_2020 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep21-04/gr_monthly_all_1784_2020.csv", delim = ";", escape_double = FALSE, col_types = cols(jan = col_double(), feb = col_double(), mar = col_double(), apr = col_double(), may = col_double(), jun = col_double(), jul = col_double(), aug = col_double(), sep = col_double(), oct = col_double(), nov = col_double(), dec = col_double(), annual = col_double()), locale = locale(decimal_mark = ",", grouping_mark = ""), trim_ws = TRUE)
 
-nuuk_dmi_temp <- gr_monthly_all_1784_2020 |>
-  filter(stat_no == 4250, annual != "null")
+nuuk_21_04_dmi_temp <- gr_monthly_all_1784_2020 |>
+  dplyr::filter(stat_no == 4250, annual != "null") |>
+  dplyr::mutate(
+    dplyr::across(c(jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec, annual), as.double))
 
-gr_daily_601_precip <- read_excel("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep21-04/gr_daily_601.xlsx")
 
-dmi_precip_yearly <- gr_daily_601_preceip |> 
-  group_by(year) |> 
-  reframe(sum = sum(elem_val))
+nuuk25_08 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep25-08_1953_2024_data1/425000.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE) |> 
+  select(Station:`101`) |> 
+  filter(!is.na(`101`)) |> 
+  group_by(Year) |> 
+  summarise(mean_temp = mean(`101`))
+
+nuuk21_04_dmi_temp_smoothed <- 
+  nuuk_dmi_temp |>
+  filter(annual < 10, annual > -10) |> 
+  arrange(year) |>
+  mutate(
+    annual_5yr = rollmean(annual, k = 20, fill = NA, align = "center")
+  )
+
+#gr_daily_601_precip <- read_excel("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep21-04/gr_daily_601.xlsx")
+
+#dmi_precip_yearly <- gr_daily_601_preceip |> 
+#  group_by(year) |> 
+#  reframe(sum = sum(elem_val))
 
 ```
 
 ```{r}
-{r}
-#| label: fig-annual-temp-historis
+#| label: fig-annual-temp-historic
 #| fig-scap: "Annual historic temperature"
 #| fig-cap: !expr glue("Annual historic temperature in °C.")
 #| message: false
 #| warning: false
+
+ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
+  aes(x = year, y = annual)) +
+  # raw points + linear trend (historic)
+  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
+  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+
+  # 5-year rolling mean (historic)
+  geom_line(aes(y = annual_5yr), color = "black", size = 1.1) +
+
+  # second dataset: note the data= and aes(x=Year, y=mean_temp)
+  geom_point(data = nuuk25_08,
+             aes(x = Year, y = mean_temp),
+             size = 3, alpha = 0.6, color = "red") +
+  geom_smooth(data = nuuk25_08,
+              aes(x = Year, y = mean_temp),
+              method = "lm", se = FALSE, color = "red") +
+    geom_point(data = data_temp_annual_mean,
+             aes(x = year, y = mean),
+             size = 3, alpha = 0.6, color = "blue") +
+  geom_smooth(data = data_temp_annual_mean,
+              aes(x = year, y = mean),
+              method = "lm", se = FALSE, color = "blue") +
+
+  xlab("") +
+  ylab("Annual temperature historic") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_x_continuous(
+    breaks = seq(min(nuuk_dmi_temp$year),
+                 max(nuuk_dmi_temp$year), by = 5)
+  ) +
+  stat_poly_eq(
+    aes(label = paste(..p.value.label..,
+                      ..rr.label..,
+                      ..eq.label..,
+                      sep = "~~~")),
+    formula = y ~ x,
+    parse = TRUE
+  )
+
 ```
 
 # References
