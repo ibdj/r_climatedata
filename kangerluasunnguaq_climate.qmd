@@ -24,7 +24,7 @@ bibliography: references.bib
 
 # Macroclimate
 
-Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@gem2020d; @gem2020c; @gem2020b] and DMI [@cappelen2021].
+Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@gem2020d; @gem2020c; @gem2020b] and DMI [@cappelen2021, @jensen2024].
 
 ```{r}
 #| label: importing-packages
@@ -1091,7 +1091,7 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_x_continuous(
     breaks = seq(min(nuuk_dmi_temp$year),
-                 max(nuuk_dmi_temp$year), by = 5)
+                 max(2025), by = 5)
   ) +
   stat_poly_eq(
     aes(label = paste(..p.value.label..,
