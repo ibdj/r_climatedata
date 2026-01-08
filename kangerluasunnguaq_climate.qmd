@@ -1040,7 +1040,7 @@ nuuk25_08 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappi
   summarise(mean_temp = mean(`101`))
 
 nuuk21_04_dmi_temp_smoothed <- 
-  nuuk_dmi_temp |>
+  gr_monthly_all_1784_2020 |>
   filter(annual < 10, annual > -10) |> 
   arrange(year) |>
   mutate(
@@ -1052,6 +1052,18 @@ nuuk21_04_dmi_temp_smoothed <-
 #dmi_precip_yearly <- gr_daily_601_preceip |> 
 #  group_by(year) |> 
 #  reframe(sum = sum(elem_val))
+
+```
+
+```{r}
+#| label: fig-annual-temp-historic-raw
+#| fig-scap: "Annual historic temperature raw data"
+#| fig-cap: !expr glue("Annual historic temperature in °C. All data, no filters")
+#| message: false
+#| warning: false
+
+ggplot(data = gr_monthly_all_1784_2020, aes(x = year, y = annual)) +
+  geom_point()
 
 ```
 
@@ -1090,9 +1102,10 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_x_continuous(
-    breaks = seq(min(nuuk_dmi_temp$year),
+    breaks = seq(min(gr_monthly_all_1784_2020$year),
                  max(2025), by = 5)
   ) +
+  scale_y_continuous(breaks = seq(-20,20, by = 5))+ 
   stat_poly_eq(
     aes(label = paste(..p.value.label..,
                       ..rr.label..,
