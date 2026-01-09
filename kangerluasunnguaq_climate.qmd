@@ -1058,13 +1058,17 @@ nuuk21_04_dmi_temp_smoothed <-
 ```{r}
 #| label: fig-annual-temp-historic-raw
 #| fig-scap: "Annual historic temperature raw data"
-#| fig-cap: !expr glue("Annual historic temperature in °C. All data, no filters")
+#| fig-cap: !expr glue("Mean air temperature (°C) pr year, from {min(gr_monthly_all_1784_2020$year)} to {max(gr_monthly_all_1784_2020$year)}. Yearly mean of {round(mean(gr_monthly_all_1784_2020$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {min(gr_monthly_all_1784_2020$annual, na.rm = TRUE)}°C to {max(gr_monthly_all_1784_2020$annual, na.rm = TRUE)}°C.")
+##| fig-cap: !expr glue("Historic yearly mean temperature(°C), between {min(gr_monthly_all_1784_2020$year)} to {max(gr_monthly_all_1784_2020$year)}. No filters applied and temperature ranges between {min(gr_monthly_all_1784_2020$annual)} and {max(gr_monthly_all_1784_2020$annual)}.)
 #| message: false
 #| warning: false
 
 ggplot(data = gr_monthly_all_1784_2020, aes(x = year, y = annual)) +
-  geom_point()
-
+  geom_point()+
+  scale_x_continuous(
+    breaks = seq(min(gr_monthly_all_1784_2020$year),
+                 max(2025), by = 20)
+  )
 ```
 
 ```{r}
