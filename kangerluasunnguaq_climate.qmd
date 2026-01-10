@@ -1131,26 +1131,22 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
 
 #this plot is to be made in to a plots that for all three datasets only includes the data from 2008, so see if they all show the same trend as the GEM temperature data set.
 
-ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
-  aes(x = year, y = annual)) +
+ggplot() +
   # raw points + linear trend (historic)
-  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
+  geom_point(data = nuuk21_04_dmi_temp_smoothed |> filter(year > 2007), aes(x = year, y = annual), size = 3, alpha = 0.6, color = "darkgreen") +
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
 
-  # 5-year rolling mean (historic)
-  geom_line(aes(y = annual_5yr), color = "black", size = 1.1) +
-
   # second dataset: note the data= and aes(x=Year, y=mean_temp)
-  geom_point(data = nuuk25_08,
+  geom_point(data = nuuk25_08 |> filter(year > 2007),
              aes(x = Year, y = mean_temp),
              size = 3, alpha = 0.6, color = "red") +
-  geom_smooth(data = nuuk25_08,
+  geom_smooth(data = nuuk25_08 |> filter(year > 2007),
               aes(x = Year, y = mean_temp),
               method = "lm", se = FALSE, color = "red") +
-    geom_point(data = data_temp_annual_mean,
+    geom_point(data = data_temp_annual_mean |> filter(year > 2007),
              aes(x = year, y = mean),
              size = 3, alpha = 0.6, color = "blue") +
-  geom_smooth(data = data_temp_annual_mean,
+  geom_smooth(data = data_temp_annual_mean |> filter(year > 2007),
               aes(x = year, y = mean),
               method = "lm", se = FALSE, color = "blue") +
 
