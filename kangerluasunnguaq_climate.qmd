@@ -1132,7 +1132,7 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
 #| warning: false
 
 
-# make legdend to see what datasets are there
+# TODO: make legdend to see what datasets are there
 
 nuuk25_08_after2007 <- nuuk25_08 |> filter(Year > 2007)
 data_temp_annual_mean_after2007 <- data_temp_annual_mean |> filter(year > 2007) 
