@@ -1030,7 +1030,10 @@ gr_monthly_all_1784_2020 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusun
 nuuk_21_04_dmi_temp <- gr_monthly_all_1784_2020 |>
   dplyr::filter(stat_no == 4250, annual != "null") |>
   dplyr::mutate(
-    dplyr::across(c(jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec, annual), as.double))
+    dplyr::across(c(jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec, annual), as.double)) |> 
+  filter(annual > -20, annual < 20) |> 
+  group_by(year) |> 
+  summarise(annual = mean(annual))
 
 
 nuuk25_08 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/dmi_historic/DMIRep25-08_1953_2024_data1/425000.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE) |> 
@@ -1040,7 +1043,7 @@ nuuk25_08 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappi
   summarise(mean_temp = mean(`101`))
 
 nuuk21_04_dmi_temp_smoothed <- 
-  gr_monthly_all_1784_2020 |>
+  nuuk_21_04_dmi_temp |>
   filter(annual < 10, annual > -10) |> 
   arrange(year) |>
   mutate(
@@ -1081,7 +1084,7 @@ ggplot(data = gr_monthly_all_1784_2020, aes(x = year, y = annual)) +
 ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
   aes(x = year, y = annual)) +
   # raw points + linear trend (historic)
-  geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
+  geom_point(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual), size = 3, alpha = 0.6, color = "darkgreen") +
   geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
 
   # 5-year rolling mean (historic)
@@ -1129,24 +1132,32 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
 #| warning: false
 
 
-#this plot is to be made in to a plots that for all three datasets only includes the data from 2008, so see if they all show the same trend as the GEM temperature data set.
+# make legdend to see what datasets are there
+
+nuuk25_08_after2007 <- nuuk25_08 |> filter(Year > 2007)
+data_temp_annual_mean_after2007 <- data_temp_annual_mean |> filter(year > 2007) 
+nuuk21_04_after2007 <- gr_monthly_all_1784_2020 |> filter(year > 2007, annual < 20, stat_no == 4250) |>
+  group_by(year) |> 
+  summarise(annual = mean(annual))
+str(nuuk25_08_after2007)
+str(data_temp_annual_mean_after2007)
 
 ggplot() +
   # raw points + linear trend (historic)
-  geom_point(data = nuuk21_04_dmi_temp_smoothed |> filter(year > 2007), aes(x = year, y = annual), size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+  geom_point(data = nuuk21_04_after2007, aes(x = year, y = annual), size = 3, alpha = 0.6, color = "darkgreen") +
+  geom_smooth(data = nuuk21_04_after2007, aes(x = year, y = annual), method = "lm", se = FALSE, color = "darkgreen") +
 
   # second dataset: note the data= and aes(x=Year, y=mean_temp)
-  geom_point(data = nuuk25_08 |> filter(year > 2007),
+  geom_point(data = nuuk25_08_after2007,
              aes(x = Year, y = mean_temp),
              size = 3, alpha = 0.6, color = "red") +
-  geom_smooth(data = nuuk25_08 |> filter(year > 2007),
+  geom_smooth(data = nuuk25_08_after2007,
               aes(x = Year, y = mean_temp),
               method = "lm", se = FALSE, color = "red") +
-    geom_point(data = data_temp_annual_mean |> filter(year > 2007),
+    geom_point(data = data_temp_annual_mean_after2007 |> filter(year > 2007),
              aes(x = year, y = mean),
              size = 3, alpha = 0.6, color = "blue") +
-  geom_smooth(data = data_temp_annual_mean |> filter(year > 2007),
+  geom_smooth(data = data_temp_annual_mean_after2007 |> filter(year > 2007),
               aes(x = year, y = mean),
               method = "lm", se = FALSE, color = "blue") +
 
@@ -1158,7 +1169,7 @@ ggplot() +
     breaks = seq(min(gr_monthly_all_1784_2020$year),
                  max(2025), by = 5)
   ) +
-  scale_y_continuous(breaks = seq(-20,20, by = 5))+ 
+  #scale_y_continuous(breaks = seq(-20,20, by = 5))+ 
   stat_poly_eq(
     aes(label = paste(..p.value.label..,
                       ..rr.label..,
