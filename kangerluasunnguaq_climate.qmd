@@ -1143,42 +1143,65 @@ str(nuuk25_08_after2007)
 str(data_temp_annual_mean_after2007)
 
 ggplot() +
-  # raw points + linear trend (historic)
-  geom_point(data = nuuk21_04_after2007, aes(x = year, y = annual), size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(data = nuuk21_04_after2007, aes(x = year, y = annual), method = "lm", se = FALSE, color = "darkgreen") +
+  # historic
+  geom_point(
+    data = nuuk21_04_after2007,
+    aes(x = year, y = annual, color = "DMI 21_04"),
+    size = 3, alpha = 0.6
+  ) +
+  geom_smooth(
+    data = nuuk21_04_after2007,
+    aes(x = year, y = annual, color = "DMI 21_04"),
+    method = "lm", se = FALSE
+  ) +
 
-  # second dataset: note the data= and aes(x=Year, y=mean_temp)
-  geom_point(data = nuuk25_08_after2007,
-             aes(x = Year, y = mean_temp),
-             size = 3, alpha = 0.6, color = "red") +
-  geom_smooth(data = nuuk25_08_after2007,
-              aes(x = Year, y = mean_temp),
-              method = "lm", se = FALSE, color = "red") +
-    geom_point(data = data_temp_annual_mean_after2007 |> filter(year > 2007),
-             aes(x = year, y = mean),
-             size = 3, alpha = 0.6, color = "blue") +
-  geom_smooth(data = data_temp_annual_mean_after2007 |> filter(year > 2007),
-              aes(x = year, y = mean),
-              method = "lm", se = FALSE, color = "blue") +
+  # second dataset
+  geom_point(
+    data = nuuk25_08_after2007,
+    aes(x = Year, y = mean_temp, color = "DMI 25_08"),
+    size = 3, alpha = 0.6
+  ) +
+  geom_smooth(
+    data = nuuk25_08_after2007,
+    aes(x = Year, y = mean_temp, color = "DMI 25_08"),
+    method = "lm", se = FALSE
+  ) +
 
+  # third dataset
+  geom_point(
+    data = data_temp_annual_mean_after2007,
+    aes(x = year, y = mean, color = "GEM data"),
+    size = 3, alpha = 0.6
+  ) +
+  geom_smooth(
+    data = data_temp_annual_mean_after2007,
+    aes(x = year, y = mean, color = "GEM data"),
+    method = "lm", se = FALSE
+  ) +
+
+  scale_color_manual(
+    name   = "",
+    values = c(
+      "DMI 21_04"   = "darkgreen",
+      "DMI 25_08"   = "red",
+      "GEM data" = "blue"
+    )
+  ) +
   xlab("") +
   ylab("Annual temperature historic") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_x_continuous(
-    breaks = seq(min(gr_monthly_all_1784_2020$year),
-                 max(2025), by = 5)
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "bottom"
   ) +
-  #scale_y_continuous(breaks = seq(-20,20, by = 5))+ 
+  scale_x_continuous(
+    breaks = seq(min(gr_monthly_all_1784_2020$year), 2025, by = 5)
+  ) +
   stat_poly_eq(
-    aes(label = paste(..p.value.label..,
-                      ..rr.label..,
-                      ..eq.label..,
-                      sep = "~~~")),
+    aes(label = paste(..p.value.label.., ..rr.label.., ..eq.label.., sep = "~~~")),
     formula = y ~ x,
     parse = TRUE
   )
-
 ```
 
 # References
