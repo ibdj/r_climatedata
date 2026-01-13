@@ -287,7 +287,18 @@ ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
 ```{r}
 #| label: importing-precip
 
-data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/data/View_ClimateBasis_Nuuk_Data_Precipitation_Precipitation_accumulated_mm210420242020078158.csv", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
+# data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/data/View_ClimateBasis_Nuuk_Data_Precipitation_Precipitation_accumulated_mm210420242020078158.csv", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
+#   janitor::clean_names() |> 
+#   drop_na() |>
+#   filter(pre_mm != -9999) |> 
+#    mutate(year = year(date),
+#          month = month(date),
+#          doy = yday(date),
+#          month_string = month.name[month])
+
+# ~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/Precipitation accumulated (mm)_10.17897_SXJ8-WA79/Precipitation accumulated (mm)_10.17897_SXJ8-WA79_data.txt
+
+data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/Precipitation accumulated (mm)_10.17897_SXJ8-WA79/Precipitation accumulated (mm)_10.17897_SXJ8-WA79_data.txt", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
   janitor::clean_names() |> 
   drop_na() |>
   filter(pre_mm != -9999) |> 
@@ -454,7 +465,7 @@ data_pre_tem_year <- data_pre_tem_joined_monthly |>
 ```{r}
 #| label: fig-snow-rain-year
 #| fig-scap: "Mean monthly distribution of types of precipitation (mm)"
-#| fig-cap: !expr glue("Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_precip$year)} to {max(data_precip$year)}. Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+#| fig-cap: !expr glue("Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_pre_tem_joined_monthly$year)} to {max(data_pre_tem_joined_monthly$year)}. Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 
 ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) + 
   geom_bar(stat = "identity")+
@@ -479,7 +490,7 @@ Out of `r precip_year_mean` (`r data_precip_type_dist$sum_pr_type[data_precip_ty
 ```{r}
 #| label: fig-snow-rain
 #| fig-scap: "Mean percipitation pr. month"
-#| fig-cap: !expr glue("Mean percipitation pr. month over the monitoring period ({min(data_pre_tem_year$year)} - {max(data_pre_tem_year$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+#| fig-cap: !expr glue("Mean percipitation pr. month over the monitoring period ({min(data_pre_tem_year$year)} - {max(data_pre_tem_year$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C. (Data only to {max(data_pre_tem_joined_monthly$year)} because the temperature data is only till {max(data_pre_tem_joined_monthly$year)}.)")
 
 ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) + 
   geom_bar(stat = "identity")+
