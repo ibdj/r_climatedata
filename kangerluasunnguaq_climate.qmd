@@ -22,9 +22,9 @@ execute:
 bibliography: references.bib
 ---
 
-# Macroclimate
+# Macroclimate data sources
 
-Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@gem2020d; @gem2020c; @gem2020b] and DMI [@cappelen2021, @jensen2024].
+Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.34368](https://maps.app.goo.gl/2ereBF15bAWeKRVX9)). Data produced by [Asiaq - Greenland Survey](https://www.asiaq.gl/en/) for [Greenland Ecosystem Monitoring](https://data.g-e-m.dk) [@gem2020d; @gem2020c; @gem2020b] and DMI [@cappelen2021; @jensen2024].
 
 ```{r}
 #| label: importing-packages
