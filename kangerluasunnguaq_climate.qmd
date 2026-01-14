@@ -109,11 +109,12 @@ The coldest months are `r data_temp_monthly_mean$month_string[12]` (`r data_temp
 
 ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   geom_smooth(color = "blue", se = F)+
-  geom_point()+
+  geom_point(size = 3, alpha = 0.7)+
   geom_line(size = 0.25, linetype="dotted")+
   scale_x_continuous(breaks=seq(1, 12, by = 1))+
   geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
-  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")
+  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")+
+  theme_minimal()
 ```
 
 ```{r}
@@ -1153,14 +1154,15 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
                       sep = "~~~")),
     formula = y ~ x,
     parse = TRUE
-  )
+  )+
+  theme_minimal()
 
 ```
 
 ```{r}
 #| label: fig-annual-temp-historic-from-2008
 #| fig-scap: "Annual temperature trends only since 2008"
-#| fig-cap: !expr glue("Annual historic temperature in °C.")
+#| fig-cap: !expr glue("Annual historic temperature in °C only from 2008 to current. DMI 25-08 (Nuuk) and GEM data (Kangerluarsungguaq) corresponds very well.")
 #| message: false
 #| warning: false
 
