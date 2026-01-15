@@ -120,22 +120,23 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
 ```{r}
 #| label: fig-annual-mean-temp
 #| fig-scap: "Mean air temperature pr year (°C)"
-#| fig-cap: !expr glue("Mean air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)}. Data from 2007 is excluded because data is only from October, November and December. Blue dashed line indicate over all mean of {year_mean}°C. Solid blue is trend line.")
+#| fig-cap: !expr glue("Annual mean temperature, Kangerluassunguaq. Mean air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)}. Data from 2007 is excluded because data is only from October, November and December. Blue dashed line indicate over all mean of {year_mean}°C. Solid blue is trend line.")
 #| message: false
 #| warning: false
 
 ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
-  geom_smooth(method = lm, color = "blue", se = F)+
-  geom_point(size = 2)+
-  geom_line(size = 0.25, color = "black", linetype="dotted")+
-  scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
-  geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
-  labs(x = "Year", y = "Mean temperature (°C)", title = "Annual mean temperature, Kangerluassunguaq")+
+  geom_line(size = 0.4, color = "gray", linetype="solid", alpha = 0.5)+
+  geom_smooth(method = lm, color = "#076834", se = F, linetype = "dashed")+
+  geom_point(size = 3, alpha = 0.7, color = "#076834") +
+    scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
+  geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
+  labs(x = "Year", y = "Mean temperature (°C)", title = "")+
   stat_poly_eq(
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
       formula = y ~ x,
       parse = TRUE
-    )
+    )+
+theme_minimal()
 ```
 
 {{< pagebreak >}} \## Mean temperature of warmest months
@@ -175,6 +176,7 @@ model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 #| warning: false
 
 ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(month)))+
+  theme_minimal() +
   geom_smooth(method = lm, color = "gray", se = F, size = 1, linetype = 2)+
   geom_point(size = 2)+
   scale_x_continuous(breaks=seq(min(data_temp_monthly_mean_summer$year), max(data_temp_monthly_mean_summer$year), by = 1))+
@@ -189,6 +191,8 @@ ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(
 ```
 
 ```{r}
+#| message: false
+#| warning: false
 #| label: regression-warmest-temp-months
 
 model_temp_warmest <- lm(mean ~ year, data = data_temp_monthly_mean_summer)
@@ -202,6 +206,8 @@ model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 
 ```{r}
 #| label: data-monthly-temp-anomaly
+#| message: false
+#| warning: false
 # Data prepping for temperature anomalies heat map
 
 data_temp_monthly_mean <- data_temp |> 
@@ -224,6 +230,8 @@ data_temp_anomaly <- data_temp_monthly_mean |>
 #| label: fig-monthly-temp-anomaly
 #| fig-scap: "Monthly Temperature Anomalies Heatmap"
 #| fig-cap: !expr glue("Monthly Temperature Anomalies Heatmap. The stronger the color the bigger the difference from mean temperature of the respective month across all monitored years (°C).")
+#| message: false
+#| warning: false
 
 
 ggplot(data_temp_anomaly, aes(x = factor(year), y = factor(month), fill = temperature_anomaly)) +
@@ -353,7 +361,8 @@ geom_hline(yintercept = precip_year_mean, linetype="dashed", color = "blue", lin
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
       formula = y ~ x,
       parse = TRUE
-    )
+    )+
+  theme_minimal()
 
 ```
 
@@ -389,7 +398,8 @@ ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
   geom_smooth(color = "blue", se = F)+
   geom_bar(stat = "identity", fill = "#6e6bc4", alpha = 0.95)+
   scale_x_continuous(breaks=seq(min(data_precip_month_mean$month), max(data_precip_month_mean$month), by = 1))+
-geom_hline(yintercept = precip_month_mean, linetype="dashed", color = "blue", linewidth =0.25)
+geom_hline(yintercept = precip_month_mean, linetype="dashed", color = "blue", linewidth =0.25)+
+  theme_minimal()
 ```
 
 The months with the most precipitation are `r data_precip_month_mean$month_string[1]` (`r data_precip_month_mean$pre_mm_mean[1]` mm), `r data_precip_month_mean$month_string[2]` (`r data_precip_month_mean$pre_mm_mean[2]` mm), `r data_precip_month_mean$month_string[3]` (`r data_precip_month_mean$pre_mm_mean[3]` mm), which account for `r data_precip_month_mean$pre_mm_mean[1]+data_precip_month_mean$pre_mm_mean[2]+data_precip_month_mean$pre_mm_mean[3]` mm or `r  round((data_precip_month_mean$pre_mm_mean[1]+data_precip_month_mean$pre_mm_mean[2]+data_precip_month_mean$pre_mm_mean[3])/precip_year_mean*100,2)` % of the yearly precipitation.
@@ -466,14 +476,15 @@ data_pre_tem_year <- data_pre_tem_joined_monthly |>
 ```{r}
 #| label: fig-snow-rain-year
 #| fig-scap: "Mean monthly distribution of types of precipitation (mm)"
-#| fig-cap: !expr glue("Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_pre_tem_joined_monthly$year)} to {max(data_pre_tem_joined_monthly$year)}. Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+#| fig-cap: !expr glue("Mean precipitation type pr month. Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_pre_tem_joined_monthly$year)} to {max(data_pre_tem_joined_monthly$year)}. Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 
 ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) + 
   geom_bar(stat = "identity")+
   scale_x_continuous(breaks=seq(min(data_pre_tem_monthly$month), max(data_pre_tem_monthly$month), by = 1))+
-  labs(x = "Month", y = "Mean precipitation (mm)", title = "Mean precipitation type pr month")+
+  labs(x = "Month", y = "Mean precipitation (mm)", title = "")+
   scale_fill_manual(values = c(rain,sleet,"#b3b3b3"))+
-  guides(fill = guide_legend(title = ""))
+  guides(fill = guide_legend(title = ""))+
+  theme_minimal()
 
 ```
 
@@ -498,14 +509,15 @@ ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) +
   scale_x_continuous(breaks=seq(min(data_pre_tem_year$year), max(data_pre_tem_year$year), by = 1))+
   labs(x = "Year", y = "Mean precipitation (mm)", title = "Mean precipitation type pr year")+
   scale_fill_manual(values = c(rain,sleet ,"#b3b3b3"))+
-  geom_smooth(aes(color = precip_type), method = "lm", se = FALSE, show.legend = FALSE, size = 0.5) + 
+  geom_smooth(aes(color = precip_type), method = "lm", se = FALSE, show.legend = FALSE, size = 0.5, linetype = "dashed") + 
   scale_color_manual(values = c(rain, sleet, "#b3b3b3")) +
   guides(fill = guide_legend(title = ""))+
   stat_poly_eq(
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
       formula = y ~ x,
       parse = TRUE
-    )
+    )+
+  theme_minimal()
 
 ```
 
@@ -580,7 +592,7 @@ data_prep_anomaly_abs <- monthly_prep_anomalies|>
 
 ggplot(data_prep_anomaly_abs, aes(x = year, y = abs_anomo)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm")+
+  geom_smooth(method = "lm", linetype = "dashed")+
   xlab("") +
   ylab("Absolute anomolies, prep") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
@@ -597,6 +609,9 @@ ggplot(data_prep_anomaly_abs, aes(x = year, y = abs_anomo)) +
 
 ```{r}
 #| label: data-par-importing
+#| message: false
+#| warning: false
+
 
 
 par <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_200_cm_5min_average_æmol_m2_sec210420241337080578 <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/ration_par/View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_@_200_cm__5min_average_æmol_m2_sec210420241337080578.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE) |> 
@@ -627,8 +642,8 @@ par_yearly_mean2 <- par |>
 # Plot
 ggplot(par_yearly_mean, aes(x = year, y = mean)) +
   #geom_point(data = par_yearly_mean2, aes(x = year, y = mean, color = month))+
-  geom_smooth(method = "lm")+
-  geom_point(size = 3)+
+  geom_smooth(method = "lm", linetype = "dashed")+
+  geom_point(size = 3, alpha = 0.7, color = "#076834") +
   xlab("Month") +
   ylab("PAR (mmol/sec/m2)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
@@ -637,7 +652,8 @@ ggplot(par_yearly_mean, aes(x = year, y = mean)) +
       formula = y ~ x,
       parse = TRUE
     )+
-  scale_x_continuous(breaks=seq(min(par_yearly_mean$year), max(par_yearly_mean$year), by = 1))
+  scale_x_continuous(breaks=seq(min(par_yearly_mean$year), max(par_yearly_mean$year), by = 1))+
+  theme_minimal()
 ```
 
 ```{r}
@@ -689,10 +705,12 @@ par_monthly_mean <- View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_r
 
 # Plot
 ggplot(par, aes(x = month, y = par_mmol_sec_m2)) +
+  #geom_jitter(size = 1, alpha = 0.1, color = "#076834")+
   geom_boxplot() +
-  xlab("Month") +
+    xlab("Month") +
   ylab("PAR (mmol/sec/m2)") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  theme_minimal()
 ```
 
 ## Highest monthly means
@@ -788,10 +806,12 @@ above_2000 <- par |>
 
 # Step 4: Plot
 ggplot(above_2000, aes(x = year, y = above_2000)) +
-  geom_point(color = "darkgreen", alpha = 0.8)+
+  geom_point(size = 3, alpha = 0.7, color = "#076834") +
+  scale_x_continuous(breaks=seq(min(above_2000$year), max(above_2000$year), by = 1))+
   geom_smooth(method = "lm", linetype = "dashed")+
   xlab("Year") +
-  ylab("Number of measurements above 2000")
+  ylab("Number of measurements above 2000")+
+  theme_minimal()
 
 # Fit the model
 model_above <- lm(above_2000 ~ year, data = above_2000)
@@ -865,7 +885,7 @@ par_anomalities_abs <- par_monthly_anomalies |>
 
 ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm")+
+  geom_smooth(method = "lm", linetype = "dashed")+
   xlab("") +
   ylab("Absolute anomolies, PAR (mmol/sec/m2)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
@@ -880,7 +900,7 @@ ggplot(par_anomalities_abs, aes(x = year, y = abs_anomo)) +
 
 # Degree days
 
-The number of degree days (days with a mean temperature \> 0°C) has not changed significantly during th emonitoring period.
+The number of degree days (days with a mean temperature \> 0°C) has not changed significantly during the monitoring period.
 
 ```{r}
 #| label: data-degree-days
@@ -905,7 +925,7 @@ summarise(n_days = n(), .groups = 'drop')
 
 ggplot(data_degree_days_count |> filter(year > 2007), aes(x = year, y = n_days)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm", )+
+  geom_smooth(method = "lm", linetype = "dashed")+
   xlab("Year") +
   ylab("Number of degree days") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
@@ -924,7 +944,7 @@ ggplot(data_degree_days_count |> filter(year > 2007), aes(x = year, y = n_days))
 ```{r}
 #| label: fig-degree-day-anomolies
 #| fig-scap: "Degree days"
-#| fig-cap: !expr glue("Degree days, days with mean temperature above 0°C")
+#| fig-cap: !expr glue("Degree Day Anomalies by Month-Year. Degree days, days with mean temperature above 0°C")
 #| message: false
 #| warning: false
 
@@ -960,7 +980,7 @@ ggplot(data_degree_days_anomolies, aes(x = month_string, y = factor(year), fill 
     name = "Deviation\nfrom mean"
   ) +
   labs(
-    title = "Degree Day Anomalies by Month-Year",
+    title = "",
     x = "Month",
     y = "Year"
   ) +
@@ -980,7 +1000,7 @@ ggplot(data_degree_days_anomolies, aes(x = month_string, y = factor(year), fill 
 
 ggplot(data_degree_days_anomolies |> filter(year > 2007), aes(x = year, y = abs_deviation)) +
   geom_point(size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm", )+
+  geom_smooth(method = "lm", linetype = "dashed")+
   xlab("") +
   ylab("Number of degree days variation") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
@@ -1083,12 +1103,12 @@ nuuk21_04_dmi_temp_smoothed <-
 #| warning: false
 
 ggplot(data = gr_monthly_all_1784_2020, aes(x = year, y = annual)) +
-  geom_point()+
+  geom_point(size = 1, alpha = 0.3, color = "#076834") +
   #geom_smooth(method = "lm")+
   scale_x_continuous(
     breaks = seq(min(gr_monthly_all_1784_2020$year),
-                 max(2025), by = 20)
-  )
+                 max(2025), by = 20))+
+  theme_minimal()
 ```
 
 ```{r}
@@ -1100,12 +1120,16 @@ ggplot(data = gr_monthly_all_1784_2020, aes(x = year, y = annual)) +
 #| warning: false
 
 ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
-  geom_point()+
+  geom_point(size = 3, alpha = 0.7, color = "#076834") +
   geom_smooth(method = "lm")+
   scale_x_continuous(
     breaks = seq(min(gr_monthly_all_1784_2020$year),
-                 max(2025), by = 20)
-  )
+                 max(2025), by = 20))+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 ```
 
 ```{r}
@@ -1155,7 +1179,10 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
     formula = y ~ x,
     parse = TRUE
   )+
-  theme_minimal()
+  theme_minimal()+ 
+  scale_x_continuous(
+    breaks = seq(min(nuuk21_04_dmi_temp_smoothed$year),
+                 max(2025), by = 20))
 
 ```
 
@@ -1239,8 +1266,8 @@ ggplot() +
   )
 ```
 # TO DOS
-[ ] make all plots similar. Ref. mnds plots from NERO analysi.
-[ ] download new PAR dataset
+[ ] make all plots similar. Ref. mnds plots from NERO analysis.\par
+[ ] download new PAR dataset.
 
 
 # References
