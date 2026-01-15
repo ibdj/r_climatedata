@@ -103,7 +103,7 @@ The coldest months are `r data_temp_monthly_mean$month_string[12]` (`r data_temp
 ```{r}
 #| label: fig-month-mean-temp
 #| fig-scap: "Mean air temperature (°C) pr month"
-#| fig-cap: !expr glue("Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(year_mean,3)}°C.")
+#| fig-cap: !expr glue("Mean temperature pr month. Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(year_mean,3)}°C.")
 #| message: false
 #| warning: false
 
@@ -112,15 +112,15 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   geom_smooth(color = "gray", se = F,  alpha = 0.1)+
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(1, 12, by = 1))+
-  geom_hline(yintercept=year_mean, linetype="dotted", color = "blue", size=0.5)+
-  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr month")+
+  geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", size=0.5)+
+  labs(x = "Month", y = "Mean temperature (°C)", title = "")+
   theme_minimal()
 ```
 
 ```{r}
 #| label: fig-annual-mean-temp
 #| fig-scap: "Mean air temperature pr year (°C)"
-#| fig-cap: !expr glue("Annual mean temperature, Kangerluassunguaq. Mean air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)}. Data from 2007 is excluded because data is only from October, November and December. Blue dashed line indicate over all mean of {year_mean}°C. Solid blue is trend line.")
+#| fig-cap: !expr glue("Annual mean temperature, Kangerluassunguaq. Mean air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)}. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {year_mean}°C. Dashed line is trend line.")
 #| message: false
 #| warning: false
 
@@ -139,7 +139,8 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
 theme_minimal()
 ```
 
-{{< pagebreak >}} \## Mean temperature of warmest months
+
+## Mean temperature of warmest months
 
 ```{r}
 #| label: mean-temp-warmest-months
@@ -171,18 +172,18 @@ model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 ```{r}
 #| label: fig-month-summer-mean-temp
 #| fig-scap: "Mean air temperature pr year (°C) for warmest months"
-#| fig-cap: !expr glue("Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}. P-value for the regression i {round(model_temp_warmest_p_value,3)}. The mean of the warmests months across all years are {round(data_temp_mean_warmest,3)}°C.")
+#| fig-cap: !expr glue("Mean temperature pr summer month. Mean air temperature (°C) pr for {data_temp_monthly_mean$month_string[1]}, {data_temp_monthly_mean$month_string[2]}, and {data_temp_monthly_mean$month_string[3]} based on data from {min(data_temp$year)} to {max(data_temp$year)}. P-value for the regression i {round(model_temp_warmest_p_value,3)}. The mean of the warmests months across all years are {round(data_temp_mean_warmest,3)}°C.")
 #| message: false
 #| warning: false
 
 ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(month)))+
   theme_minimal() +
   geom_smooth(method = lm, color = "gray", se = F, size = 1, linetype = 2)+
-  geom_point(size = 2)+
+  geom_point(size = 3)+
   scale_x_continuous(breaks=seq(min(data_temp_monthly_mean_summer$year), max(data_temp_monthly_mean_summer$year), by = 1))+
   #geom_hline(yintercept=year_mean, linetype="dashed", color = "blue", size=0.5)+
-  labs(x = "Month", y = "Mean temperature (°C)", title = "Mean temperature pr summer month")+
-  labs(color = "Months")+
+  labs(x = "Year", y = "Mean temperature (°C)", title = "")+
+  labs(shape = "Months")+
   stat_poly_eq(
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
       formula = y ~ x,
@@ -191,9 +192,9 @@ ggplot(data_temp_monthly_mean_summer, aes(x = year, y = mean, color = as.factor(
 ```
 
 ```{r}
+#| label: regression-warmest-temp-months
 #| message: false
 #| warning: false
-#| label: regression-warmest-temp-months
 
 model_temp_warmest <- lm(mean ~ year, data = data_temp_monthly_mean_summer)
 
@@ -208,6 +209,7 @@ model_temp_warmest_p_value <- glance(model_temp_warmest)$p.value
 #| label: data-monthly-temp-anomaly
 #| message: false
 #| warning: false
+
 # Data prepping for temperature anomalies heat map
 
 data_temp_monthly_mean <- data_temp |> 
@@ -291,10 +293,13 @@ ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
     )
 ```
 
+
 # Precipitation data
 
 ```{r}
 #| label: importing-precip
+#| message: false
+#| warning: false
 
 # data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/data/View_ClimateBasis_Nuuk_Data_Precipitation_Precipitation_accumulated_mm210420242020078158.csv", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
 #   janitor::clean_names() |> 
@@ -321,6 +326,8 @@ data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Map
 
 ```{r}
 #| label: precip-mean-annual
+#| message: false
+#| warning: false
 
 data_precip_sum <- data_precip |> 
   group_by(year) |> 
@@ -330,7 +337,8 @@ data_precip_sum <- data_precip |>
 
 ```{r}
 #| label: precip-year-mean
-#| echo: false
+#| message: false
+#| warning: false
 
 data_precip_mean <- data_precip_sum |> 
   summarize(mean = mean(pre_mm_sum))
@@ -350,6 +358,8 @@ The mean annual precipitation is `r precip_year_mean` mm. `r data_precip_mean_ye
 #| label: fig-precipitation-annual
 #| fig-scap: "Mean yearly precipitation (mm)"
 #| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm.")
+#| message: false
+#| warning: false
 
 ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
   geom_bar(stat = "identity", fill = "#6e6bc4")+
@@ -370,6 +380,7 @@ geom_hline(yintercept = precip_year_mean, linetype="dashed", color = "blue", lin
 
 ```{r}
 #| label: precip-mean-monthly
+#| message: false
 #| warning: false
 
 data_precip_month_sum <- data_precip |> 
@@ -392,6 +403,7 @@ precip_month_mean <- round(mean(data_precip_month_mean$pre_mm_mean),2)
 #| label: fig-precipitation-month
 #| fig-scap: "Mean monthly precipitation (mm)"
 #| fig-cap: !expr glue("Mean monthly precipitation (mm) including data from {min(data_precip$year)} to {max(data_precip$year)}. Blue dashed line represent monthly mean of {precip_month_mean} mm. ADD SF BARS!")
+#| message: false
 #| warning: false
 
 ggplot(data_precip_month_mean, aes(y = pre_mm_mean, x = month))+
@@ -719,7 +731,9 @@ The months with the highest mean levels of PAR (when the sun is up, solar elevat
 
 ```{r}
 #| label: par-highest-mean
-
+#| message: false
+#| warning: false
+#| 
 par_highest_mean <- par |> 
   group_by(year, month) |>  # Group by month name (e.g., "Jan")
   filter(month %in% c("May","June","July")) |> 
@@ -731,6 +745,9 @@ par_highest_mean <- par |>
 
 ```{r}
 #| label: par-highest-mean2
+#| message: false
+#| warning: false
+
 
 par_highest_mean2 <- par |> 
   group_by(year) |>  # Group by month name (e.g., "Jan")
@@ -744,8 +761,8 @@ par_highest_mean2 <- par |>
 #| label: fig-par-month-highest-means
 #| fig-scap: "Mean of months with highest PAR"
 #| fig-cap: !expr glue("Mean of months with highest PAR. ")
-# Plot
-
+#| message: false
+#| warning: false
 
 ggplot(par_highest_mean, aes(x = year, y = par_mean)) +
   geom_point(aes(color = factor(month_num)), size = 3) +
@@ -780,6 +797,9 @@ Data indicate that high-radiation months have gotten less radiant during the mon
 
 ```{r}
 #| label: regression-par-month
+#| message: false
+#| warning: false
+
 # Convert month to numeric if necessary
 
 # Fit the model
@@ -797,6 +817,9 @@ summary(model)
 #| label: fig-par-high-values
 #| fig-scap: "Number of measurements of PAR above 2000"
 #| fig-cap: !expr glue("Number of measurements of PAR above 2000.")
+#| message: false
+#| warning: false
+
 # measurements above mean
 # Step 1: Calculate the monthly mean and add it to the dataframe
 above_2000 <- par |> 
@@ -826,7 +849,7 @@ summary(model_above)
 ```{r}
 #| label: fig-par-anomolies-heatmap
 #| fig-scap: "Monthly PAR anomaly"
-#| fig-cap: !expr glue("Anomolies (difference from mean) of respective month. Stronger color indication bigger difference from monthly mean across entire period.")
+#| fig-cap: !expr glue("Anomolies (difference from mean) of respective month. Stronger color indication bigger difference from monthly mean across entire period. Strongest color corresponding to anomaly of {round(min(par_monthly_anomalies$anomaly),1)} (darkest blue) - {round(max(par_monthly_anomalies$anomaly),1)} (darkest red).")
 #| message: false
 #| warning: false
 
@@ -939,7 +962,7 @@ ggplot(data_degree_days_count |> filter(year > 2007), aes(x = year, y = n_days))
     )
 ```
 
-##Degree days anomilies (in number of days)
+## Degree days anomilies (in number of days)
 
 ```{r}
 #| label: fig-degree-day-anomolies
@@ -989,7 +1012,7 @@ ggplot(data_degree_days_anomolies, aes(x = month_string, y = factor(year), fill 
 
 ```
 
-##Absolute numbers of variation in degree days
+## Absolute numbers of variation in degree days
 
 ```{r}
 #| label: fig-degree-day-abs-anomilies
@@ -1032,11 +1055,8 @@ Lookings to see if CHELSA data shoc the same pattern of minimal change as the lo
 
 ## DMI
 
-Looking at the historic weather data from DMI from Nuuk. I.e. not the exact location of Kangerluarsunnguaq, but Nuuk. Hoping to illustrate over all trends.
+Looking at the historic weather data from DMI from Nuuk. I.e. not the exact location of Kangerluarsunnguaq, but Nuuk. Comparing overall trends with data from [@cappelen2021; @jensen2024].
 
--   How does the data look, when compared during the monitoring period \> 2007 for Nuuk?
-
--   What are the trends during the historic period?
 
 -   For rain
 
