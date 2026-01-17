@@ -1287,7 +1287,8 @@ ggplot() +
 ```
 # TO DOS
 [ ] make all plots similar. Ref. mnds plots from NERO analysis.\par
-[ ] download new PAR dataset.
+[ ] download new PAR dataset.\par
+[ ] are there other types than rolling mean? E.g. a 'squared' 15 year average?\par
 
 
 # References
