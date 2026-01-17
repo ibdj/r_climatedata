@@ -1144,7 +1144,7 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
   geom_smooth(method = "lm")+
   scale_x_continuous(
     breaks = seq(min(gr_monthly_all_1784_2020$year),
-                 max(2025), by = 20))+
+                 max(2025), by = 15))+
   stat_poly_eq(
       aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
       formula = y ~ x,
@@ -1202,7 +1202,7 @@ ggplot(nuuk21_04_dmi_temp_smoothed |> filter(annual < 10, annual > -10),
   theme_minimal()+ 
   scale_x_continuous(
     breaks = seq(min(nuuk21_04_dmi_temp_smoothed$year),
-                 max(2025), by = 20))
+                 max(2025), by = 15))
 
 ```
 
