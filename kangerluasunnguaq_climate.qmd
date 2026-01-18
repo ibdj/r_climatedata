@@ -1170,42 +1170,50 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
 ```{r}
 #| label: fig-annual-temp-historic
 #| fig-scap: "Annual historic temperature"
-#| fig-cap: !expr glue("Annual historic temperature in °C.")
+#| fig-cap: !expr glue("Annual historic temperature in °C comparing data from DMI 21-04, DMI 25-08 and GEM. Black line represent 15 year interval means for DMI 21-04.")
 #| message: false
 #| warning: false
 
-ggplot(nuuk21_04_dmi_temp_smoothed_15yr |> filter(annual < 10, annual > -10),
-  aes(x = year, y = annual)) +
-  # raw points + linear trend (historic)
-  geom_point(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual, color = "DMI 21_04"), size = 3, alpha = 0.6, color = "darkgreen") +
-  geom_smooth(method = "lm", se = FALSE, color = "darkgreen") +
+ggplot(nuuk21_04_dmi_temp_smoothed_15yr |> 
+         filter(annual < 10, annual > -10),
+       aes(x = year, y = annual)) +
+  # DMI 21_04: raw points + linear trend
+  geom_point(data = nuuk_21_04_dmi_temp,
+             aes(x = year, y = annual, colour = "DMI 21_04"),
+             size = 3, alpha = 0.6) +
+  geom_smooth(data = nuuk_21_04_dmi_temp,
+              aes(x = year, y = annual, colour = "DMI 21_04"),
+              method = "lm", se = FALSE) +
 
-  # 5-year rolling mean (historic)
-  geom_line(aes(y = seg_mean_temp), color = "black", size = 1.1) +
+  # 15-year mean line (if you want it in legend, also map colour)
+  geom_line(aes(y = seg_mean_temp, colour = "black"), linetype = "solid",
+            size = 1.1, ) +
 
-  # second dataset: note the data= and aes(x=Year, y=mean_temp)
+  # DMI 25_08
   geom_point(data = nuuk25_08,
-             aes(x = Year, y = mean_temp),
-             size = 3, alpha = 0.6, color = "red", color = "DMI 25_08") +
+             aes(x = Year, y = mean_temp, colour = "DMI 25_08"),
+             size = 3, alpha = 0.6) +
   geom_smooth(data = nuuk25_08,
-              aes(x = Year, y = mean_temp),
-              method = "lm", se = FALSE, color = "red") +
-    geom_point(data = data_temp_annual_mean,
-             aes(x = year, y = mean),
-             size = 3, alpha = 0.6, color = "blue", color = "GEM data") +
+              aes(x = Year, y = mean_temp, colour = "DMI 25_08"),
+              method = "lm", se = FALSE) +
+
+  # GEM data
+  geom_point(data = data_temp_annual_mean,
+             aes(x = year, y = mean, colour = "GEM data"),
+             size = 3, alpha = 0.6) +
   geom_smooth(data = data_temp_annual_mean,
-              aes(x = year, y = mean),
-              method = "lm", se = FALSE, color = "blue") +
+              aes(x = year, y = mean, colour = "GEM data"),
+              method = "lm", se = FALSE) +
 
   xlab("") +
   ylab("Annual temperature historic") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_x_continuous(
-    breaks = seq(min(gr_monthly_all_1784_2020$year),
-                 max(2025), by = 5)
+    breaks = seq(min(nuuk21_04_dmi_temp_smoothed$year),
+                 2025, by = 15)
   ) +
-  scale_y_continuous(breaks = seq(-20,20, by = 5))+ 
+  scale_y_continuous(breaks = seq(-20, 20, by = 5)) +
   stat_poly_eq(
     aes(label = paste(..p.value.label..,
                       ..rr.label..,
@@ -1213,19 +1221,22 @@ ggplot(nuuk21_04_dmi_temp_smoothed_15yr |> filter(annual < 10, annual > -10),
                       sep = "~~~")),
     formula = y ~ x,
     parse = TRUE
-  )+
-  theme_minimal()+ 
-  scale_x_continuous(
-    breaks = seq(min(nuuk21_04_dmi_temp_smoothed$year),
-                 max(2025), by = 15))+
+  ) +
   scale_color_manual(
     name   = "",
     values = c(
-      "DMI 21_04"   = "darkgreen",
-      "DMI 25_08"   = "red",
-      "GEM data" = "blue"
-    ))
-
+      "DMI 21_04" = "darkgreen",
+      "DMI 25_08" = "red",
+      "GEM data"  = "blue"
+    )
+  )+
+theme(
+  axis.text.x = element_text(angle = 90, hjust = 1),
+  legend.position = "bottom",
+  legend.direction = "horizontal",  # ensures horizontal layout
+  legend.box = "horizontal"         # packs multiple legends horizontally
+) +
+guides(colour = guide_legend(nrow = 1))  # single row if needed
 ```
 
 ```{r}
