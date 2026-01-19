@@ -1243,12 +1243,9 @@ guides(colour = guide_legend(nrow = 1))  # single row if needed
 ```{r}
 #| label: fig-annual-temp-historic-from-2008
 #| fig-scap: "Annual temperature trends only since 2008"
-#| fig-cap: !expr glue("Annual historic temperature in °C only from 2008 to current. DMI 25-08 (Nuuk) and GEM data (Kangerluarsungguaq) corresponds very well.")
+#| fig-cap: !expr glue("Annual historic temperature in °C only from 2008 to current. DMI 25-08 (Nuuk) and GEM data (Kangerluarsunguaq) corresponds very well with only a slight off set. ")
 #| message: false
 #| warning: false
-
-
-# TODO: make legdend to see what datasets are there
 
 nuuk25_08_after2007 <- nuuk25_08 |> filter(Year > 2007)
 data_temp_annual_mean_after2007 <- data_temp_annual_mean |> filter(year > 2007) 
@@ -1318,9 +1315,8 @@ ggplot() +
   )
 ```
 # TO DOS
-[ ] make all plots similar. Ref. mnds plots from NERO analysis.\par
-[ ] download new PAR dataset.\par
-[ ] are there other types than rolling mean? E.g. a 'squared' 15 year average?\par
+[ ]make all plots similar. Ref. mnds plots from NERO analysis.\par
+[ ]download new PAR dataset.\par
 
 
 # References
