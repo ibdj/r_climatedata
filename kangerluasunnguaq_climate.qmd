@@ -1186,7 +1186,7 @@ ggplot(nuuk21_04_dmi_temp_smoothed_15yr |>
               method = "lm", se = FALSE) +
 
   # 15-year mean line (if you want it in legend, also map colour)
-  geom_line(aes(y = seg_mean_temp, colour = "black"), linetype = "solid",
+  geom_line(aes(y = seg_mean_temp, colour = "DMI 21-04 15y mean"), linetype = "solid",
             size = 1.1, ) +
 
   # DMI 25_08
@@ -1227,7 +1227,8 @@ ggplot(nuuk21_04_dmi_temp_smoothed_15yr |>
     values = c(
       "DMI 21_04" = "darkgreen",
       "DMI 25_08" = "red",
-      "GEM data"  = "blue"
+      "GEM data"  = "blue", 
+      "DMI 21-04 15y mean" = "black"
     )
   )+
 theme(
