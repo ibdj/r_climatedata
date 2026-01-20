@@ -533,7 +533,7 @@ ggplot(data_pre_tem_year, aes(x = year, y = mean, fill = precip_type)) +
 
 ```
 
-## Precipitation anomalies
+## Anomalies
 
 ```{r}
 #| label: data-precip-anomalies
@@ -559,7 +559,7 @@ monthly_prep_anomalies <- data_precip_monthly_mean_sum |>
 ```{r}
 #| label: fig-monthly-prep-anomaly
 #| fig-scap: "Monthly precipitation anomaly (°C)"
-#| fig-cap: !expr glue("Monthly precipitation anomaly (°C). Stronger colors indicate large derivation from the month mean.")
+#| fig-cap: !expr glue("Monthly precipitation anomaly (mm). Stronger colors indicate large derivation from the month mean. Anomalies vary from {round(min(monthly_prep_anomalies$prep_anomaly),2)} to {round(max(monthly_prep_anomalies$prep_anomaly),2)}.")
 
 ggplot(monthly_prep_anomalies, aes(x = factor(year), y = factor(month), fill = prep_anomaly)) +
   geom_tile(color = "white") +
@@ -844,7 +844,7 @@ summary(model_above)
 
 ```
 
-## PAR anomalies
+## Anomalies
 
 ```{r}
 #| label: fig-par-anomolies-heatmap
