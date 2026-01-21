@@ -843,7 +843,7 @@ model_above <- lm(above_2000 ~ year, data = above_2000)
 summary(model_above)
 
 ```
-## Observations below
+## Observations below 200
 
 ```{r}
 #| label: fig-par-low-values
@@ -856,7 +856,7 @@ summary(model_above)
 # Step 1: Calculate the monthly mean and add it to the dataframe
 below_200 <- par |> 
   group_by(date,month,year) |> 
-  summarise(par_mmol_sec_m2 = mean(par_mmol_sec_m2))
+  summarise(par_mmol_sec_m2 = max(par_mmol_sec_m2))
 
 data_par_below_200 <- below_200 |> 
   group_by(year) |> 
@@ -870,7 +870,12 @@ ggplot(data_par_below_200, aes(x = year, y = below_200)) +
   geom_smooth(method = "lm", linetype = "dashed")+
   xlab("Year") +
   ylab("Number of measurements below 200")+
-  theme_minimal()
+  theme_minimal()+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )
 
 # Fit the model
 model_above <- lm(below_200 ~ year, data = below_200)
@@ -1353,6 +1358,7 @@ ggplot() +
 # TO DOS
 [ ]make all plots similar. Ref. mnds plots from NERO analysis.\par
 [ ]download new PAR dataset.\par
+[ ]make all the heat map the same axis.\par
 
 
 # References
