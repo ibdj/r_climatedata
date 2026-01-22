@@ -1125,11 +1125,9 @@ nuuk_21_04_dmi_temp <- gr_monthly_all_1784_2020 |>
   dplyr::mutate(
     dplyr::across(c(jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec, annual), as.double)) |> 
   drop_na() |> 
+  group_by(year) |> 
    mutate(mean_month = mean(c_across(jan:dec)),
           diff = annual - mean_month)
-
-  group_by(year) |> 
-  summarise(annual = mean(annual))
 
 annual1784 <- -30.1 + 0.0155 * 1784
 
@@ -1173,14 +1171,15 @@ nuuk21_04_dmi_temp_smoothed_15yr <- nuuk_21_04_dmi_temp |>
 #| warning: false
 
 nuuk_21_04_dmi_temp_long <- nuuk_21_04_dmi_temp |> 
-  pivot_longer(cols = c(jan:dec, mean_month), names_to = "type", values_to = "temp")
+  pivot_longer(cols = c(jan:dec, mean_month, annual), names_to = "type", values_to = "temp")
 
-ggplot(data = nuuk_21_04_dmi_temp_long |> filter(type == "mean_month"), aes(x = year, y = temp)) +
-  geom_point(size = 1, alpha = 0.3, color = "#076834") +
-  geom_smooth(method = "lm")+
-  scale_x_continuous(
-    breaks = seq(min(nuuk_21_04_dmi_temp_long$year),
-                 max(2025), by = 20))+
+filtered_data <- nuuk_21_04_dmi_temp_long |> filter(type != "annual", type != "mean_month")
+
+ggplot(data = filtered_data, aes(x = year, y = temp)) +
+  geom_point(size = 3, alpha = 0.3, color = "#076834") +
+  geom_smooth(method = "lm", se = TRUE) +
+  scale_x_continuous(breaks = seq(min(filtered_data$year), 2025, by = 20)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   theme_minimal()
 ```
 
