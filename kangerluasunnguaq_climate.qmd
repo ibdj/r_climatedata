@@ -295,6 +295,34 @@ ggplot(data_temp_anomaly_abs, aes(x = year, y = abs_anomo)) +
 
 ## 5 year intervals temperature
 
+```{r}
+#| label: data-fiveyear_intervals
+#| message: false
+#| warning: false
+
+data_temp_fiveyear <- data_temp |> 
+  mutate(
+    # choose the anchor year so that 2007–2022 is a bin
+    anchor    = 2007,
+    seg_start = anchor + floor((year - anchor) / 5) * 5,
+    seg_end   = seg_start + 4,
+    segment   = paste0(seg_start, "-", seg_end)
+  ) |>
+  group_by(segment, seg_start, seg_end) |>
+  mutate(seg_mean_temp = mean(at_c, na.rm = TRUE))
+
+```
+
+mutate(
+    # choose the anchor year so that 2007–2022 is a bin
+    anchor    = 2007,
+    seg_start = anchor + floor((year - anchor) / 15) * 15,
+    seg_end   = seg_start + 14,
+    segment   = paste0(seg_start, "-", seg_end)
+  ) |>
+  group_by(segment, seg_start, seg_end) |>
+  mutate(seg_mean_temp = mean(annual, na.rm = TRUE))
+
 # Precipitation data
 
 ```{r}
