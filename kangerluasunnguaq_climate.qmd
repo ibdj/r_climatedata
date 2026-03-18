@@ -32,7 +32,7 @@ Background macroclimate of Kangerluarsunnguaq ([Kobbefjord, Nuuk 64.13334, -51.3
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo)
+pacman::p_load(ggplot2, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp,Hmisc)
 
 opts_chunk$set( size="small")
 
@@ -312,17 +312,81 @@ data_temp_fiveyear <- data_temp |>
   mutate(seg_mean_temp = mean(at_c, na.rm = TRUE))
 
 ```
+```{r}
+#| label: data-fiveyear_intervals_test
+#| message: false
+#| warning: false
 
-mutate(
-    # choose the anchor year so that 2007–2022 is a bin
-    anchor    = 2007,
-    seg_start = anchor + floor((year - anchor) / 15) * 15,
-    seg_end   = seg_start + 14,
-    segment   = paste0(seg_start, "-", seg_end)
-  ) |>
-  group_by(segment, seg_start, seg_end) |>
-  mutate(seg_mean_temp = mean(annual, na.rm = TRUE))
+# Fit the linear mixed model
+temp_data <- data_temp_fiveyear |> filter(year > 2007)
 
+# Fit the model explicitly
+model_temp_fiveyear <- lmer(
+  at_c ~ segment + (1 | year), 
+  data = temp_data
+)
+
+# Get estimated marginal means with cld
+emm_temp_fiveyear <- model_temp_fiveyear |>
+  emmeans(~ segment) |>
+  cld(alpha = 0.05)
+
+# View the results
+print(emm_temp_fiveyear)
+
+```
+
+```{r}
+#| label: fig-temp-fiveyear
+#| fig-scap: "5 year intervals in temperature means"
+#| fig-cap: !expr glue("5 year intervals in temperature means.")
+#| message: false
+#| warning: false
+
+yearly_means <- data_temp_fiveyear |>
+  group_by(year) |>
+  filter(year > 2007) |> 
+  summarise(
+    mean_temp = mean(at_c, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+interval_lines <- data_temp_fiveyear |>
+  filter(year > 2007) |> 
+  distinct(segment, seg_start, seg_end, seg_mean_temp)
+
+
+# 3. Plot
+ggplot() +
+  # Base: Yearly means (points)
+  geom_point(
+    data = yearly_means,
+    aes(x = year, y = mean_temp),
+    size = 3,
+    color = "#2E86AB"
+  ) +
+  
+  # Layer: Interval lines (horizontal spans)
+  geom_segment(
+    data = interval_lines,
+    aes(
+      x = seg_start,
+      xend = seg_end,
+      y = seg_mean_temp,
+      yend = seg_mean_temp
+    ),
+    linewidth = 1.2
+  ) +
+  
+  # Labels and Theme
+  labs(
+    x = "",
+    y = "Mean Annual Temperature (°C)",
+    title = "Annual Mean Temperature with Interval Estimates"
+  ) +
+  theme_minimal()+
+  scale_x_continuous(breaks=seq(min(yearly_means$year), max(yearly_means$year), by = 1))
+```
 # Precipitation data
 
 ```{r}
