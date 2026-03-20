@@ -363,7 +363,7 @@ ggplot() +
     data = yearly_means,
     aes(x = year, y = mean_temp),
     size = 3,
-    color = "#2E86AB"
+    color = "darkgreen"
   ) +
   
   # Layer: Interval lines (horizontal spans)
@@ -375,7 +375,7 @@ ggplot() +
       y = seg_mean_temp,
       yend = seg_mean_temp
     ),
-    linewidth = 1.2
+    linewidth = 1
   ) +
   
   # Labels and Theme
@@ -708,6 +708,102 @@ ggplot(data_prep_anomaly_abs, aes(x = year, y = abs_anomo)) +
       formula = y ~ x,
       parse = TRUE
     )
+```
+
+## 5 year intervals precipitation
+
+```{r}
+#| label: data-precip-fiveyear
+#| message: false
+#| warning: false
+
+data_precip_fiveyear <- data_precip |> 
+  filter(year > 2007) |> 
+  mutate(
+    # choose the anchor year so that 2007–2022 is a bin
+    anchor    = 2007,
+    seg_start = anchor + floor((year - anchor) / 5) * 5,
+    seg_end   = seg_start + 4,
+    segment   = paste0(seg_start, "-", seg_end)
+  ) |>
+  group_by(segment, seg_start, seg_end) |>
+  mutate(seg_mean_precip = sum(pre_mm, na.rm = TRUE))
+
+summary(data_precip_fiveyear)
+
+```
+
+```{r}
+#| label: data-precip-fiveyear-test
+#| message: false
+#| warning: false
+
+
+data_precip_fiveyear_year <- data_precip_fiveyear |> 
+  filter(year > 2007) |> 
+  group_by(year, segment, seg_start, seg_end) |> 
+  summarise(sum_precip = sum(pre_mm))
+
+# Fit the model explicitly
+model_precip <- lm(sum_precip ~ segment, data = data_precip_fiveyear_year)
+
+# Get estimated marginal means with cld
+emm_precip_fiveyear <- emmeans(model_precip, ~ segment)
+
+cld(emm_precip_fiveyear)
+
+# View the results
+print(emm_temp_fiveyear)
+
+```
+```{r}
+#| label: fig-precip-fiveyear
+#| fig-scap: "5 year intervals in precipitation means"
+#| fig-cap: !expr glue("5 year intervals in precipitation means.")
+#| message: false
+#| warning: false
+
+interval_mate <- data_precip_fiveyear_year |> 
+  distinct(segment, seg_start, seg_end)
+
+interval_lines_precip <- data_precip_fiveyear_year |>
+  filter(year > 2007) |> 
+  group_by(segment) |> 
+  summarise(seg_mean = mean(sum_precip)) |> 
+  left_join(interval_mate)
+
+
+# 3. Plot
+ggplot() +
+  # Base: Yearly means (points)
+  geom_point(
+    data = data_precip_fiveyear_year,
+    aes(x = year, y = sum_precip),
+    size = 3,
+    color = "darkgreen"
+  ) +
+  
+  # Layer: Interval lines (horizontal spans)
+  geom_segment(
+    data = interval_lines_precip,
+    aes(
+      x = seg_start,
+      xend = seg_end,
+      y = seg_mean,
+      yend = seg_mean
+    ),
+    linewidth = 1
+  ) +
+  
+  # Labels and Theme
+  labs(
+    x = "",
+    y = "Mean Annual Precipitation (mm)",
+    title = "Annual Mean Precipitation with Interval Estimates"
+  ) +
+  theme_minimal()+
+  scale_x_continuous(breaks=seq(min(data_precip_fiveyear_year$year), max(data_precip_fiveyear_year$year), by = 1))+
+  scale_y_continuous(limits = c(0, NA), breaks=seq(0, max(data_precip_fiveyear_year$sum_precip), by = 100))
 ```
 
 # PAR data
