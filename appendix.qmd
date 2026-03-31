@@ -5,11 +5,11 @@ format: html
 editor: visual
 ---
 
-## Quarto
+# Current climate conditions
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+All climatic variables are calculated based on 2008 – 2022 data, as these are the year where full year data is available. Data available from GEM. (2020). ClimateBasis Nuuk—Temperature—Air temperature \@ 200 cm—30min average (°C) (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/PGN3-7597>
 
-## Running Code
+## Tempterature
 
 When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
 
