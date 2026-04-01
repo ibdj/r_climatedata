@@ -1,27 +1,138 @@
 ---
 title: "Appendix"
 author: "ibdj"
-format: html
+format:
+  pdf:
+    fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
+    out-width: 100%
+    fig-align: center
 editor: visual
 ---
 
 # Current climate conditions
 
-All climatic variables are calculated based on 2008 – 2022 data, as these are the year where full year data is available. Data available from GEM. (2020). ClimateBasis Nuuk—Temperature—Air temperature \@ 200 cm—30min average (°C) (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/PGN3-7597>
+Data is available 2007 – 2022. 2008 is the first whole year of temperature data. Data available from GEM. (2020). ClimateBasis Nuuk—Temperature—Air temperature \@ 200 cm—30min average (°C) (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/PGN3-7597>
 
-## Tempterature
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+### Tempterature
 
 ```{r}
-1 + 1
+#| label: importing-packages
+#| output: FALSE
+#| echo: FALSE
+#| message: FALSE
+#| warning: FALSE
+
+#install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
+library(pacman)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp)
+
+opts_chunk$set( size="small")
+
+# colors
+sleet <- rgb(110/255, 107/255, 196/255, 1)
+rain <- rgb(0/255, 0/255, 165/255, 1)
+warm <- rgb(165/255, 0/255, 0/255, 1)
 ```
 
-You can add options to executable code like this
+```{r}
+#| label: importing-temp-data
+#| echo: FALSE
+
+
+data_temp <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/temperature/data/View_ClimateBasis_Nuuk_Data_Temperature_Air_temperature_@_200_cm__30min_average__DegreesC220420240157436123.csv", delim = "\t", escape_double = FALSE,col_types = cols(Date = col_datetime(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
+  janitor::clean_names() |> 
+  drop_na() |>  
+  filter(at_c != -9999) |>  
+   mutate(year = year(date),
+         month = month(date), 
+         doy = yday(date),
+         month_string = month.name[month])
+```
 
 ```{r}
+#| label: temp-mean-monthly
 #| echo: false
-2 * 2
+
+data_temp_monthly_mean <- data_temp |> 
+  group_by(month) |> 
+  dplyr::reframe(mean = round(mean(at_c),2),
+            sd = round(sd(at_c),2)) |> 
+  mutate(month_string = month.name[month]) |> 
+  arrange(desc(mean)) |> 
+  mutate(temp_rank = row_number())
+
+year_mean <- round(mean(data_temp$at_c),4)
+
+data_temp_annual_mean <- data_temp |> 
+  group_by(year) |> 
+  filter(year != 2007) |> #excluding 2007 because it is only the months of oct, nov, dec
+  dplyr::reframe(mean = mean(at_c),
+            sd = sd(at_c))
+
+```
+#### Monthly mean
+
+```{r}
+#| label: fig-month-mean-temp
+#| fig-scap: "Mean air temperature (°C) pr month"
+#| fig-cap: !expr glue("Mean temperature pr month. Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(year_mean,3)}°C.")
+#| echo: false
+#| message: false
+#| warning: false
+
+ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
+  geom_line(size = 0.25, linetype="solid", alpha = 0.2)+
+  geom_smooth(color = "gray", se = F,  alpha = 0.1)+
+  geom_point(size = 3, alpha = 0.7, color = "#076834") +
+    scale_x_continuous(breaks=seq(1, 12, by = 1))+
+  geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", size=0.5)+
+  labs(x = "Month", y = "Mean temperature (°C)", title = "")+
+  theme_minimal()+
+  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+#### Yearly mean
+
+```{r}
+#| label: fig-annual-mean-temp
+#| fig-scap: "Mean air temperature pr year (°C)"
+#| fig-cap: !expr glue("Annual mean temperature, Kangerluassunguaq. Mean air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)}. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {year_mean}°C. Dashed line is trend line.")
+#| message: false
+#| warning: false
+#| echo: false
+
+ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
+  geom_line(size = 0.4, color = "gray", linetype="solid", alpha = 0.5)+
+  geom_smooth(method = lm, color = "#076834", se = F, linetype = "dashed")+
+  geom_point(size = 3, alpha = 0.7, color = "#076834") +
+    scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
+  geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
+  labs(x = "Year", y = "Mean temperature (°C)", title = "")+
+  stat_poly_eq(
+      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
+      formula = y ~ x,
+      parse = TRUE
+    )+
+theme_minimal()
+```
+#### Five year intervals
+## Precipitation
+### Monthly mean
+### Yearly mean
+### Five year intervals
+# Historic climate data
+## Temperature
+## Precipitation
+# Statistical analysis
+## Diversity
+### Richness
+### Evenness
+### Shannon
+### Turnover
+## Community composition
+### Within vegetation composition
+### Between vegetation composition
+## Shrubification
+### Functional groups
+### Specific species
+
