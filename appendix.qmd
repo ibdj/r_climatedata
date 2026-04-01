@@ -6,6 +6,7 @@ format:
     fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
     out-width: 100%
     fig-align: center
+    toc: true
 editor: visual
 ---
 
@@ -113,7 +114,8 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
       formula = y ~ x,
       parse = TRUE
     )+
-theme_minimal()
+  theme_minimal()+
+  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
 ```
 #### Five year intervals
 ## Precipitation
