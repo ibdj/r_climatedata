@@ -8,6 +8,21 @@ format:
     fig-align: center
     toc: true
     fig-pos: "H"
+    include-in-header:
+      text: |
+        \usepackage{fancyhdr}
+        \pagestyle{fancy}
+        \fancyhf{}
+        \lhead{Appendix: NERO line paper}
+        \rhead{\thepage}
+        \renewcommand{\headrulewidth}{0.4pt}
+        \setlength{\headheight}{15pt}
+        \fancypagestyle{plain}{
+          \fancyhf{}
+          \lhead{Appendix: NERO line paper}
+          \rhead{\thepage}
+          \renewcommand{\headrulewidth}{0.4pt}
+        }
 editor: visual
 ---
 
@@ -192,7 +207,7 @@ print(emm_temp_fiveyear)
 ```{r}
 #| label: fig-temp-fiveyear
 #| fig-scap: "5 year intervals in temperature means"
-#| fig-cap: !expr glue("5 year intervals in temperature means.")
+#| fig-cap: !expr glue("Five year intervals in temperature means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| message: false
 #| warning: false
 #| echo: false
@@ -331,6 +346,7 @@ data_precip_month_mean <- data_precip_month_sum |>
 precip_month_mean <- round(mean(data_precip_month_mean$pre_mm_mean),2)
 
 data_precip_mean_annual <- data_precip  |> 
+  filter(year != 2007) |> 
   group_by(year) |> 
   summarise(yearly_precip = sum(pre_mm, na.rm = TRUE))
 
@@ -395,7 +411,7 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
 model_precip_mean_annual <- lm(yearly_precip ~ year, data = data_precip_mean_annual)
 summary(model_precip_mean_annual)
 
-data_precip_mean_annual$pred <- predict(model_precip_mean_annual)
+data_precip_sum$pred <- predict(model_precip_mean_annual)
 
 ```
 
@@ -403,26 +419,51 @@ data_precip_mean_annual$pred <- predict(model_precip_mean_annual)
 #| label: fig-precipitation-annual
 #| echo: false
 #| fig-scap: "Mean yearly precipitation (mm)"
-#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm.")
+#| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm. Dashed line represent model prediction.")
 #| message: false
 #| warning: false
 
 ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
+    geom_line(
+    aes(y = pred),
+    color = "#076834",
+    linetype = "dashed",
+  ) +
   geom_bar(stat = "identity", fill = "#6e6bc4")+
   scale_x_continuous(breaks=seq(min(data_precip_sum$year), max(data_precip_sum$year), by = 1))+
 geom_hline(yintercept = precip_year_mean, linetype="dotted", color = "blue", linewidth =0.5)+
   geom_smooth(method = lm, color = "blue", size = 0.5, se = F, linetype="dashed")+
-  labs(x = "Year", y = "Precipitation (mm)")+
-  stat_poly_eq(
-      aes(label = paste(..eq.label.., ..rr.label.., ..p.value.label.., sep = "~~~")),
-      formula = y ~ x,
-      parse = TRUE
-    )+
-  theme_minimal()
+  labs(x = "", y = "Precipitation (mm)")+
+theme_minimal()+
+    theme(  axis.title.x = element_text(size = 8),
+  axis.title.y = element_text(size = 8),
+  axis.text.x  = element_text(size = 7),
+  axis.text.y  = element_text(size = 7))
 
 ```
 
 #### Five year intervals
+```{r}
+#| label: data-precip-fiveyear
+#| echo: false
+#| message: false
+#| warning: false
+
+data_precip_fiveyear <- data_precip |> 
+  filter(year > 2007) |> 
+  mutate(
+    # choose the anchor year so that 2007–2022 is a bin
+    anchor    = 2007,
+    seg_start = anchor + floor((year - anchor) / 5) * 5,
+    seg_end   = seg_start + 4,
+    segment   = paste0(seg_start, "-", seg_end)
+  ) |>
+  group_by(segment, seg_start, seg_end) |>
+  mutate(seg_mean_precip = sum(pre_mm, na.rm = TRUE))
+
+summary(data_precip_fiveyear)
+
+```
 
 # Historic climate data
 
