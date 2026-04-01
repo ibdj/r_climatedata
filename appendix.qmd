@@ -1,6 +1,6 @@
 ---
 title: "Appendix"
-author: "ibdj"
+author: "Jacobsen et al 2026"
 format:
   pdf:
     fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
@@ -15,7 +15,7 @@ editor: visual
 
 Data is available 2007 – 2022. 2008 is the first whole year of temperature data. Data available from GEM. (2020). ClimateBasis Nuuk—Temperature—Air temperature \@ 200 cm—30min average (°C) (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/PGN3-7597>
 
-### Tempterature
+## Tempterature
 
 ```{r}
 #| label: importing-packages
