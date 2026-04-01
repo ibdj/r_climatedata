@@ -127,13 +127,138 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
   labs(x = "Year", y = "Mean temperature (°C)", title = "")+
   theme_minimal()+
-  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
+    theme(  axis.title.x = element_text(size = 8),
+  axis.title.y = element_text(size = 8),
+  axis.text.x  = element_text(size = 7),
+  axis.text.y  = element_text(size = 7))
 ```
 
-
-
 #### Five year intervals
+
+```{r}
+#| label: data-fiveyear_intervals
+#| message: false
+#| warning: false
+#| echo: false
+
+data_temp_fiveyear <- data_temp |> 
+  mutate(
+    # choose the anchor year so that 2007–2022 is a bin
+    anchor    = 2007,
+    seg_start = anchor + floor((year - anchor) / 5) * 5,
+    seg_end   = seg_start + 4,
+    segment   = paste0(seg_start, "-", seg_end)
+  ) |>
+  group_by(segment, seg_start, seg_end) |>
+  mutate(seg_mean_temp = mean(at_c, na.rm = TRUE))
+
+interval_lines <- data_temp_fiveyear |>
+  filter(year > 2007) |> 
+  distinct(segment, seg_start, seg_end, seg_mean_temp)
+
+```
+
+```{r}
+#| label: data-fiveyear_intervals_test
+#| message: false
+#| warning: false
+#| echo: false
+
+# Fit the linear mixed model
+temp_data <- data_temp_fiveyear |> filter(year > 2007)
+
+# Fit the model explicitly
+model_temp_fiveyear <- lmer(
+  at_c ~ segment + (1 | year), 
+  data = temp_data
+)
+
+# Get estimated marginal means with cld
+emm_temp_fiveyear <- model_temp_fiveyear |>
+  emmeans(~ segment) |>
+  cld(alpha = 0.05, Letters = letters)
+
+cld_temp <- as.data.frame(emm_temp_fiveyear)
+
+cld_plot <- cld_temp |>
+  left_join(interval_lines, by = "segment")
+
+# View the results
+print(emm_temp_fiveyear)
+
+```
+```{r}
+#| label: fig-temp-fiveyear
+#| fig-scap: "5 year intervals in temperature means"
+#| fig-cap: !expr glue("5 year intervals in temperature means.")
+#| message: false
+#| warning: false
+#| echo: false
+
+yearly_means <- data_temp_fiveyear |>
+  group_by(year) |>
+  filter(year > 2007) |> 
+  summarise(
+    mean_temp = mean(at_c, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+interval_lines <- data_temp_fiveyear |>
+  filter(year > 2007) |> 
+  distinct(segment, seg_start, seg_end, seg_mean_temp)
+
+# amke the positions of the cld in the plot
+cld_plot <- cld_plot |>
+  mutate(
+    x_mid = (seg_start + seg_end) / 2
+  )
+
+# 3. Plot
+ggplot() +
+  # Base: Yearly means (points)
+  geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
+  geom_point(
+    data = yearly_means,
+    aes(x = year, y = mean_temp),
+    size = 3,
+    color = "darkgreen"
+  ) +
+  
+  # Layer: Interval lines (horizontal spans)
+  geom_segment(
+    data = interval_lines,
+    aes(
+      x = seg_start,
+      xend = seg_end,
+      y = seg_mean_temp,
+      yend = seg_mean_temp
+    )
+  ) +
+  geom_text(
+  data = cld_plot,
+  aes(
+    x = x_mid,
+    y = max(yearly_means$mean_temp)*0.8,
+    label = .group
+  ),
+  vjust = -0.8,
+  size = 3
+)+
+  # Labels and Theme
+  labs(
+    x = "",
+    y = "Mean Annual Temperature (°C)",
+    title = ""
+  ) +
+  theme_minimal()+
+  scale_x_continuous(breaks=seq(min(yearly_means$year), max(yearly_means$year), by = 1))+
+  theme(  axis.title.x = element_text(size = 8),
+  axis.title.y = element_text(size = 8),
+  axis.text.x  = element_text(size = 7),
+  axis.text.y  = element_text(size = 7))
+```
 ## Precipitation
+
 ### Monthly mean
 ### Yearly mean
 ### Five year intervals
