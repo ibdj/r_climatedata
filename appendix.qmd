@@ -596,6 +596,8 @@ merged_data <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappin
   ungroup()
 ```
 
+Remember to include all the diversity data in ONE df.
+
 ### Richness
 
 ### Evenness
