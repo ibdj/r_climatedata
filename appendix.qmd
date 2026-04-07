@@ -594,6 +594,36 @@ merged_data <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappin
   group_by(year, subsection) |> 
   mutate(no_plots = n_distinct(plot_id)) |> 
   ungroup()
+
+merged_data <- merged_data |> 
+  dplyr::select(year,vt_section,subsection,no_plots, veg_type,species,taxon_code, presence)
+
+subsection_completed <- merged_data |> 
+  tidyr::complete(
+    # 1. The "Index" columns (the grid you want to fill)
+    year,
+    nesting(vt_section, subsection, veg_type, no_plots), # Site attributes
+    nesting(species, taxon_code),                # Species attributes
+    
+    # 2. The Value column (what to fill for missing combinations)
+    fill = list(presence = 0) 
+  )
+
+  subsection_species <- subsection_completed |> 
+  group_by(year, subsection, species, veg_type) |> 
+  summarise(
+    presence_count = sum(presence),  # Count how many times presence = 1
+    frec = presence_count / first(no_plots),  # Divide by total plots
+    .groups = 'drop'
+  )
+  
+  # 2. Run your Pivot Wider -> Longer logic on the test data
+test_result <- merged_data |> 
+  ungroup() |> 
+  tidyr::pivot_wider(
+    names_from = taxon_code, 
+    values_from = presence, 
+    values_fill = 0)
 ```
 
 Remember to include all the diversity data in ONE df.
