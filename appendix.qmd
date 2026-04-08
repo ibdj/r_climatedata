@@ -34,10 +34,10 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 ```{r}
 #| label: importing-packages
-#| output: FALSE
-#| echo: FALSE
-#| message: FALSE
-#| warning: FALSE
+#| output: false
+#| echo: false
+#| message: false
+#| warning: false
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
@@ -590,40 +590,35 @@ Data is available from GEM. (2020). *BioBasis Nuuk—Vegetation—NERO line Raun
 ### Calculating indexes
 
 ```{r}
+#| label: data-indexes
 merged_data <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/nero_analysis/data/merged_data.rds") |> 
   group_by(year, subsection) |> 
   mutate(no_plots = n_distinct(plot_id)) |> 
-  ungroup()
+  ungroup() |> 
+  filter(taxon_code != "rock")
 
 merged_data <- merged_data |> 
-  dplyr::select(year,vt_section,subsection,no_plots, veg_type,species,taxon_code, presence)
+  dplyr::select(year,vt_section,subsection, plot_id, no_plots, veg_type, taxon_code, presence)
 
-subsection_completed <- merged_data |> 
-  tidyr::complete(
-    # 1. The "Index" columns (the grid you want to fill)
-    year,
-    nesting(vt_section, subsection, veg_type, no_plots), # Site attributes
-    nesting(species, taxon_code),                # Species attributes
-    
-    # 2. The Value column (what to fill for missing combinations)
-    fill = list(presence = 0) 
-  )
-
-  subsection_species <- subsection_completed |> 
-  group_by(year, subsection, species, veg_type) |> 
-  summarise(
-    presence_count = sum(presence),  # Count how many times presence = 1
-    frec = presence_count / first(no_plots),  # Divide by total plots
-    .groups = 'drop'
-  )
-  
-  # 2. Run your Pivot Wider -> Longer logic on the test data
-test_result <- merged_data |> 
-  ungroup() |> 
+pivot_plot <- merged_data |>
   tidyr::pivot_wider(
-    names_from = taxon_code, 
-    values_from = presence, 
-    values_fill = 0)
+    id_cols = c(year, vt_section, subsection, plot_id, no_plots, veg_type),
+    names_from = taxon_code,
+    values_from = presence,
+    values_fill = 0,
+    values_fn = max
+  )
+
+pivot_long <- pivot_plot |> 
+  pivot_longer(cols = carbig:viospe, names_to = "taxon_code", values_to = "presence")
+
+subsection_summary <- pivot_long |> 
+  group_by(year,subsection,veg_type, no_plots, taxon_code) |> 
+  summarise(count = sum(presence))
+
+
+
+
 ```
 
 Remember to include all the diversity data in ONE df.
