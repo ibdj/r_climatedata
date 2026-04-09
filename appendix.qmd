@@ -596,16 +596,17 @@ Data is available from GEM. (2020). *BioBasis Nuuk—Vegetation—NERO line Raun
 #| message: false
 #| warning: false
 
+#reading the raw datafile
 data_raw <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/nero_analysis/data/data_long.rds")
 
-data_long <- data_raw |> 
+data_filtered <- data_raw |> 
   group_by(year, subsection) |> 
   mutate(no_plots = n_distinct(plot_id)) |> 
   ungroup() |> 
   filter(taxon_code != "rock", no_plots > 1, veg_type != "saltmarsh") |>
   dplyr::select(year,vt_section,subsection, plot_id, no_plots, veg_type, taxon_code, presence)
 
-pivot_plot <- data_long |>
+data_pivotwide <- data_filtered |>
   tidyr::pivot_wider(
     id_cols = c(year, vt_section, subsection, plot_id, no_plots, veg_type),
     names_from = taxon_code,
@@ -614,16 +615,16 @@ pivot_plot <- data_long |>
     values_fn = max
   )
 
-pivot_long <- pivot_plot |> 
+data_pivotlong <- data_pivotwide |> 
   pivot_longer(cols = carbig:viospe, names_to = "taxon_code", values_to = "presence")
 
 #calculation count and frequency of occurrence
-subsection_species <- pivot_long |> 
+subsection_species <- data_pivotlong |> 
   group_by(year,subsection,veg_type, no_plots, taxon_code) |> 
   summarise(count = sum(presence), foo = count/no_plots)
 
-
-subsection_summary <- subsection_species |> 
+# caluculating richness, evenness and diversity
+subsection_indices <- subsection_species |> 
   dplyr::group_by(year, subsection, veg_type) |> 
   dplyr::summarise(
     # restrict to taxa that are present
@@ -645,7 +646,7 @@ subsection_summary <- subsection_species |>
 
 ```
 
-Data has been filtered to remove sections with only one remaining plot and subsections in saltmarsh, due to too few replicates in this vegetation type. Final calculates included `r length(unique(subsection_summary$subsection))` subsections (original dataset includes `r length(unique(data_raw$subsection))`).
+Data has been filtered to remove sections with only one remaining plot and subsections in saltmarsh, due to too few replicates in this vegetation type. Final calculates included `r length(unique(subsection_indices$subsection))` subsections (original dataset includes `r length(unique(data_raw$subsection))`).
 
 ### Richness
 
