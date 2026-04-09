@@ -41,7 +41,7 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTest)
 
 opts_chunk$set( size="small")
 
@@ -588,7 +588,7 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
 Data is available from GEM. (2020). *BioBasis Nuuk—Vegetation—NERO line Raunkiaer* (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/HXJY-RQ13>.
 
 
-### Calculating indexes
+### Importing data and calculating indexes
 
 ```{r}
 #| label: data-import-indexes
@@ -622,18 +622,6 @@ data_pivotlong <- data_pivotwide |>
 subsection_species <- data_pivotlong |> 
   group_by(year,subsection,veg_type, no_plots, taxon_code) |> 
   summarise(count = sum(presence), foo = count/no_plots)
-
-# caluculating richness, evenness and diversity
-subsection_indices <- subsection_species |> 
-  dplyr::group_by(year, subsection, veg_type) |> 
-  dplyr::summarise(
-    # restrict to taxa that are present
-    H = vegan::diversity(count[count > 0], index = "shannon"),
-    S = dplyr::n_distinct(taxon_code[count > 0]),
-    J = ifelse(S > 1, H / log(S), NA_real_),
-    richness = S,
-    .groups = "drop"
-  )
 ```
 
 ```{r}
@@ -642,13 +630,108 @@ subsection_indices <- subsection_species |>
 #| message: false
 #| warning: false
 
-
+# caluculating richness, evenness and diversity
+subsection_indices <- subsection_species |> 
+  dplyr::group_by(year, subsection, veg_type) |> 
+  dplyr::summarise(
+    # restrict to taxa that are present
+    H = vegan::diversity(count[count > 0], index = "shannon"),
+    S = dplyr::n_distinct(taxon_code[count > 0]),
+    shannon = H,
+    evenness = ifelse(S > 1, H / log(S), NA_real_),
+    richness = S,
+    .groups = "drop"
+  )
 
 ```
 
 Data has been filtered to remove sections with only one remaining plot and subsections in saltmarsh, due to too few replicates in this vegetation type. Final calculates included `r length(unique(subsection_indices$subsection))` subsections (original dataset includes `r length(unique(data_raw$subsection))`).
 
 ### Richness
+
+```{r}
+#| label: indices-model-richness
+#| echo: true
+#| message: false
+#| warning: false
+
+model_richness_sub_f <- lmer(
+  richness ~ factor(year) + (1 | subsection),
+  data = subsection_indices
+)
+
+summary(model_richness_sub_f)
+
+richness_emmeans_f <- emmeans(model_richness_sub_f, ~ year) 
+
+richness_pairs_f <- emmeans(model_richness_sub_f, ~ year) |> 
+  pairs()
+
+richness_emmeans_f
+richness_pairs_f
+
+richness_pairs_df <- as.data.frame(richness_pairs_f)
+```
+
+```{r}
+#| label: fig-indices-model-richness
+#| fig-scap: "Species richness"
+#| fig-cap: !expr glue("Species richness, number of species pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| echo: false
+#| message: false
+#| warning: false
+
+years <- c("2007", "2012", "2017", "2022")
+
+subsection_indices$year <- factor(subsection_indices$year, levels = years)
+richness_emm_df <- as.data.frame(richness_emmeans_f)
+richness_emm_df$year <- factor(richness_emm_df$year, levels = years)
+
+richness_cld <- cld(
+  richness_emmeans_f,
+  adjust = "sidak",
+  Letters = letters
+)
+
+richness_cld <- as.data.frame(richness_cld)
+richness_cld$year <- factor(richness_cld$year, levels = years)
+
+cl_cols <- intersect(c("asymp.LCL", "lower.CL"), names(richness_emm_df))[1]
+cu_cols <- intersect(c("asymp.UCL", "upper.CL"), names(richness_emm_df))[1]
+
+ggplot() +
+  geom_jitter(
+    data = subsection_indices,
+    aes(x = year, y = richness),
+    width = 0.15,
+    alpha = 0.5,
+    color = "darkgray"
+  ) +
+  geom_errorbar(
+    data = richness_emm_df,
+    aes(x = year, ymin = .data[[cl_cols]], ymax = .data[[cu_cols]]),
+    width = 0.25,
+    linewidth = 0.9,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  geom_point(
+    data = richness_emm_df,
+    aes(x = year, y = emmean),
+    size = 2.8,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = richness_cld,
+    aes(x = year, y = 25, label = .group),
+    size = 4,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  labs(x = "", y = "Species richness") +
+  theme_minimal()
+```
 
 ### Evenness
 
