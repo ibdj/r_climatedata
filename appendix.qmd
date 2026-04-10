@@ -7,6 +7,7 @@ format:
     out-width: 100%
     fig-align: center
     toc: true
+    lof: true
     fig-pos: "H"
     include-in-header:
       text: |
@@ -472,6 +473,10 @@ summary(data_precip_fiveyear)
 
 ## Temperature
 
+Data available from Cappelen, J. (2021). *Greenland – DMI Historical Climate Data Collection 1784-2020* (Nos. 21–04; DMI Report). Danish Meteorological Institute. <https://www.dmi.dk/fileadmin/Rapporter/2021/DMIRep21-04.pdf>
+
+Station 4250 is Nuuk, and element 101 is precipitation.
+
 ```{r}
 #| label: data-import-dmi-historic-data
 #| echo: false
@@ -586,7 +591,6 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
 ## Diversity
 
 Data is available from GEM. (2020). *BioBasis Nuuk—Vegetation—NERO line Raunkiaer* (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/HXJY-RQ13>.
-
 
 ### Importing data and calculating indexes
 
@@ -734,6 +738,30 @@ ggplot() +
 ```
 
 ### Evenness
+
+```{r}
+#| label: indices-model-evenness
+#| echo: true
+#| message: false
+#| warning: false
+
+model_evenness_sub_f <- lmer(
+  evenness ~ factor(year) + (1 | subsection),
+  data = subsection_indices
+)
+
+summary(model_evenness_sub_f)
+
+evenness_emmeans_f <- emmeans(model_evenness_sub_f, ~ year) 
+
+evenness_pairs_f <- emmeans(model_evenness_sub_f, ~ year) |> 
+  pairs()
+
+evenness_emmeans_f
+evenness_pairs_f
+
+evenness_pairs_df <- as.data.frame(evenness_pairs_f)
+```
 
 ### Shannon
 
