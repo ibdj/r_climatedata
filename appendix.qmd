@@ -647,6 +647,7 @@ subsection_indices <- subsection_species |>
     .groups = "drop"
   )
 
+years <- c("2007", "2012", "2017", "2022")
 ```
 
 Data has been filtered to remove sections with only one remaining plot and subsections in saltmarsh, due to too few replicates in this vegetation type. Final calculates included `r length(unique(subsection_indices$subsection))` subsections (original dataset includes `r length(unique(data_raw$subsection))`).
@@ -684,8 +685,6 @@ richness_pairs_df <- as.data.frame(richness_pairs_f)
 #| echo: false
 #| message: false
 #| warning: false
-
-years <- c("2007", "2012", "2017", "2022")
 
 subsection_indices$year <- factor(subsection_indices$year, levels = years)
 richness_emm_df <- as.data.frame(richness_emmeans_f)
@@ -728,7 +727,7 @@ ggplot() +
   ) +
   geom_text(
     data = richness_cld,
-    aes(x = year, y = 25, label = .group),
+    aes(x = year, y = max(subsection_indices$richness), label = .group),
     size = 4,
     color = "black",
     inherit.aes = FALSE
@@ -761,6 +760,65 @@ evenness_emmeans_f
 evenness_pairs_f
 
 evenness_pairs_df <- as.data.frame(evenness_pairs_f)
+```
+
+```{r}
+#| label: fig-indices-model-evenness
+#| fig-scap: "Evenness"
+#| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| echo: false
+#| message: false
+#| warning: false
+
+
+subsection_indices$year <- factor(subsection_indices$year, levels = years)
+evenness_emm_df <- as.data.frame(evenness_emmeans_f)
+evenness_emm_df$year <- factor(evenness_emm_df$year, levels = years)
+
+evenness_cld <- cld(
+  evenness_emmeans_f,
+  adjust = "sidak",
+  Letters = letters
+)
+
+evenness_cld <- as.data.frame(evenness_cld)
+evenness_cld$year <- factor(evenness_cld$year, levels = years)
+
+cl_cols <- intersect(c("asymp.LCL", "lower.CL"), names(evenness_emm_df))[1]
+cu_cols <- intersect(c("asymp.UCL", "upper.CL"), names(evenness_emm_df))[1]
+
+ggplot() +
+  geom_jitter(
+    data = subsection_indices,
+    aes(x = year, y = evenness),
+    width = 0.15,
+    alpha = 0.5,
+    color = "darkgray"
+  ) +
+  geom_errorbar(
+    data = evenness_emm_df,
+    aes(x = year, ymin = .data[[cl_cols]], ymax = .data[[cu_cols]]),
+    width = 0.25,
+    linewidth = 0.9,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  geom_point(
+    data = evenness_emm_df,
+    aes(x = year, y = emmean),
+    size = 2.8,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = evenness_cld,
+    aes(x = year, y = max(subsection_indices$evenness), label = .group),
+    size = 4,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  labs(x = "", y = "Evenness") +
+  theme_minimal()
 ```
 
 ### Shannon
