@@ -200,9 +200,6 @@ cld_temp <- as.data.frame(emm_temp_fiveyear)
 cld_plot <- cld_temp |>
   left_join(interval_lines, by = "segment")
 
-# View the results
-print(emm_temp_fiveyear)
-
 ```
 
 ```{r}
@@ -852,7 +849,7 @@ shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 ```{r}
 #| label: fig-indices-model-shannon
 #| fig-scap: "shannon"
-#| fig-cap: !expr glue("Shannon pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| message: false
 #| warning: false
@@ -910,7 +907,7 @@ ggplot() +
 ### Turnover
 
 ```{r}
-#| label: data-indices-turnover
+#| label: data-indices-turnover-calculation
 #| echo: true
 #| message: false
 #| warning: false
@@ -929,8 +926,6 @@ valid_plots <- plot_years |>
 species_long_filtered <- subsection_species |>
   filter(subsection %in% valid_plots)
 
-length(species_long_filtered$subsection)
-
 # Calculate turnover per plot between years
 turnover_results <- turnover(
   df = species_long_filtered,
@@ -941,7 +936,110 @@ turnover_results <- turnover(
   metric = "total"
 )
 
-head(turnover_results)
+```
+````{r}
+#| label: indices-model-turnover
+#| echo: true
+#| message: false
+#| warning: false
+
+m_turnover_sub_f <- lmer(total ~ factor(year) + (1|subsection),
+                         data = turnover_results)
+
+summary(m_turnover_sub_f)
+
+turnover_emmeans <- emmeans(m_turnover_sub_f, ~ year) |>
+  pairs()
+
+turnover_emmeans
+
+````
+```{r}
+#| label: fig-indices-model-turnover
+#| fig-scap: "Turnover"
+#| fig-cap: !expr glue("Turnover pr. year calculate pr subsection, but only pr present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| echo: false
+#| message: false
+#| warning: false
+
+## 2️⃣  Define the canonical year factor (four ticks)
+all_years <- factor(c("2007","2012","2017","2022"),
+                    levels = c("2007","2012","2017","2022"))
+
+
+## 3️⃣  Marginal means for the three intervals that really exist
+emm_raw_turnover <- emmeans(m_turnover_sub_f, ~ year) %>%          # returns 3 rows
+  as.data.frame() %>%
+  mutate(year = factor(year, levels = levels(all_years)))   # align factor
+
+
+## 4️⃣  Build the *plot* data frame – pad the missing 2007 row
+
+turnover_plot_df <- tibble(year = all_years) %>%          # 4 rows, ordered
+  left_join(emm_raw_turnover, by = "year") %>%                    # bring in the 3 real rows
+  mutate(x_pos = as.integer(year))                       # 1‑4 for the axis
+
+
+## 5️⃣  Compact‑letter‑display (add a dummy row for 2007)
+# CLD for the three real means
+cld_three <- cld(emmeans(m_turnover_sub_f, ~ year),
+                 adjust = "sidak", Letters = letters) %>%
+  as.data.frame() %>%
+  mutate(year = factor(year, levels = levels(all_years)),
+         x_pos = as.integer(year))
+
+# Dummy row for 2007 (no label)
+cld_dummy <- data.frame(year   = factor("2007", levels = levels(all_years)),
+                        .group = "",               # empty string → no letter
+                        x_pos  = 1,
+                        stringsAsFactors = FALSE)
+
+# Combine – now we have four rows, matching turnover_plot_df
+turnover_cld <- bind_rows(cld_dummy, cld_three) %>%
+  arrange(x_pos)
+
+turnover_jitter <- turnover_results %>%
+  filter(year %in% c(2012, 2017, 2022))
+
+## 6️⃣  Plot – everything comes from the two tidy tables
+
+plot_turnover <- ggplot() +
+  
+  ## raw observations (optional jitter)
+  geom_jitter(data = turnover_jitter,
+              aes(x = as.integer(factor(year, levels = levels(all_years))),
+                  y = total),
+              width = .15, alpha = .5, colour = "darkgray")+
+  
+  ## 95 % CI error bars (NA rows are ignored automatically)
+  geom_errorbar(data = turnover_plot_df,
+                aes(x = x_pos, ymin = lower.CL, ymax = upper.CL),
+                width = .25, linewidth = .9, colour = "black",
+                na.rm = TRUE) +
+  
+  ## marginal‑mean points
+  geom_point(data = turnover_plot_df,
+             aes(x = x_pos, y = emmean),
+             size = 2.8, colour = "black",
+             na.rm = TRUE) +
+  
+  ## significance letters (blank for 2007)
+  geom_text(data = turnover_cld,
+            aes(x = x_pos, label = .group),
+            y = max(turnover_jitter$total, na.rm = TRUE),
+            size = 4, colour = "black") +
+  
+  ## axis – force the four tick labels
+  scale_x_continuous(name = "",
+                     breaks = 1:4,
+                     labels = c("2007","2012","2017","2022")) +
+  
+  labs(y = "Turnover (total)") +
+  theme_minimal()
+
+plot_turnover
+
+
 ```
 
 ## Community composition
