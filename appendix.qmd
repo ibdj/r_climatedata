@@ -849,9 +849,72 @@ shannon_pairs_f
 shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 ```
 
+```{r}
+#| label: fig-indices-model-shannon
+#| fig-scap: "shannon"
+#| fig-cap: !expr glue("Shannon pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| echo: false
+#| message: false
+#| warning: false
+
+
+subsection_indices$year <- factor(subsection_indices$year, levels = years)
+shannon_emm_df <- as.data.frame(shannon_emmeans_f)
+shannon_emm_df$year <- factor(shannon_emm_df$year, levels = years)
+
+shannon_cld <- cld(
+  shannon_emmeans_f,
+  adjust = "sidak",
+  Letters = letters
+)
+
+shannon_cld <- as.data.frame(shannon_cld)
+shannon_cld$year <- factor(shannon_cld$year, levels = years)
+
+cl_cols <- intersect(c("asymp.LCL", "lower.CL"), names(shannon_emm_df))[1]
+cu_cols <- intersect(c("asymp.UCL", "upper.CL"), names(shannon_emm_df))[1]
+
+ggplot() +
+  geom_jitter(
+    data = subsection_indices,
+    aes(x = year, y = shannon),
+    width = 0.15,
+    alpha = 0.5,
+    color = "darkgray"
+  ) +
+  geom_errorbar(
+    data = shannon_emm_df,
+    aes(x = year, ymin = .data[[cl_cols]], ymax = .data[[cu_cols]]),
+    width = 0.25,
+    linewidth = 0.9,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  geom_point(
+    data = shannon_emm_df,
+    aes(x = year, y = emmean),
+    size = 2.8,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = shannon_cld,
+    aes(x = year, y = max(subsection_indices$shannon), label = .group),
+    size = 4,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  labs(x = "", y = "Shannon") +
+  theme_minimal()
+```
 ### Turnover
 
 ```{r}
+#| label: data-indices-turnover
+#| echo: true
+#| message: false
+#| warning: false
+
 # Check number of unique years per plot
 plot_years <- subsection_species |>
   group_by(subsection) |>
