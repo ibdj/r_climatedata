@@ -42,7 +42,7 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTest)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn)
 
 opts_chunk$set( size="small")
 
@@ -561,7 +561,7 @@ nuuk_21_04_dmi_temp$upper <- preds$fit + 1.96 * preds$se.fit
 ```{r}
 #| label: fig-annual-temp-historic-raw-range-filter
 #| fig-scap: "Annual historic temperature raw data"
-#| fig-cap: !expr glue("Mean air temperature (°C) pr year, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024.")
+#| fig-cap: !expr glue("Historic yearly mean air temperature (°C) in Nuuk, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024.")
 #| message: false
 #| warning: false
 
@@ -579,6 +579,7 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
   scale_x_continuous(
     breaks = seq(min(gr_monthly_all_1784_2020$year),
                  max(2025), by = 15))+
+  labs(x = "", y = "Temperature (°C)") +
   theme_minimal()+
     theme(  axis.title.x = element_text(size = 8),
   axis.title.y = element_text(size = 8),
@@ -625,7 +626,8 @@ data_pivotlong <- data_pivotwide |>
 #calculation count and frequency of occurrence
 subsection_species <- data_pivotlong |> 
   group_by(year,subsection,veg_type, no_plots, taxon_code) |> 
-  summarise(count = sum(presence), foo = count/no_plots)
+  summarise(count = sum(presence), foo = count/no_plots) |> 
+  distinct()
 ```
 
 ```{r}
@@ -823,7 +825,61 @@ ggplot() +
 
 ### Shannon
 
+```{r}
+#| label: indices-model-shannon
+#| echo: true
+#| message: false
+#| warning: false
+
+model_shannon_sub_f <- lmer(
+  shannon ~ factor(year) + (1 | subsection),
+  data = subsection_indices
+)
+
+summary(model_shannon_sub_f)
+
+shannon_emmeans_f <- emmeans(model_shannon_sub_f, ~ year) 
+
+shannon_pairs_f <- emmeans(model_shannon_sub_f, ~ year) |> 
+  pairs()
+
+shannon_emmeans_f
+shannon_pairs_f
+
+shannon_pairs_df <- as.data.frame(shannon_pairs_f)
+```
+
 ### Turnover
+
+```{r}
+# Check number of unique years per plot
+plot_years <- subsection_species |>
+  group_by(subsection) |>
+  summarise(n_years = n_distinct(year), .groups = "drop")
+
+# Filter plots with at least 2 years (turnover requires temporal comparison)
+valid_plots <- plot_years |>
+  filter(n_years > 1) |>
+  pull(subsection)
+
+# Filter data to valid plots only
+species_long_filtered <- subsection_species |>
+  filter(subsection %in% valid_plots)
+
+length(species_long_filtered$subsection)
+
+# Calculate turnover per plot between years
+turnover_results <- turnover(
+  df = species_long_filtered,
+  time.var = "year",
+  species.var = "taxon_code",
+  abundance.var = "foo",
+  replicate.var = "subsection",
+  metric = "total"
+)
+
+head(turnover_results)
+```
 
 ## Community composition
 
