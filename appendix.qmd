@@ -1041,6 +1041,15 @@ plot_turnover
 
 
 ```
+````{r}
+#| label: fig-indices-wrapped
+#| fig-scap: "Final indices plot, wrapper"
+#| fig-cap: !expr glue("Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| echo: false
+#| message: false
+#| warning: false
+
+````
 
 ## Community composition
 
