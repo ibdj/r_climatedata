@@ -732,7 +732,8 @@ plot_richness <- ggplot() +
     inherit.aes = FALSE
   ) +
   labs(x = "", y = "Species richness") +
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
 
 plot_richness
 ```
@@ -819,7 +820,8 @@ plot_evenness <- ggplot() +
     inherit.aes = FALSE
   ) +
   labs(x = "", y = "Evenness") +
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
 
 plot_evenness
 ```
@@ -906,7 +908,8 @@ plot_shannon <- ggplot() +
     inherit.aes = FALSE
   ) +
   labs(x = "", y = "Shannon") +
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
 
 plot_shannon
 ```
@@ -1041,7 +1044,8 @@ plot_turnover <- ggplot() +
                      labels = c("2007","2012","2017","2022")) +
   
   labs(y = "Turnover (total)") +
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
 
 plot_turnover
 
@@ -1050,33 +1054,27 @@ plot_turnover
 ### Plots combined
 ````{r}
 #| label: fig-indices-wrapped
-#| fig-scap: "Final indices plot, wrapper"
-#| fig-cap: !expr glue("Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-scap: "Final indices plot, wrapper (Paper figure X)"
+#| fig-cap: !expr glue("Diversity metrices, a) Shannon diversity, b) Species richness, c) Evenness, c) Species turnover. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: true
 #| message: false
 #| warning: false
 
-( plot_richness  |plot_evenness  ) /
-  ( plot_shannon | plot_turnover ) +
-  
+grid_labeled <- (
+  (plot_shannon  | plot_richness) /
+  (plot_evenness | plot_turnover)
+) +
   plot_layout(
     guides  = "collect",
     heights = c(1, 1),
     widths  = c(1, 1)
+  ) +
+  plot_annotation(
+    tag_levels = "a",
+    tag_suffix = ")"
   ) &
-  
   theme(legend.position = "bottom")
 
-grid_base <- (plot_shannon  | plot_richness) /
-  (plot_evenness | plot_turnover) +
-  plot_layout(guides = "collect",
-              heights = c(1, 1),
-              widths  = c(1, 1)) &
-  theme(legend.position = "bottom")
-
-grid_labeled <- grid_base +
-  plot_annotation(tag_levels = "a",          # a), b), c), d)
-                  tag_suffix = ")")            # point size (adjust to match text)
 grid_labeled
 
 ````
