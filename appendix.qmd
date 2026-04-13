@@ -42,7 +42,7 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork)
 
 opts_chunk$set( size="small")
 
@@ -701,7 +701,7 @@ richness_cld$year <- factor(richness_cld$year, levels = years)
 cl_cols <- intersect(c("asymp.LCL", "lower.CL"), names(richness_emm_df))[1]
 cu_cols <- intersect(c("asymp.UCL", "upper.CL"), names(richness_emm_df))[1]
 
-ggplot() +
+plot_richness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = richness),
@@ -733,6 +733,8 @@ ggplot() +
   ) +
   labs(x = "", y = "Species richness") +
   theme_minimal()
+
+plot_richness
 ```
 
 ### Evenness
@@ -786,7 +788,7 @@ evenness_cld$year <- factor(evenness_cld$year, levels = years)
 cl_cols <- intersect(c("asymp.LCL", "lower.CL"), names(evenness_emm_df))[1]
 cu_cols <- intersect(c("asymp.UCL", "upper.CL"), names(evenness_emm_df))[1]
 
-ggplot() +
+plot_evenness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = evenness),
@@ -818,6 +820,8 @@ ggplot() +
   ) +
   labs(x = "", y = "Evenness") +
   theme_minimal()
+
+plot_evenness
 ```
 
 ### Shannon
@@ -871,7 +875,7 @@ shannon_cld$year <- factor(shannon_cld$year, levels = years)
 cl_cols <- intersect(c("asymp.LCL", "lower.CL"), names(shannon_emm_df))[1]
 cu_cols <- intersect(c("asymp.UCL", "upper.CL"), names(shannon_emm_df))[1]
 
-ggplot() +
+plot_shannon <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = shannon),
@@ -903,6 +907,8 @@ ggplot() +
   ) +
   labs(x = "", y = "Shannon") +
   theme_minimal()
+
+plot_shannon
 ```
 ### Turnover
 
@@ -1041,13 +1047,37 @@ plot_turnover
 
 
 ```
+### Plots combined
 ````{r}
 #| label: fig-indices-wrapped
 #| fig-scap: "Final indices plot, wrapper"
 #| fig-cap: !expr glue("Shared letters indicate non-significant differences among estimated means according to compact letter display.")
-#| echo: false
+#| echo: true
 #| message: false
 #| warning: false
+
+( plot_richness  |plot_evenness  ) /
+  ( plot_shannon | plot_turnover ) +
+  
+  plot_layout(
+    guides  = "collect",
+    heights = c(1, 1),
+    widths  = c(1, 1)
+  ) &
+  
+  theme(legend.position = "bottom")
+
+grid_base <- (plot_shannon  | plot_richness) /
+  (plot_evenness | plot_turnover) +
+  plot_layout(guides = "collect",
+              heights = c(1, 1),
+              widths  = c(1, 1)) &
+  theme(legend.position = "bottom")
+
+grid_labeled <- grid_base +
+  plot_annotation(tag_levels = "a",          # a), b), c), d)
+                  tag_suffix = ")")            # point size (adjust to match text)
+grid_labeled
 
 ````
 
