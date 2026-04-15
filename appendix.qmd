@@ -727,7 +727,7 @@ plot_richness <- ggplot() +
   geom_text(
     data = richness_cld,
     aes(x = year, y = max(subsection_indices$richness), label = .group),
-    size = 4,
+    size = 3,
     color = "black",
     inherit.aes = FALSE
   ) +
@@ -815,7 +815,7 @@ plot_evenness <- ggplot() +
   geom_text(
     data = evenness_cld,
     aes(x = year, y = max(subsection_indices$evenness), label = .group),
-    size = 4,
+    size = 3,
     color = "black",
     inherit.aes = FALSE
   ) +
@@ -903,7 +903,7 @@ plot_shannon <- ggplot() +
   geom_text(
     data = shannon_cld,
     aes(x = year, y = max(subsection_indices$shannon), label = .group),
-    size = 4,
+    size = 3,
     color = "black",
     inherit.aes = FALSE
   ) +
@@ -1036,7 +1036,7 @@ plot_turnover <- ggplot() +
   geom_text(data = turnover_cld,
             aes(x = x_pos, label = .group),
             y = max(turnover_jitter$total, na.rm = TRUE),
-            size = 4, colour = "black") +
+            size = 3, colour = "black") +
   
   ## axis – force the four tick labels
   scale_x_continuous(name = "",
@@ -1054,7 +1054,7 @@ plot_turnover
 ### Plots combined
 ````{r}
 #| label: fig-indices-wrapped
-#| fig-scap: "Final indices plot, wrapper (Paper figure X)"
+#| fig-scap: "All indices plot, wrapped (Paper figure 3)"
 #| fig-cap: !expr glue("Diversity metrices, a) Shannon diversity, b) Species richness, c) Evenness, c) Species turnover. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: true
 #| message: false
@@ -1073,7 +1073,8 @@ grid_labeled <- (
     tag_levels = "a",
     tag_suffix = ")"
   ) &
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom", plot.tag = element_text(size = 8))+
+  theme(axis.title = element_text(size = 8), axis.text  = element_text(size = 8))
 
 grid_labeled
 
@@ -1081,6 +1082,22 @@ grid_labeled
 
 ## Community composition
 
+```{r}
+#| label: importing-data-nmds
+#| echo: FALSE
+#| 
+community_matrix <- species_sub_wide |> 
+  unite("sub_year_vt", subsection, year, veg_type, sep = "_", remove = FALSE) |> 
+  as.data.frame() |> 
+  column_to_rownames(var = "sub_year_vt") |> 
+  dplyr::select(-year, -subsection, -veg_type, -no_plots)
+
+meta <- merged_data |>
+  mutate(sub_year_vt = paste(subsection, year, veg_type, sep = "_")) |>
+  dplyr::select(sub_year_vt, year, veg_type, subsection) |> 
+  distinct()
+
+```
 ### Within vegetation composition
 
 ### Between vegetation composition
