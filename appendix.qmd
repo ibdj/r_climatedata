@@ -1,8 +1,30 @@
 ---
-title: "Appendix"
-author: "Jacobsen et al 2026"
+title: "Supplementary Information 1"
+subtitle: "Document caption: Detailed methods, supplementatyry analyses, and results including p-values."
+author:
+  - name: Ida Bomholt Dyrholm Jacobsen
+    orcid: 0000-0003-2481-8061
+    affiliation: [1, 2]
+    email: ida@example.com
+    corresponding: true
+
+  - name: Katrine Raundrup
+    orcid: 0000-0002-2110-3709
+    affiliation: 1
+
+  - name: Niels Martin Schmidt
+    orcid: 0000-0002-4166-6218 
+    affiliation: 2
+
+affiliations:
+  - id: 1
+    name: Greenland Institute of Natural Resources
+  - id: 2
+    name: Arctic Research Centre, University Y
+
 format:
   pdf:
+    
     fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
     out-width: 100%
     fig-align: center
@@ -11,6 +33,8 @@ format:
     fig-pos: "H"
     include-in-header:
       text: |
+        \usepackage{orcidlink}
+        \usepackage{authblk}
         \usepackage{fancyhdr}
         \pagestyle{fancy}
         \fancyhf{}
@@ -42,7 +66,7 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble)
 
 opts_chunk$set( size="small")
 
@@ -625,6 +649,11 @@ subsection_species <- data_pivotlong |>
   group_by(year,subsection,veg_type, no_plots, taxon_code) |> 
   summarise(count = sum(presence), foo = count/no_plots) |> 
   distinct()
+
+subsection_species_wide <- subsection_species |>
+  dplyr::select(-count,-no_plots) |> 
+  pivot_wider(names_from = taxon_code, values_from = foo, values_fill = 0)
+
 ```
 
 ```{r}
@@ -1084,18 +1113,30 @@ grid_labeled
 
 ```{r}
 #| label: importing-data-nmds
-#| echo: FALSE
-#| 
-community_matrix <- species_sub_wide |> 
+#| echo: false
+#| warning: false
+#| message: false
+
+community_matrix <- subsection_species_wide |> 
   unite("sub_year_vt", subsection, year, veg_type, sep = "_", remove = FALSE) |> 
   as.data.frame() |> 
   column_to_rownames(var = "sub_year_vt") |> 
   dplyr::select(-year, -subsection, -veg_type, -no_plots)
 
-meta <- merged_data |>
+meta <- subsection_species_wide |>
   mutate(sub_year_vt = paste(subsection, year, veg_type, sep = "_")) |>
   dplyr::select(sub_year_vt, year, veg_type, subsection) |> 
   distinct()
+
+```
+
+```{r}
+#| label: nmds-run
+#| echo: false
+#| warning: false
+#| message: false
+
+
 
 ```
 ### Within vegetation composition
