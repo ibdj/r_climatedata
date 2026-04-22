@@ -1,30 +1,38 @@
 ---
-title: "Supplementary Information 1"
-subtitle: "Document caption: Detailed methods, supplementatyry analyses, and results including p-values."
-author:
-  - name: Ida Bomholt Dyrholm Jacobsen
-    orcid: 0000-0003-2481-8061
-    affiliation: [1, 2]
-    email: ida@example.com
-    corresponding: true
+title: "Supplementary Information"
+subtitle: "Document caption: Detailed methods, supplementary analyses, and results including p-values."
+# author:
+#   - name: Ida Bomholt Dyrholm Jacobsen
+#     orcid: 0000-0003-2481-8061
+#     affiliation: [1, 2]
+#     email: ida@example.com
+#     corresponding: true
+# 
+#   - name: Katrine Raundrup
+#     orcid: 0000-0002-2110-3709
+#     affiliation: 1
+# 
+#   - name: Niels Martin Schmidt
+#     orcid: 0000-0002-4166-6218 
+#     affiliation: 2
+# 
+# affiliations:
+#   - id: 1
+#     name: Greenland Institute of Natural Resources
+#   - id: 2
+#     name: Arctic Research Centre, University Y
 
-  - name: Katrine Raundrup
-    orcid: 0000-0002-2110-3709
-    affiliation: 1
-
-  - name: Niels Martin Schmidt
-    orcid: 0000-0002-4166-6218 
-    affiliation: 2
-
-affiliations:
-  - id: 1
-    name: Greenland Institute of Natural Resources
-  - id: 2
-    name: Arctic Research Centre, University Y
+output:
+  pdf_document:
+    toc: true
+    fig_width: 6.5
+    fig_caption: true
+    keep_tex: true
+    includes:
+      in_header: header.tex
 
 format:
   pdf:
-    
     fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
     out-width: 100%
     fig-align: center
@@ -33,12 +41,11 @@ format:
     fig-pos: "H"
     include-in-header:
       text: |
-        \usepackage{orcidlink}
         \usepackage{authblk}
         \usepackage{fancyhdr}
         \pagestyle{fancy}
         \fancyhf{}
-        \lhead{Appendix: NERO line paper}
+        \lhead{Supplementary Information}
         \rhead{\thepage}
         \renewcommand{\headrulewidth}{0.4pt}
         \setlength{\headheight}{15pt}
@@ -708,7 +715,7 @@ richness_pairs_df <- as.data.frame(richness_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-richness
-#| fig-scap: "Species richness"
+#| fig-scap: "Species richness (Figure 3, a)"
 #| fig-cap: !expr glue("Species richness, number of species pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| message: false
@@ -795,7 +802,7 @@ evenness_pairs_df <- as.data.frame(evenness_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-evenness
-#| fig-scap: "Evenness"
+#| fig-scap: "Evenness (figure 3, b)"
 #| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| message: false
@@ -883,7 +890,7 @@ shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-shannon
-#| fig-scap: "shannon"
+#| fig-scap: "Shannon (Figure 3, C)"
 #| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| message: false
@@ -994,7 +1001,7 @@ turnover_emmeans
 ````
 ```{r}
 #| label: fig-indices-model-turnover
-#| fig-scap: "Turnover"
+#| fig-scap: "Turnover (Figure 3 d)"
 #| fig-cap: !expr glue("Turnover pr. year calculate pr subsection, but only pr present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| message: false
@@ -1137,6 +1144,186 @@ meta <- subsection_species_wide |>
 #| message: false
 
 
+# Set seed for reproducibility
+set.seed(42)
+
+# Run NMDS on presence/absence community matrix
+nmds_result <- metaMDS(community_matrix, k = 3, trymax = 100)
+
+print(nmds_result)
+
+nmds_scores <- as.data.frame(scores(nmds_result, display = "sites"))
+
+#nrow(community_matrix) # to check that they are the same lenght
+#nrow(nmds_scores) 
+
+# Extract NMDS scores for plots
+nmds_scores <- as.data.frame(scores(nmds_result, display = "sites"))
+nmds_scores$sub_year_vt <- rownames(nmds_scores)
+
+write_rds(nmds_result,"nmds_results")
+write_rds(nmds_scores,"nmds_scores")
+```
+```{r}
+#| label: fig-nmds
+#| fig-scap: "NMDS (Figure 4)"
+#| fig-cap: !expr glue("Plant community dynamics. Non-metric multidimensional scaling (NMDS) ordination of vegetation composition across years and vegetation types. Each panel represents subset of years of the full NMDS including all data to keep NMDS distances comparable. Grey lines connect plots within vegetation types, the within-type centroid distances. Black dashed lines indicate distances between vegetation-type centroids.")
+#| echo: false
+#| warning: false
+#| message: false
+
+nmds_plot_data <- nmds_scores |>
+  left_join(meta, by = "sub_year_vt") |>
+  mutate(year = factor(year))  # convert year to factor for plotting
+
+# Function to compute convex hull safely
+find_hull <- function(df) {
+  df <- na.omit(df)
+  if (nrow(df) < 3) return(df)
+  df[chull(df$NMDS1, df$NMDS2), ]
+}
+
+# Compute hulls per year and veg_type
+hulls <- nmds_plot_data %>%
+  group_by(year, veg_type) %>%
+  do(find_hull(.))
+
+# Close hull polygons
+hulls_closed <- hulls %>%
+  group_by(year, veg_type) %>%
+  do({
+    df <- .
+    if (nrow(df) > 1) df <- rbind(df, df[1, ])
+    df
+  })
+
+# Compute centroids per year and veg_type
+centroids <- nmds_plot_data %>%
+  group_by(year, veg_type) %>%
+  summarize(centroid_NMDS1 = mean(NMDS1),
+            centroid_NMDS2 = mean(NMDS2),
+            .groups = "drop")
+
+centroid_paths <- centroids %>%
+  arrange(veg_type, year)
+
+centroid_pairs <- centroids %>%
+  arrange(year, veg_type) %>%
+  group_by(year) %>%
+  reframe({
+    pairs <- combn(n(), 2)
+    tibble(
+      x    = centroid_NMDS1[pairs[1,]],
+      y    = centroid_NMDS2[pairs[1,]],
+      xend = centroid_NMDS1[pairs[2,]],
+      yend = centroid_NMDS2[pairs[2,]]
+    )
+  })
+
+# Create separate plots for each year
+lims_x <- base::range(nmds_plot_data$NMDS1, na.rm = TRUE)
+lims_y <- base::range(nmds_plot_data$NMDS2, na.rm = TRUE)
+
+centroids$year        <- as.character(centroids$year)
+nmds_plot_data$year   <- as.character(nmds_plot_data$year)
+hulls_closed$year     <- as.character(hulls_closed$year)
+centroid_pairs$year   <- as.character(centroid_pairs$year)
+
+years <- unique(centroids$year)  # will now be characters
+
+
+plots <- lapply(years, function(y) {
+  
+  df       <- nmds_plot_data %>% filter(year == y)
+  hull_df  <- hulls_closed   %>% filter(year == y)
+  cent_df  <- centroids      %>% filter(year == y)
+  
+  df_joined <- df %>%
+    left_join(cent_df, by = c("year", "veg_type"))
+  
+  # centroid–centroid pairs
+  pair_df <- cent_df %>%
+    arrange(veg_type) %>%
+    reframe({
+      if (n() < 2) return(NULL)
+      pairs <- combn(n(), 2)
+      tibble(
+        x    = centroid_NMDS1[pairs[1,]],
+        y    = centroid_NMDS2[pairs[1,]],
+        xend = centroid_NMDS1[pairs[2,]],
+        yend = centroid_NMDS2[pairs[2,]]
+      )
+    })
+  
+  ggplot() +   # ⬅️ IMPORTANT: remove global aes()
+    
+    # Hulls
+    geom_polygon(data = hull_df,
+                 aes(NMDS1, NMDS2, fill = veg_type, group = veg_type),
+                 alpha = 0.2,
+                 colour = NA) +
+    
+    geom_path(data = hull_df,
+              aes(NMDS1, NMDS2, group = veg_type),
+              colour = "white",
+              linewidth = 0.3) +
+    
+    # 🔹 centroid–centroid
+    geom_segment(data = pair_df,
+                 aes(x = x, y = y, xend = xend, yend = yend),
+                 linetype = "dashed",
+                 linewidth = 0.7,
+                 colour = "black") +
+    
+    # 🔹 plot–centroid
+    geom_segment(data = df_joined,
+                 aes(x = NMDS1, y = NMDS2,
+                     xend = centroid_NMDS1,
+                     yend = centroid_NMDS2),
+                 linewidth = 0.3,
+                 colour = "grey40",
+                 alpha = 0.6) +
+    
+    # Observations
+    geom_point(data = df,
+               aes(NMDS1, NMDS2,
+                   shape = veg_type,
+                   colour = veg_type),
+               size = 3,
+               alpha = 0.7) +
+    
+    # Centroids
+    geom_point(data = cent_df,
+               aes(centroid_NMDS1,
+                   centroid_NMDS2,
+                   fill = veg_type),
+               shape = 21,
+               size = 5,
+               colour = "black") +
+    
+    geom_text(data = cent_df,
+              aes(centroid_NMDS1,
+                  centroid_NMDS2,
+                  label = veg_type),
+              vjust = -0.2,
+              hjust = 1.3,
+              size = 5) +
+    coord_cartesian(xlim = lims_x,
+                    ylim = lims_y) +
+    annotate("text",
+         x = lims_x[1], 
+         y = lims_y[2],
+         label = y,
+         hjust = 0, 
+         vjust = 1,
+         size = 4)+
+    theme_minimal() +
+    theme(legend.position = "none")+
+    theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
+})
+
+# Combine plots in a grid
+wrap_plots(plots, ncol = 2)  
 
 ```
 ### Within vegetation composition
