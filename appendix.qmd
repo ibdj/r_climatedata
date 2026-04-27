@@ -81,6 +81,7 @@ opts_chunk$set( size="small")
 sleet <- rgb(110/255, 107/255, 196/255, 1)
 rain <- rgb(0/255, 0/255, 165/255, 1)
 warm <- rgb(165/255, 0/255, 0/255, 1)
+fig_text_size = 11
 ```
 
 ```{r}
@@ -138,7 +139,7 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", size=0.5)+
   labs(x = "Month", y = "Mean temperature (°C)", title = "")+
   theme_minimal()+
-  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
+  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
 ```
 
 #### Yearly mean
@@ -175,10 +176,10 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
   labs(x = "", y = "Mean temperature (°C)", title = "")+
   theme_minimal()+
-    theme(  axis.title.x = element_text(size = 8),
-  axis.title.y = element_text(size = 8),
-  axis.text.x  = element_text(size = 7),
-  axis.text.y  = element_text(size = 7))
+    theme(  axis.title.x = element_text(size = 10),
+  axis.title.y = element_text(size = 10),
+  axis.text.x  = element_text(size = 10),
+  axis.text.y  = element_text(size = 10))
 ```
 
 #### Five year intervals
@@ -298,10 +299,10 @@ ggplot() +
   ) +
   theme_minimal()+
   scale_x_continuous(breaks=seq(min(yearly_means$year), max(yearly_means$year), by = 1))+
-  theme(  axis.title.x = element_text(size = 8),
-  axis.title.y = element_text(size = 8),
-  axis.text.x  = element_text(size = 7),
-  axis.text.y  = element_text(size = 7))
+  theme(  axis.title.x = element_text(size = 10),
+  axis.title.y = element_text(size = 10),
+  axis.text.x  = element_text(size = 10),
+  axis.text.y  = element_text(size = 10))
 ```
 
 ## Precipitation
@@ -426,10 +427,10 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
   scale_fill_manual(values = c(rain,sleet,"#b3b3b3"))+
   guides(fill = guide_legend(title = ""))+
   theme_minimal()+
-      theme(  axis.title.x = element_text(size = 8),
-  axis.title.y = element_text(size = 8),
-  axis.text.x  = element_text(size = 7),
-  axis.text.y  = element_text(size = 7))
+      theme(  axis.title.x = element_text(size = 10),
+  axis.title.y = element_text(size = 10),
+  axis.text.x  = element_text(size = 10),
+  axis.text.y  = element_text(size = 10))
 
 ```
 
@@ -466,10 +467,10 @@ geom_hline(yintercept = precip_year_mean, linetype="dotted", color = "blue", lin
   geom_smooth(method = lm, color = "blue", size = 0.5, se = F, linetype="dashed")+
   labs(x = "", y = "Precipitation (mm)")+
 theme_minimal()+
-    theme(  axis.title.x = element_text(size = 8),
-  axis.title.y = element_text(size = 8),
-  axis.text.x  = element_text(size = 7),
-  axis.text.y  = element_text(size = 7))
+    theme(  axis.title.x = element_text(size = 10),
+  axis.title.y = element_text(size = 10),
+  axis.text.x  = element_text(size = 10),
+  axis.text.y  = element_text(size = 10))
 
 ```
 
@@ -609,10 +610,10 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
                  max(2025), by = 15))+
   labs(x = "", y = "Temperature (°C)") +
   theme_minimal()+
-    theme(  axis.title.x = element_text(size = 8),
-  axis.title.y = element_text(size = 8),
-  axis.text.x  = element_text(size = 7),
-  axis.text.y  = element_text(size = 7))
+    theme(  axis.title.x = element_text(size = 10),
+  axis.title.y = element_text(size = 10),
+  axis.text.x  = element_text(size = 10),
+  axis.text.y  = element_text(size = 10))
 ```
 
 # Statistical analysis
@@ -769,7 +770,7 @@ plot_richness <- ggplot() +
   ) +
   labs(x = "", y = "Species richness") +
   theme_minimal()+
-  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
+  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
 
 plot_richness
 ```
@@ -857,7 +858,7 @@ plot_evenness <- ggplot() +
   ) +
   labs(x = "", y = "Evenness") +
   theme_minimal()+
-  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
+  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
 
 plot_evenness
 ```
@@ -945,7 +946,7 @@ plot_shannon <- ggplot() +
   ) +
   labs(x = "", y = "Shannon") +
   theme_minimal()+
-  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
+  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
 
 plot_shannon
 ```
@@ -1013,23 +1014,23 @@ all_years <- factor(c("2007","2012","2017","2022"),
 
 
 ## 3️⃣  Marginal means for the three intervals that really exist
-emm_raw_turnover <- emmeans(m_turnover_sub_f, ~ year) %>%          # returns 3 rows
-  as.data.frame() %>%
+emm_raw_turnover <- emmeans(m_turnover_sub_f, ~ year) |>          # returns 3 rows
+  as.data.frame() |>
   mutate(year = factor(year, levels = levels(all_years)))   # align factor
 
 
 ## 4️⃣  Build the *plot* data frame – pad the missing 2007 row
 
-turnover_plot_df <- tibble(year = all_years) %>%          # 4 rows, ordered
-  left_join(emm_raw_turnover, by = "year") %>%                    # bring in the 3 real rows
+turnover_plot_df <- tibble(year = all_years) |>          # 4 rows, ordered
+  left_join(emm_raw_turnover, by = "year") |>                    # bring in the 3 real rows
   mutate(x_pos = as.integer(year))                       # 1‑4 for the axis
 
 
 ## 5️⃣  Compact‑letter‑display (add a dummy row for 2007)
 # CLD for the three real means
 cld_three <- cld(emmeans(m_turnover_sub_f, ~ year),
-                 adjust = "sidak", Letters = letters) %>%
-  as.data.frame() %>%
+                 adjust = "sidak", Letters = letters) |>
+  as.data.frame() |>
   mutate(year = factor(year, levels = levels(all_years)),
          x_pos = as.integer(year))
 
@@ -1040,10 +1041,10 @@ cld_dummy <- data.frame(year   = factor("2007", levels = levels(all_years)),
                         stringsAsFactors = FALSE)
 
 # Combine – now we have four rows, matching turnover_plot_df
-turnover_cld <- bind_rows(cld_dummy, cld_three) %>%
+turnover_cld <- bind_rows(cld_dummy, cld_three) |>
   arrange(x_pos)
 
-turnover_jitter <- turnover_results %>%
+turnover_jitter <- turnover_results |>
   filter(year %in% c(2012, 2017, 2022))
 
 ## 6️⃣  Plot – everything comes from the two tidy tables
@@ -1081,7 +1082,7 @@ plot_turnover <- ggplot() +
   
   labs(y = "Turnover (total)") +
   theme_minimal()+
-  theme(axis.title.x = element_text(size = 8), axis.title.y = element_text(size = 8))
+  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
 
 plot_turnover
 
@@ -1097,8 +1098,8 @@ plot_turnover
 #| warning: false
 
 grid_labeled <- (
-  (plot_shannon  | plot_richness) /
-  (plot_evenness | plot_turnover)
+  (plot_richness | plot_evenness) /
+  (plot_shannon  | plot_turnover)
 ) +
   plot_layout(
     guides  = "collect",
@@ -1109,8 +1110,8 @@ grid_labeled <- (
     tag_levels = "a",
     tag_suffix = ")"
   ) &
-  theme(legend.position = "bottom", plot.tag = element_text(size = 8))+
-  theme(axis.title = element_text(size = 8), axis.text  = element_text(size = 8))
+  theme(legend.position = "bottom", plot.tag = element_text(size = fig_text_size))+
+  theme(axis.title = element_text(size = fig_text_size), axis.text  = element_text(size = fig_text_size))
 
 grid_labeled
 
@@ -1120,14 +1121,15 @@ grid_labeled
 
 ```{r}
 #| label: importing-data-nmds
-#| echo: false
+#| echo: true
 #| warning: false
 #| message: false
+#| output: false
 
 community_matrix <- subsection_species_wide |> 
   unite("sub_year_vt", subsection, year, veg_type, sep = "_", remove = FALSE) |> 
   as.data.frame() |> 
-  column_to_rownames(var = "sub_year_vt") |> 
+  column_to_rownames(var = "sub_year_vt") |>
   dplyr::select(-year, -subsection, -veg_type, -no_plots)
 
 meta <- subsection_species_wide |>
@@ -1136,19 +1138,25 @@ meta <- subsection_species_wide |>
   distinct()
 
 ```
+### NMDS
+Community composition data ready for analysis consists of `r length(unique(meta$subsection))` subsections from `r length(unique(meta$year))` years of surveys. `r  ncol(community_matrix)` species have been observed across all surveys.
 
 ```{r}
 #| label: nmds-run
 #| echo: false
 #| warning: false
 #| message: false
+#| output: true
 
 
 # Set seed for reproducibility
 set.seed(42)
 
 # Run NMDS on presence/absence community matrix
-nmds_result <- metaMDS(community_matrix, k = 3, trymax = 100)
+# nmds_result <- metaMDS(community_matrix, k = 3, trymax = 100)
+# write_rds(nmds_result, "nmds_result")
+
+nmds_result <- read_rds("nmds_result")
 
 print(nmds_result)
 
@@ -1184,13 +1192,13 @@ find_hull <- function(df) {
 }
 
 # Compute hulls per year and veg_type
-hulls <- nmds_plot_data %>%
-  group_by(year, veg_type) %>%
+hulls <- nmds_plot_data |>
+  group_by(year, veg_type) |>
   do(find_hull(.))
 
 # Close hull polygons
-hulls_closed <- hulls %>%
-  group_by(year, veg_type) %>%
+hulls_closed <- hulls |>
+  group_by(year, veg_type) |>
   do({
     df <- .
     if (nrow(df) > 1) df <- rbind(df, df[1, ])
@@ -1198,18 +1206,18 @@ hulls_closed <- hulls %>%
   })
 
 # Compute centroids per year and veg_type
-centroids <- nmds_plot_data %>%
-  group_by(year, veg_type) %>%
+centroids <- nmds_plot_data |>
+  group_by(year, veg_type) |>
   summarize(centroid_NMDS1 = mean(NMDS1),
             centroid_NMDS2 = mean(NMDS2),
             .groups = "drop")
 
-centroid_paths <- centroids %>%
+centroid_paths <- centroids |>
   arrange(veg_type, year)
 
-centroid_pairs <- centroids %>%
-  arrange(year, veg_type) %>%
-  group_by(year) %>%
+centroid_pairs <- centroids |>
+  arrange(year, veg_type) |>
+  group_by(year) |>
   reframe({
     pairs <- combn(n(), 2)
     tibble(
@@ -1234,16 +1242,16 @@ years <- unique(centroids$year)  # will now be characters
 
 plots <- lapply(years, function(y) {
   
-  df       <- nmds_plot_data %>% filter(year == y)
-  hull_df  <- hulls_closed   %>% filter(year == y)
-  cent_df  <- centroids      %>% filter(year == y)
+  df       <- nmds_plot_data |> filter(year == y)
+  hull_df  <- hulls_closed   |> filter(year == y)
+  cent_df  <- centroids      |> filter(year == y)
   
-  df_joined <- df %>%
+  df_joined <- df |>
     left_join(cent_df, by = c("year", "veg_type"))
   
   # centroid–centroid pairs
-  pair_df <- cent_df %>%
-    arrange(veg_type) %>%
+  pair_df <- cent_df |>
+    arrange(veg_type) |>
     reframe({
       if (n() < 2) return(NULL)
       pairs <- combn(n(), 2)
@@ -1326,9 +1334,216 @@ plots <- lapply(years, function(y) {
 wrap_plots(plots, ncol = 2)  
 
 ```
-### Within vegetation composition
 
 ### Between vegetation composition
+
+
+### Within vegetation composition
+
+````{r}
+#| label: nmds-analysis-within
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+# this is for all veg types, but calculations have been done with respect to each subsecstions vegetation type
+nmds_plot_data <- read_rds("nmds_plot_data")
+
+centroids <- nmds_plot_data %>%
+  # 1. Remove unwanted vegetation type
+  filter(veg_type != "saltmarsh") %>%               # <-- change if spelling differs
+  # 2. Group by the two factors that define each centroid
+  group_by(year, veg_type) %>%
+  # 3. Compute the mean of each NMDS axis for the group
+  summarise(
+    cent_NMDS1 = mean(NMDS1, na.rm = TRUE),
+    cent_NMDS2 = mean(NMDS2, na.rm = TRUE),
+    cent_NMDS3 = mean(NMDS3, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Quick peek at the result
+print(centroids)
+
+# 1️⃣  Left‑join so every row keeps its original data
+nmds_with_dist <- nmds_plot_data %>%
+  left_join(centroids, by = c("year", "veg_type"))
+
+# 2️⃣  Verify the join succeeded (optional sanity check)
+if(any(is.na(nmds_with_dist$cent_NMDS1))) {
+  warning("Some rows did not find a matching centroid – check year/veg_type combos.")
+}
+
+# 3️⃣  Euclidean distance in 3‑dimensional NMDS space
+nmds_with_dist <- nmds_with_dist %>%
+  mutate(
+    dist_to_centroid = sqrt(
+      (NMDS1 - cent_NMDS1)^2 +
+        (NMDS2 - cent_NMDS2)^2 +
+        (NMDS3 - cent_NMDS3)^2
+    )
+  )
+
+# Quick glimpse of the new column
+head(nmds_with_dist[, c("sub_year_vt", "year", "veg_type",
+                        "dist_to_centroid")])
+
+nmds_with_dist <- nmds_plot_data %>%
+  # Keep every column from nmds_plot_data (the left table)
+  left_join(centroids, by = c("year", "veg_type"))
+
+# checking that all wors have a value
+summary(nmds_with_dist$dist_to_centroid)
+
+n_unique <- n_distinct(paste0(nmds_with_dist$year, "_", nmds_with_dist$veg_type))
+cat("Unique (year × veg_type) combos:", n_unique, "\n")
+n_unique
+
+cat("Unique (year × veg_type) combos:", n_unique, "\n")
+
+nmds_with_dist <- nmds_plot_data %>%
+  left_join(centroids, by = c("year", "veg_type")) %>%   # keep veg_type
+  mutate(
+    dist_to_centroid = sqrt(
+      (NMDS1 - cent_NMDS1)^2 +
+        (NMDS2 - cent_NMDS2)^2 +
+        (NMDS3 - cent_NMDS3)^2
+    )
+  )
+
+# 4️⃣  Summary table: mean ± SD of distance for each (year, veg_type)
+dispersion_summary <- nmds_with_dist %>%
+  group_by(year, veg_type) %>%                # keep the two‑factor structure
+  summarise(
+    n          = n(),
+    mean_dist  = mean(dist_to_centroid, na.rm = TRUE),
+    sd_dist    = sd(dist_to_centroid,   na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(year, veg_type)
+
+# View the table
+print(dispersion_summary)
+
+# Are there any NAs in the distance column?
+sum(is.na(nmds_with_dist$dist_to_centroid))
+
+# Does every (year, veg_type) combo have at least one observation?
+nmds_with_dist %>%
+  count(year, veg_type) %>%
+  filter(n == 0)
+
+# baseline model (M1)
+model_dist_to_centroid <- lmer(dist_to_centroid ~ year + (1 | subsection),
+           data = nmds_with_dist,
+           REML = FALSE)   # ML for model comparison
+summary(model_dist_to_centroid) 
+
+model_dist_to_centroid2 <- lmer(dist_to_centroid ~ year + (1 | subsection) + (1 | veg_type),
+           data = nmds_with_dist,
+           REML = FALSE)
+summary(model_dist_to_centroid2)
+
+anova(model_dist_to_centroid, model_dist_to_centroid2)
+
+emm <- emmeans(model_dist_to_centroid, ~ year)
+pairs(emm, adjust = "tukey")
+````
+
+```{r}
+
+#| label: fig-nmds
+#| fig-scap: "Be (Figure )"
+#| fig-cap: !expr glue(" Distances")
+#| echo: false
+#| warning: false
+#| message: false
+
+emm_year <- emmeans(model_dist_to_centroid, ~ year)
+
+# Generate the CLD (default uses Tukey letters)
+cld_tbl <- cld(emm_year, Letters = letters, adjust = "sidak") %>%
+  as.data.frame() %>%
+  rename(
+    year = year,
+    est  = emmean,
+    se   = SE,
+    lower = lower.CL,
+    upper = upper.CL,
+    cld  = .group   # column that holds the letters
+  ) %>%
+  mutate(year = factor(year))   # keep factor ordering consistent
+
+## 2.  Get marginal means (EMMs) and their SEs
+emm_year <- emmeans(model_dist_to_centroid, ~ year) %>%   # model object name
+  as.data.frame() %>%                                   # turn into plain df
+  rename(
+    est   = emmean,      # estimated mean distance
+    se    = SE,          # standard error
+    lower = lower.CL,    # lower 95 % CI (optional)
+    upper = upper.CL     # upper 95 % CI (optional)
+  ) %>%
+  mutate(year = factor(year))   # ensure year is treated as categorical
+
+## 3.  Prepare the raw data for plotting
+raw_plot_df <- nmds_with_dist |> 
+  dplyr::select(sub_year_vt, year, dist_to_centroid) |> 
+  mutate(year = factor(year))   # match factor levels used in emm_year
+
+
+## 4.  Build the ggplot
+
+p <- ggplot() +
+  
+  ## 4a. Jittered raw observations (semi‑transparent)
+  geom_jitter(data = raw_plot_df,
+              aes(x = year, y = dist_to_centroid),
+              width = 0.15,               # horizontal jitter amount
+              alpha = 0.35,               # point transparency
+              size  = 1.5,
+              colour = "#555555") +      # neutral grey
+  
+  ## 4b. Model‑estimated means (solid larger points)
+  geom_point(data = emm_year,
+             aes(x = year, y = est),
+             colour = "black",        # a strong orange for visibility
+             size   = 3) +
+  
+  ## 4c. Error bars (SE)
+  geom_errorbar(data = emm_year,
+                aes(x = year,
+                    ymin = est - se,
+                    ymax = est + se),
+                width = 0.2,
+                colour = "black",
+                size   = 0.9) +
+  
+## 4e. Axis labels, theme, etc.
+  labs(
+    x = "",
+    y = "Distance to vegetation-type centroid",
+    title = ""
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    axis.text.x = element_text(angle = 0, vjust = 0.7)
+  )+
+  geom_text(data = cld_tbl,
+            aes(x = year,
+                y = 1.25,   # small offset above the CI bar
+                label = cld),
+            colour = "black",
+            vjust = 0,           # align bottom of text with the offset
+            size = 5) 
+
+
+## 5.  Print / save the figure
+print(p)                     # display in RStudio / notebook
+
+```
+
 
 ## Shrubification
 
