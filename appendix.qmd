@@ -746,21 +746,6 @@ plot_richness <- ggplot() +
     alpha = 0.5,
     color = "darkgray"
   ) +
-  # geom_errorbar(
-  #   data = richness_emm_df,
-  #   aes(x = year, ymin = .data[[cl_cols]], ymax = .data[[cu_cols]]),
-  #   width = 0.25,
-  #   linewidth = 0.9,
-  #   color = "black",
-  #   inherit.aes = FALSE
-  # ) +
-  # geom_point(
-  #   data = richness_emm_df,
-  #   aes(x = year, y = emmean),
-  #   size = 2.8,
-  #   color = "black",
-  #   inherit.aes = FALSE
-  # ) +
     geom_crossbar(data = richness_emm_df,
               aes(x = year, y = emmean,
                   ymin = .data[[cl_cols]], 
@@ -769,9 +754,6 @@ plot_richness <- ggplot() +
               fill = NA, alpha = 0.1,      # <<< no fill
               colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
-  # geom_errorbar(data = emm_df,
-  #               aes(x = x_pos, ymin = lower.CL, ymax = upper.CL),
-  #               width = 0.2, colour = "black") +
   geom_point(data = richness_emm_df,
              aes(x = year, y = emmean),
              size = 7, colour = "black", shape = 95) +
