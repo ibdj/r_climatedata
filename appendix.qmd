@@ -498,7 +498,7 @@ summary(data_precip_fiveyear)
 
 ```
 
-# 2 istoric climate data
+# 2 Historic climate data
 
 ## 2-1 Temperature
 
@@ -590,7 +590,7 @@ nuuk_21_04_dmi_temp$upper <- preds$fit + 1.96 * preds$se.fit
 ```{r}
 #| label: fig-annual-temp-historic-raw-range-filter
 #| fig-scap: "Annual historic temperature raw data"
-#| fig-cap: !expr glue("Historic yearly mean air temperature (°C) in Nuuk, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024.")
+#| fig-cap: !expr glue("Historic yearly mean air temperature (°C) in Nuuk, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024 (increase of {round(annual2024,2)-round(annual1784,2)}°C or {round((round(annual2024,2)-round(annual1784,2))/((2024-1784)/10),3)}°C decade⁻¹.)")
 #| message: false
 #| warning: false
 
@@ -1038,43 +1038,34 @@ turnover_jitter <- turnover_results |>
 ## 6️⃣  Plot – everything comes from the two tidy tables
 
 plot_turnover <- ggplot() +
-  
-  ## raw observations (optional jitter)
   geom_jitter(data = turnover_jitter,
               aes(x = as.integer(factor(year, levels = levels(all_years))),
                   y = total),
-              width = .15, alpha = .5, colour = "darkgray")+
-  
-  ## 95 % CI error bars (NA rows are ignored automatically)
-  geom_errorbar(data = turnover_plot_df,
-                aes(x = x_pos, ymin = lower.CL, ymax = upper.CL),
-                width = .25, linewidth = .9, colour = "black",
-                na.rm = TRUE) +
-  
-  ## marginal‑mean points
+              width = .05, alpha = .5, colour = "darkgray") +
+  geom_crossbar(data = turnover_plot_df,
+                aes(x = x_pos, y = emmean,
+                    ymin = .data[[cl_cols]],
+                    ymax = .data[[cu_cols]]),
+                width = 0.1,
+                fill = NA,
+                colour = "black",
+                linewidth = 0.2) +
   geom_point(data = turnover_plot_df,
              aes(x = x_pos, y = emmean),
-             size = 2.8, colour = "black",
-             na.rm = TRUE) +
-  
-  ## significance letters (blank for 2007)
+             size = 7, colour = "black", shape = 95) +
   geom_text(data = turnover_cld,
             aes(x = x_pos, label = .group),
             y = max(turnover_jitter$total, na.rm = TRUE),
             size = 3, colour = "black") +
-  
-  ## axis – force the four tick labels
   scale_x_continuous(name = "",
                      breaks = 1:4,
-                     labels = c("2007","2012","2017","2022")) +
-  
+                     labels = c("2007", "2012", "2017", "2022")) +
   labs(y = "Turnover (total)") +
-  theme_minimal()+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
+  theme_minimal() +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot_turnover
-
-
 ```
 ### Plots combined
 ````{r}
@@ -1491,8 +1482,8 @@ ggplot() +
 ```
 
 
-## 4 Functional types
+## 3-4 Functional types
 
-### 4-1 Functional groups
+### Functional groups
 
-### 4-2 Specific species
+### Specific species
