@@ -58,11 +58,11 @@ format:
 editor: visual
 ---
 
-# Current climate conditions
+# 1 Current climate conditions 
 
 Data is available 2007 – 2022. 2008 is the first whole year of temperature data. Data available from GEM. (2020). ClimateBasis Nuuk—Temperature—Air temperature \@ 200 cm—30min average (°C) (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/PGN3-7597>
 
-## Tempterature
+## 1-1 Tempterature
 
 ```{r}
 #| label: importing-packages
@@ -305,7 +305,7 @@ ggplot() +
   axis.text.y  = element_text(size = 10))
 ```
 
-## Precipitation
+## 1-2 Precipitation
 
 Data is available from GEM. (2020). *ClimateBasis Nuuk—Precipitation—Precipitation accumulated (mm)* (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/SXJ8-WA79>. Downloaded on XXXX.
 
@@ -498,9 +498,9 @@ summary(data_precip_fiveyear)
 
 ```
 
-# Historic climate data
+# 2 istoric climate data
 
-## Temperature
+## 2-1 Temperature
 
 Data available from Cappelen, J. (2021). *Greenland – DMI Historical Climate Data Collection 1784-2020* (Nos. 21–04; DMI Report). Danish Meteorological Institute. <https://www.dmi.dk/fileadmin/Rapporter/2021/DMIRep21-04.pdf>
 
@@ -616,9 +616,9 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
   axis.text.y  = element_text(size = 10))
 ```
 
-# Statistical analysis
+# 3 Statistical analysis
 
-## Diversity
+## 3-1 Diversity
 
 Data is available from GEM. (2020). *BioBasis Nuuk—Vegetation—NERO line Raunkiaer* (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/HXJY-RQ13>.
 
@@ -1117,7 +1117,7 @@ grid_labeled
 
 ````
 
-## Community composition
+## 3-2 Community composition
 
 ```{r}
 #| label: importing-data-nmds
@@ -1503,8 +1503,8 @@ ggplot() +
 ```
 
 
-## Shrubification
+## 4 Functional types
 
-### Functional groups
+### 4-1 Functional groups
 
-### Specific species
+### 4-2 Specific species
