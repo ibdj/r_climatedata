@@ -1442,14 +1442,20 @@ y_max <- max(
 ggplot() +
   geom_jitter(data = centroid_pairs,
               aes(x = as.integer(factor(year)), y = dist),
-              width = 0.15, height = 0,
+              width = 0.01, height = 0,
               alpha = 0.4, colour = "gray30") +
-  geom_errorbar(data = emm_df,
-                aes(x = x_pos, ymin = lower.CL, ymax = upper.CL),
-                width = 0.2, colour = "black") +
+  geom_crossbar(data = emm_df,
+              aes(x = x_pos, y = emmean, ymin = lower.CL, ymax = upper.CL),
+              width = 0.1,
+              fill = "black", alpha = 0.1,      # <<< no fill
+              colour = "white",   # <<< outline back
+              linewidth = 0.2)  +  # <<< very thin
+  # geom_errorbar(data = emm_df,
+  #               aes(x = x_pos, ymin = lower.CL, ymax = upper.CL),
+  #               width = 0.2, colour = "black") +
   geom_point(data = emm_df,
              aes(x = x_pos, y = emmean),
-             size = 2.8, colour = "black") +
+             size = 7, colour = "black", shape = 95) +
   geom_text(data = centroid_cld,
             aes(x = x_pos, label = .group),
             y = y_max,
