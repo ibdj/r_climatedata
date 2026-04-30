@@ -1427,14 +1427,17 @@ pairs(emm_year, adjust = "sidak") |>
 ```
 ```{r}
 #| label: fig-nmds-between
-#| fig-scap: "Between comminuty dynamics (Figure 4)"
-#| fig-cap: !expr glue("Plant community dynamics.")
+#| fig-scap: "Between community dynamics (Figure 6)"
+#| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black points show estimated means (± SE), and grey dots represent raw subsection-level distances (in NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| warning: false
 #| message: false
 
 
-y_max <- max(emm_df$upper.CL, na.rm = TRUE) * 1.05
+y_max <- max(
+  max(emm_df$upper.CL, na.rm = TRUE),
+  max(centroid_pairs$dist, na.rm = TRUE)
+) * 1.05
 
 ggplot() +
   geom_jitter(data = centroid_pairs,
@@ -1454,6 +1457,7 @@ ggplot() +
   scale_x_continuous(name = "Year",
                      breaks = 1:4,
                      labels = c("2007", "2012", "2017", "2022")) +
+  coord_cartesian(ylim = c(NA, y_max * 1.05)) +
   labs(y = "Estimated mean centroid distance") +
   theme_minimal()
 ```
