@@ -910,25 +910,21 @@ plot_shannon <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = shannon),
-    width = 0.15,
+    width = 0.05,
     alpha = 0.5,
     color = "darkgray"
   ) +
-  geom_errorbar(
-    data = shannon_emm_df,
-    aes(x = year, ymin = .data[[cl_cols]], ymax = .data[[cu_cols]]),
-    width = 0.25,
-    linewidth = 0.9,
-    color = "black",
-    inherit.aes = FALSE
-  ) +
-  geom_point(
-    data = shannon_emm_df,
-    aes(x = year, y = emmean),
-    size = 2.8,
-    color = "black",
-    inherit.aes = FALSE
-  ) +
+        geom_crossbar(data = shannon_emm_df,
+              aes(x = year, y = emmean,
+                  ymin = .data[[cl_cols]], 
+                  ymax = .data[[cu_cols]]),
+              width = 0.1,
+              fill = NA, alpha = 0.1,      # <<< no fill
+              colour = "black",   # <<< outline back
+              linewidth = 0.2)  +  # <<< very thin
+  geom_point(data = shannon_emm_df,
+             aes(x = year, y = emmean),
+             size = 7, colour = "black", shape = 95) +
   geom_text(
     data = shannon_cld,
     aes(x = year, y = max(subsection_indices$shannon), label = .group),
