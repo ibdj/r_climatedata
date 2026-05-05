@@ -1,6 +1,7 @@
 ---
 title: "Supplementary Information"
 subtitle: "Document caption: Detailed methods, supplementary analyses, and results including p-values."
+bibliography: references.bib
 # author:
 #   - name: Ida Bomholt Dyrholm Jacobsen
 #     orcid: 0000-0003-2481-8061
@@ -33,6 +34,7 @@ output:
 
 format:
   pdf:
+    link-citations: true
     fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
     out-width: 100%
     fig-align: center
@@ -60,7 +62,7 @@ editor: visual
 
 # 1 Current climate conditions 
 
-Data is available 2007 – 2022. 2008 is the first whole year of temperature data. Data available from GEM. (2020). ClimateBasis Nuuk—Temperature—Air temperature \@ 200 cm—30min average (°C) (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/PGN3-7597>
+Data is available 2007 – 2022. 2008 is the first whole year of temperature data. Data available from https://data.g-e-m.dk [@gem2026d; @gem2026c].
 
 ## 1-1 Tempterature
 
@@ -502,7 +504,7 @@ summary(data_precip_fiveyear)
 
 ## 2-1 Temperature
 
-Data available from Cappelen, J. (2021). *Greenland – DMI Historical Climate Data Collection 1784-2020* (Nos. 21–04; DMI Report). Danish Meteorological Institute. <https://www.dmi.dk/fileadmin/Rapporter/2021/DMIRep21-04.pdf>
+Data available from Cappelen [-@cappelen2021].
 
 Station 4250 is Nuuk, and element 101 is precipitation.
 
@@ -1461,7 +1463,7 @@ ggplot() +
 
 
 ```{r}
-#| label: nmds-analysis-within-
+#| label: nmds-analysis-within-print
 #| echo: false
 #| output: false
 #| warning: false
@@ -1471,7 +1473,7 @@ ggplot() +
 ```
 
 ```{r}
-#| label: fig-nmds2
+#| label: fig-nmds-within
 #| fig-scap: "Be (Figure )"
 #| fig-cap: !expr glue("Distances")
 #| echo: false
@@ -1487,3 +1489,5 @@ ggplot() +
 ### Functional groups
 
 ### Specific species
+
+# 4 References
