@@ -476,7 +476,7 @@ theme_minimal()+
 
 ```
 
-#### Five year intervals
+#### Five year interval precipitation
 
 ```{r}
 #| label: data-precip-fiveyear
@@ -501,6 +501,140 @@ summary(data_precip_fiveyear)
 ```
 
 ## 1-3 Radiation
+
+Data available from https://data.g-e-m.dk [@gem2026b]
+
+```{r}
+#| label: data-import-radiation
+#| echo: false
+#| message: false
+#| warning: false
+
+par <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/ration_par/View_ClimateBasis_Nuuk_Data_Radiation_Photosyntetic_active_radiation_@_200_cm__5min_average_æmol_m2_sec210420241337080578.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE) |> 
+  clean_names() |> 
+  filter(par_mmol_sec_m2 != -9999, solar_elevation > 0) |> 
+    mutate(
+     year = year(date),
+     month = month(date)) |> 
+      mutate(
+    anchor    = 2007,
+    seg_start = anchor + floor((year - anchor) / 5) * 5,
+    seg_end   = seg_start + 4,
+    segment   = paste0(seg_start, "-", seg_end)
+  ) |> 
+  group_by(segment, seg_start, seg_end) |>
+  mutate(seg_mean_par = mean(par_mmol_sec_m2, na.rm = TRUE))
+
+par_year <- par |> 
+  group_by(year) |> 
+  reframe(year_mean = mean(par_mmol_sec_m2))
+
+par_segment <- par |>   
+    mutate(
+    anchor    = 2007,
+    seg_start = anchor + floor((year - anchor) / 5) * 5,
+    seg_end   = seg_start + 4,
+    segment   = paste0(seg_start, "-", seg_end)
+  ) |> 
+  group_by(segment, seg_start, seg_end) |>
+  reframe(seg_mean_par = mean(par_mmol_sec_m2, na.rm = TRUE))
+
+par_month <- par |> 
+  group_by(month) |> 
+  reframe(month_mean = mean(par_mmol_sec_m2))
+
+```
+
+```{r}
+#| label: model-fiveyear-par
+#| message: false
+#| warning: false
+#| echo: false
+
+# Fit the model explicitly
+model_par_fiveyear <- lmer(
+  par_mmol_sec_m2 ~ segment + (1 | year), 
+  data = par
+)
+
+# Get estimated marginal means with cld
+emm_par_fiveyear <- model_par_fiveyear |>
+  emmeans(~ segment) |>
+  cld(alpha = 0.05, Letters = letters)
+
+cld_par <- as.data.frame(emm_par_fiveyear)
+
+cld_plot_par <- cld_par |>
+  left_join(par_segment, by = "segment")
+
+```
+
+```{r}
+#| label: fig-par-fiveyear
+#| fig-scap: "PAR means, 5 year interval"
+#| fig-cap: !expr glue("Five year intervals in PAR means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| message: false
+#| warning: false
+#| echo: false
+
+yearly_means_par <- par |>
+  group_by(year) |>
+  summarise(
+    mean_par = mean(par_mmol_sec_m2, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+interval_lines_par <- par |>
+  distinct(segment, seg_start, seg_end, seg_mean_par)
+
+cld_plot_par <- cld_plot_par |>
+  mutate(
+    x_mid = (seg_start + seg_end) / 2
+  )
+
+overall_mean_par <- mean(par$par_mmol_sec_m2, na.rm = TRUE)
+
+ggplot() +
+  geom_hline(yintercept = overall_mean_par, linetype = "dotted", color = "darkgray", size = 0.7) +
+  geom_point(
+    data = yearly_means_par,
+    aes(x = year, y = mean_par),
+    size = 3,
+    color = "darkgreen"
+  ) +
+  geom_segment(
+    data = interval_lines_par,
+    aes(
+      x = seg_start,
+      xend = seg_end,
+      y = seg_mean_par,
+      yend = seg_mean_par
+    )
+  ) +
+  geom_text(
+    data = cld_plot_par,
+    aes(
+      x = x_mid,
+      y = max(yearly_means_par$mean_par)*0.99,
+      label = .group
+    ),
+    vjust = -0.8,
+    size = 3
+  ) +
+  labs(
+    x = "",
+    y = expression("Mean Annual PAR (" * mu * "mol m"^-2 * " s"^-1 * ")"),
+    title = ""
+  ) +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(min(yearly_means_par$year), max(yearly_means_par$year), by = 1)) +
+  theme(
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_text(size = 10),
+    axis.text.x  = element_text(size = 10),
+    axis.text.y  = element_text(size = 10)
+  )
+```
 
 # 2 Historic climate data
 
@@ -803,7 +937,7 @@ evenness_pairs_df <- as.data.frame(evenness_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-evenness
-#| fig-scap: "Evenness (figure 3, b)"
+#| fig-scap: "Evenness (Figure 3, b)"
 #| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| message: false
@@ -887,7 +1021,7 @@ shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-shannon
-#| fig-scap: "Shannon (Figure 3, C)"
+#| fig-scap: "Shannon (Figure 3, c)"
 #| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| message: false
@@ -1074,7 +1208,7 @@ plot_turnover
 ### Plots combined
 ````{r}
 #| label: fig-indices-wrapped
-#| fig-scap: "All indices plot, wrapped (Paper figure 3)"
+#| fig-scap: "All indices plot, wrapped (Figure 3)"
 #| fig-cap: !expr glue("Diversity metrices, a) Shannon diversity, b) Species richness, c) Evenness, c) Species turnover. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
