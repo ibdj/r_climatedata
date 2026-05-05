@@ -1490,4 +1490,7 @@ ggplot() +
 
 ### Specific species
 
-# 4 References
+# 4 Phenology (discussion)
+Data available from https://data.g-e-m.dk [@gem2026; @gem2026a].
+
+# 5 References
