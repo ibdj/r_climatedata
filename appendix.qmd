@@ -75,7 +75,7 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble, broom.mixed)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble, broom.mixed, ggeffects)
 
 opts_chunk$set( size="small")
 
@@ -758,7 +758,7 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
 
 ## 3-1 Diversity
 
-Data is available from GEM. (2020). *BioBasis Nuuk—Vegetation—NERO line Raunkiaer* (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/HXJY-RQ13>.
+Data available from https://data.g-e-m.dk [@gem2026e].
 
 ### Importing data and calculating indexes
 
@@ -1631,6 +1631,96 @@ ggplot() +
 Data available from https://data.g-e-m.dk [@gem2026; @gem2026a].
 
 ## NDVI
+
+```{r}
+#| label: ndvi-data-import
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+ndvi <- readRDS("/Users/ibdj/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/r_generel/ndvi-comparison/ndvi-comparison/biobasis_ndvi.rds") |>   
+  clean_names() |> 
+  mutate(month = month(date), year = year(date), plot_id = factor(paste0(species, plot)),
+         year_c = year - mean(year)) |> 
+  filter(ndvi != -9999)
+```
+
+```{r}
+#| label: ndvi-data-model
+#| echo: false
+#| output: true
+#| warning: false
+#| message: false
+
+model_ndvi <- lmer(
+  ndvi ~ year_c + (1 | plot_id/section),
+  data = ndvi
+)
+
+confint(model_ndvi, method = "boot", nsim = 1000)  # bootstrap
+
+summary(model_ndvi)
+
+# Fixed effects with CIs
+ci <- confint(model_ndvi, method = "boot", nsim = 1000) |>
+  as.data.frame() |>
+  rownames_to_column("term") |>
+  rename(lower = `2.5 %`, upper = `97.5 %`)
+
+tidy(model_ndvi, effects = "fixed") |>
+  left_join(ci, by = "term") |>
+  dplyr::select(term, estimate, std.error, statistic, lower, upper) |>
+  mutate(across(where(is.numeric), \(x) round(x, 4))) |>
+  knitr::kable(caption = "Fixed effects")
+
+# Random effects variance components
+tidy(model_ndvi, effects = "ran_pars") |>
+  dplyr::select(group, term, estimate) |>
+  mutate(estimate = round(estimate, 4)) |>
+  knitr::kable(caption = "Random effects (variance components)")
+
+
+```
+
+```{r}
+#| label: ndvi-visualisering
+#| echo: false
+#| output: true
+#| warning: false
+#| message: false
+
+# Get predicted values + CIs
+mean_year <- mean(ndvi$year)
+preds <- ggpredict(model_ndvi, terms = "year_c [all]") |>
+  mutate(year = x + mean_year)
+
+# Plot-level yearly means for jitter (cleaner than raw weekly points)
+ndvi_means <- ndvi |>
+  group_by(plot_id, year) |>
+  summarise(ndvi_mean = mean(ndvi), .groups = "drop")
+
+ggplot() +
+  geom_jitter(data = ndvi_means,
+              aes(x = year, y = ndvi_mean),
+              width = 0.1, height = 0,
+              alpha = 0.4, colour = "gray30") +
+  geom_ribbon(data = preds,
+              aes(x = year, ymin = conf.low, ymax = conf.high),
+              fill = "black", alpha = 0.1) +
+  geom_line(data = preds,
+            aes(x = year, y = predicted),
+            colour = "black", linewidth = 0.2) +
+  geom_point(data = preds |> filter(year %in% unique(ndvi_means$year)),
+             aes(x = year, y = predicted),
+             size = 7, colour = "black", shape = 95) +
+  scale_x_continuous(name = "",
+                     breaks = unique(ndvi_means$year)) +
+  labs(y = "NDVI") +
+  theme_minimal()
+
+```
+
 ## Salix reproductive phenology
 
 # 5 References
