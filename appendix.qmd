@@ -421,7 +421,7 @@ data_pre_tem_year <- data_pre_tem_joined_monthly |>
 #| message: false
 #| warning: false
 #| fig-scap: "Mean monthly distribution of types of precipitation (mm)"
-#| fig-cap: !expr glue("Mean precipitation type pr month. Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_pre_tem_joined_monthly$year)} to {max(data_pre_tem_joined_monthly$year)}. Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+#| fig-cap: !expr glue("Mean precipitation type pr month. Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_pre_tem_joined_monthly$year)} to {max(data_pre_tem_joined_monthly$year)} (requires join with temperature data which it only available till {max(data_pre_tem_joined_monthly$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 
 ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) + 
   geom_bar(stat = "identity")+
