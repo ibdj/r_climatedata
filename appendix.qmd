@@ -123,7 +123,7 @@ data_temp_annual_mean <- data_temp |>
 
 ```
 
-#### Monthly mean
+#### Monthly mean temeprature
 
 ```{r}
 #| label: fig-month-mean-temp
@@ -144,7 +144,7 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
 ```
 
-#### Yearly mean
+#### Yearly mean temperature
 
 ```{r}
 #| label: model-annual-mean-temp
@@ -184,7 +184,7 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   axis.text.y  = element_text(size = 10))
 ```
 
-#### Five year intervals
+#### Five year intervals of temperature
 
 ```{r}
 #| label: data-fiveyear_intervals
@@ -317,7 +317,7 @@ Data is available from GEM. (2020). *ClimateBasis Nuuk—Precipitation—Precipi
 #| warning: false
 #| echo: false
 
-data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/Precipitation accumulated (mm)_10.17897_SXJ8-WA79/Precipitation accumulated (mm)_10.17897_SXJ8-WA79_data.txt", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
+data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/Precipitation accumulated (mm)_10.17897_SXJ8-WA79 2/Precipitation accumulated (mm)_10.17897_SXJ8-WA79_data.txt", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
   janitor::clean_names() |> 
   drop_na() |>
   filter(pre_mm != -9999) |> 
@@ -337,6 +337,7 @@ data_precip_sum <- data_precip |>
   group_by(year) |> 
   filter(year != 2007) |> 
   summarise(pre_mm_sum = sum(pre_mm))
+
 data_precip_mean <- data_precip_sum |> 
   summarize(mean = mean(pre_mm_sum))
 
@@ -391,7 +392,7 @@ The months with the most precipitation are `r data_precip_month_mean$month_strin
 
 The months with the least precipitation are `r data_precip_month_mean$month_string[10]` (`r data_precip_month_mean$pre_mm_mean[10]` mm), `r data_precip_month_mean$month_string[11]` (`r data_precip_month_mean$pre_mm_mean[11]` mm), `r data_precip_month_mean$month_string[12]` (`r data_precip_month_mean$pre_mm_mean[12]` mm).
 
-#### Monthly mean
+#### Monthly mean precipitation
 
 ```{r}
 #| label: data-yearly-mean-dist_rain-snow
@@ -436,7 +437,7 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
 
 ```
 
-#### Yearly mean
+#### Yearly mean precipitation
 
 ```{r}
 #| label: model-annual-mean-precip
@@ -1658,9 +1659,7 @@ model_ndvi <- lmer(
   data = ndvi
 )
 
-confint(model_ndvi, method = "boot", nsim = 1000)  # bootstrap
-
-summary(model_ndvi)
+boot_ci <- confint(model_ndvi, method = "boot", nsim = 1000)
 
 # Fixed effects with CIs
 ci <- confint(model_ndvi, method = "boot", nsim = 1000) |>
@@ -1680,11 +1679,21 @@ tidy(model_ndvi, effects = "ran_pars") |>
   mutate(estimate = round(estimate, 4)) |>
   knitr::kable(caption = "Random effects (variance components)")
 
+ndvi_caption <- glue(
+  "NDVI change over time. Mean NDVI per plot per year, based on in situ measurements ",
+  "from {min(ndvi$year)} to {max(ndvi$year)}. The trend line shows a significant ",
+  "increase of {round(fixef(model_ndvi)['year_c'], 4)} NDVI units per year ",
+  "(95% CI: {round(boot_ci['year_c', '2.5 %'], 4)}–",
+  "{round(boot_ci['year_c', '97.5 %'], 4)}), representing a cumulative increase of ",
+  "{round(fixef(model_ndvi)['year_c'] * (max(ndvi$year) - min(ndvi$year)), 4)} ",
+  "NDVI units over the study period."
+)
 
 ```
 
 ```{r}
 #| label: ndvi-visualisering
+#| fig-cap: !expr ndvi_caption
 #| echo: false
 #| output: true
 #| warning: false
