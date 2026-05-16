@@ -1631,7 +1631,7 @@ ggplot() +
 # 4 Phenology (discussion)
 Data available from https://data.g-e-m.dk [@gem2026; @gem2026a].
 
-## NDVI
+## 4-1 NDVI
 
 ```{r}
 #| label: ndvi-data-import
@@ -1730,6 +1730,6 @@ ggplot() +
 
 ```
 
-## Salix reproductive phenology
+## 4-2 Salix reproductive phenology
 
 # 5 References
