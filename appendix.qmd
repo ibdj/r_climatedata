@@ -34,6 +34,8 @@ output:
 
 format:
   pdf:
+    pdf-engine: xelatex
+    sansfont: "Myriad Pro"
     link-citations: true
     fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
     out-width: 100%
@@ -75,15 +77,25 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble, broom.mixed, ggeffects)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble, broom.mixed, ggeffects, systemfonts, ragg)
 
-opts_chunk$set( size="small")
+opts_chunk$set(size = "small", dev = "cairo_pdf")
 
 # colors
 sleet <- rgb(110/255, 107/255, 196/255, 1)
 rain <- rgb(0/255, 0/255, 165/255, 1)
 warm <- rgb(165/255, 0/255, 0/255, 1)
 fig_text_size = 11
+
+# global font settings
+theme_set(
+  theme_minimal(base_family = "Myriad Pro", base_size = 8) +
+    theme(  
+          axis.title.x = element_text(size = 10),
+          axis.title.y = element_text(size = 10),
+          axis.text.x  = element_text(size = 10),
+          axis.text.y  = element_text(size = 10))
+)
 ```
 
 ```{r}
@@ -139,9 +151,7 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(1, 12, by = 1))+
   geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", size=0.5)+
-  labs(x = "Month", y = "Mean temperature (°C)", title = "")+
-  theme_minimal()+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
+  labs(x = "Month", y = "Mean temperature (°C)", title = "")
 ```
 
 #### Yearly mean temperature
@@ -176,12 +186,7 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
   geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
-  labs(x = "", y = "Mean temperature (°C)", title = "")+
-  theme_minimal()+
-    theme(  axis.title.x = element_text(size = 10),
-  axis.title.y = element_text(size = 10),
-  axis.text.x  = element_text(size = 10),
-  axis.text.y  = element_text(size = 10))
+  labs(x = "", y = "Mean temperature (°C)", title = "")
 ```
 
 #### Five year intervals of temperature
@@ -299,12 +304,7 @@ ggplot() +
     y = "Mean Annual Temperature (°C)",
     title = ""
   ) +
-  theme_minimal()+
-  scale_x_continuous(breaks=seq(min(yearly_means$year), max(yearly_means$year), by = 1))+
-  theme(  axis.title.x = element_text(size = 10),
-  axis.title.y = element_text(size = 10),
-  axis.text.x  = element_text(size = 10),
-  axis.text.y  = element_text(size = 10))
+  scale_x_continuous(breaks=seq(min(yearly_means$year), max(yearly_means$year), by = 1))
 ```
 
 ## 1-2 Precipitation
@@ -429,7 +429,6 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
   labs(x = "Month", y = "Mean precipitation (mm)", title = "")+
   scale_fill_manual(values = c(rain,sleet,"#b3b3b3"))+
   guides(fill = guide_legend(title = ""))+
-  theme_minimal()+
       theme(  axis.title.x = element_text(size = 10),
   axis.title.y = element_text(size = 10),
   axis.text.x  = element_text(size = 10),
@@ -468,12 +467,7 @@ ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
   scale_x_continuous(breaks=seq(min(data_precip_sum$year), max(data_precip_sum$year), by = 1))+
 geom_hline(yintercept = precip_year_mean, linetype="dotted", color = "blue", linewidth =0.5)+
   geom_smooth(method = lm, color = "blue", size = 0.5, se = F, linetype="dashed")+
-  labs(x = "", y = "Precipitation (mm)")+
-theme_minimal()+
-    theme(  axis.title.x = element_text(size = 10),
-  axis.title.y = element_text(size = 10),
-  axis.text.x  = element_text(size = 10),
-  axis.text.y  = element_text(size = 10))
+  labs(x = "", y = "Precipitation (mm)")
 
 ```
 
@@ -627,14 +621,7 @@ ggplot() +
     y = expression("Mean Annual PAR (" * mu * "mol m"^-2 * " s"^-1 * ")"),
     title = ""
   ) +
-  theme_minimal() +
-  scale_x_continuous(breaks = seq(min(yearly_means_par$year), max(yearly_means_par$year), by = 1)) +
-  theme(
-    axis.title.x = element_text(size = 10),
-    axis.title.y = element_text(size = 10),
-    axis.text.x  = element_text(size = 10),
-    axis.text.y  = element_text(size = 10)
-  )
+  scale_x_continuous(breaks = seq(min(yearly_means_par$year), max(yearly_means_par$year), by = 1))
 ```
 
 # 2 Historic climate data
@@ -748,7 +735,6 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
     breaks = seq(min(gr_monthly_all_1784_2020$year),
                  max(2025), by = 15))+
   labs(x = "", y = "Temperature (°C)") +
-  theme_minimal()+
     theme(  axis.title.x = element_text(size = 10),
   axis.title.y = element_text(size = 10),
   axis.text.x  = element_text(size = 10),
@@ -761,13 +747,15 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
 
 Data available from https://data.g-e-m.dk [@gem2026e].
 
-### Importing data and calculating indexes
 
 ```{r}
 #| label: data-import-indexes
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
+
+#Importing data and calculating indexes
 
 #reading the raw datafile
 data_raw <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/nero_analysis/data/data_long.rds")
@@ -831,7 +819,8 @@ Data has been filtered to remove sections with only one remaining plot and subse
 
 ```{r}
 #| label: indices-model-richness
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -847,8 +836,8 @@ richness_emmeans_f <- emmeans(model_richness_sub_f, ~ year)
 richness_pairs_f <- emmeans(model_richness_sub_f, ~ year) |> 
   pairs()
 
-richness_emmeans_f
-richness_pairs_f
+#richness_emmeans_f
+#richness_pairs_f
 
 richness_pairs_df <- as.data.frame(richness_pairs_f)
 ```
@@ -858,6 +847,7 @@ richness_pairs_df <- as.data.frame(richness_pairs_f)
 #| fig-scap: "Species richness (Figure 3, a)"
 #| fig-cap: !expr glue("Species richness, number of species pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
+#| output: true
 #| message: false
 #| warning: false
 
@@ -903,9 +893,7 @@ plot_richness <- ggplot() +
     color = "black",
     inherit.aes = FALSE
   ) +
-  labs(x = "", y = "Species richness") +
-  theme_minimal()+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
+  labs(x = "", y = "Species richness") 
 
 plot_richness
 ```
@@ -987,9 +975,7 @@ plot_evenness <- ggplot() +
     color = "black",
     inherit.aes = FALSE
   ) +
-  labs(x = "", y = "Evenness") +
-  theme_minimal()+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
+  labs(x = "", y = "Evenness")
 
 plot_evenness
 ```
@@ -1071,9 +1057,7 @@ plot_shannon <- ggplot() +
     color = "black",
     inherit.aes = FALSE
   ) +
-  labs(x = "", y = "Shannon") +
-  theme_minimal()+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
+  labs(x = "", y = "Shannon")
 
 plot_shannon
 ```
@@ -1199,10 +1183,7 @@ plot_turnover <- ggplot() +
   scale_x_continuous(name = "",
                      breaks = 1:4,
                      labels = c("2007", "2012", "2017", "2022")) +
-  labs(y = "Turnover (total)") +
-  theme_minimal() +
-  theme(axis.title.x = element_text(size = 10),
-        axis.title.y = element_text(size = 10))
+  labs(y = "Turnover (total)")
 
 plot_turnover
 ```
@@ -1229,8 +1210,7 @@ grid_labeled <- (
     tag_levels = "a",
     tag_suffix = ")"
   ) &
-  theme(legend.position = "bottom", plot.tag = element_text(size = fig_text_size))+
-  theme(axis.title = element_text(size = fig_text_size), axis.text  = element_text(size = fig_text_size))
+  theme(legend.position = "bottom", plot.tag = element_text(size = fig_text_size))
 
 grid_labeled
 
@@ -1444,9 +1424,7 @@ plots <- lapply(years, function(y) {
          hjust = 0, 
          vjust = 1,
          size = 4)+
-    theme_minimal() +
-    theme(legend.position = "none")+
-    theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10))
+    theme(legend.position = "none")
 })
 
 # Combine plots in a grid
@@ -1583,11 +1561,79 @@ ggplot() +
                      breaks = 1:4,
                      labels = c("2007", "2012", "2017", "2022")) +
   coord_cartesian(ylim = c(NA, y_max * 1.05)) +
-  labs(y = "Centroid distance (NMDS units)") +
-  theme_minimal()
+  labs(y = "Centroid distance (NMDS units)")
 ```
 
 ### Within vegetation composition
+
+```{r}
+#| label: nmds-analysis-within-data-prep
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+## 1️⃣  Global NMDS site scores + metadat
+
+nmds_result <- read_rds("nmds_results")
+# 1.1  Pull the three NMDS axes for every plot
+site_scores <- scores(nmds_result, display = "sites") |>
+  as.data.frame() |>
+  tibble::rownames_to_column("sub_year_vt")
+
+# 1.2  Join the metadata (veg_type, year, etc.)
+site_scores <- site_scores |>
+  left_join(meta, by = "sub_year_vt")
+
+# 1.3  Keep only the columns we need
+site_scores <- scores(nmds_result, display = "sites") |>
+  as.data.frame() |>
+  tibble::rownames_to_column("sub_year_vt") |>
+  left_join(meta, by = "sub_year_vt") |>
+  dplyr::select(
+    sub_year_vt,
+    veg_type,
+    year,
+    subsection,          # <<< keep this column
+    NMDS1, NMDS2, NMDS3 # keep the three NMDS axes
+  )
+
+# 1. Compute global centroids (veg_type × year)
+centroids_all <- site_scores |>
+  dplyr::group_by(veg_type, year) |>
+  dplyr::summarise(
+    cen1 = mean(NMDS1),
+    cen2 = mean(NMDS2),
+    cen3 = mean(NMDS3),
+    .groups = "drop"
+  )
+
+# 2. Join and create the distance column (single operation)
+site_scores <- site_scores |>
+  dplyr::left_join(centroids_all,
+                   by = c("veg_type", "year")) |>
+  dplyr::mutate(
+    dist_to_centroid = sqrt(
+      (NMDS1 - cen1)^2 +
+        (NMDS2 - cen2)^2 +
+        (NMDS3 - cen3)^2
+    )
+  ) |>
+  # <‑‑ make sure it is numeric
+  dplyr::mutate(dist_to_centroid = as.numeric(dist_to_centroid)) |>
+  dplyr::select(-cen1, -cen2, -cen3)
+##  Global y‑axis limits (computed once)
+# Raw distances from the full data set (used for the jitter points)
+global_y_max <- site_scores |>
+  dplyr::summarise(max_dist = max(dist_to_centroid, na.rm = TRUE)) |>
+  dplyr::pull(max_dist)
+
+# Upper bound for the error‑bar + mean point (adds a small cushion)
+global_y_upper <- global_y_max * 1.10   # 10 % headroom for the CLD letters
+global_y_limits <- c(0, global_y_upper)   # lower bound = 0 (distances cannot be negative)
+
+```
+
 
 ```{r}
 #| label: nmds-analysis-within
@@ -1597,16 +1643,137 @@ ggplot() +
 #| message: false
 
 
-```
+veg_vec   <- unique(site_scores$veg_type)
+plot_list <- vector("list", length(veg_vec))
+mlm_table <- tibble()   # collect fixed‑effect summaries
+pairwise_table  <- tibble()   # pairwise year contrasts for all veg types
 
+for (i in seq_along(veg_vec)) {
+  vt <- veg_vec[i]
+  
 
-```{r}
-#| label: nmds-analysis-within-print
-#| echo: false
-#| output: false
-#| warning: false
-#| message: false
+  ## 2.1  Subset data (year stays a factor for the model)
+  vt_dat <- site_scores |>
+    dplyr::filter(veg_type == vt) |>
+    dplyr::mutate(year = factor(year))
+  
 
+  ## 2.2  Fit mixed‑effects model (year fixed, subsection random)
+
+  mod <- lmerTest::lmer(
+    dist_to_centroid ~ year + (1 | subsection),
+    data = vt_dat,
+    REML = FALSE
+  )
+  
+
+  ## 2.3  EMMeans (needed for both CLD and pairwise contrasts)
+
+  emm <- emmeans::emmeans(mod, ~ year)
+  
+
+  ## 2.4  CLD letters (Sidak‑adjusted) – for the plot
+
+  cld_df <- multcomp::cld(
+    emm,
+    adjust = "sidak",
+    Letters = letters,
+    sort = FALSE
+  ) |> as_tibble() |> dplyr::select(year, .group)
+  
+
+  ## 2.5  Pairwise year contrasts (the numbers behind the CLD)
+
+  pairwise_cmp <- emmeans::contrast(
+    emm,
+    method = "pairwise",
+    adjust = "sidak"
+  ) |> as_tibble() |> dplyr::rename(
+    contrast = contrast,
+    estimate = estimate,
+    SE       = SE,
+    df       = df,
+    t_ratio  = t.ratio,
+    p_adj    = p.value
+  ) |> dplyr::mutate(veg_type = vt)
+  
+
+  ## 2.6  Append pairwise results to the master table
+
+  pairwise_table <- dplyr::bind_rows(pairwise_table, pairwise_cmp)
+  
+  ## 2.7  Plot‑ready summary (mean ± SE) + attach CLD letters
+  plot_stats <- vt_dat |>
+    dplyr::group_by(year) |>
+    dplyr::summarise(
+      mean_dist = mean(dist_to_centroid),
+      se_dist   = sd(dist_to_centroid) / sqrt(n()),
+      .groups = "drop"
+    ) |>
+    dplyr::left_join(cld_df, by = "year")
+  
+  centroid_cld <- plot_stats |>
+    dplyr::mutate(
+      y_pos = global_y_upper * 0.92   # fixed vertical position inside panel
+    ) |>
+    dplyr::select(year, .group, y_pos)
+  
+## 2.8  Build the facet plot
+p <- ggplot() +
+  geom_jitter(data = vt_dat,
+              aes(x = as.integer(factor(year)), y = dist_to_centroid),
+              width = 0.01, height = 0,
+              alpha = 0.4, colour = "gray30") +
+  
+  geom_crossbar(data = plot_stats,
+                aes(x = as.integer(factor(year)),
+                    y = mean_dist,
+                    ymin = mean_dist - se_dist,
+                    ymax = mean_dist + se_dist),
+                width = 0.1,
+                fill = "black", alpha = 0.1,
+                colour = "white",
+                linewidth = 0.2) +
+  
+  geom_point(data = plot_stats,
+             aes(x = as.integer(factor(year)), y = mean_dist),
+             size = 7, colour = "black", shape = 95) +
+  
+  geom_text(data = centroid_cld,
+            aes(x = as.integer(factor(year)), label = .group),
+            y = global_y_upper * 0.92,
+            vjust = 0, size = 4, colour = "black") +
+  
+  scale_x_continuous(name = "",
+                     breaks = 1:4,
+                     labels = c("2007", "2012", "2017", "2022")) +
+  coord_cartesian(ylim = global_y_limits) +
+  labs(title = vt, y = "Centroid distance (NMDS units)") +
+  theme(
+    plot.title = element_text(face = "plain", hjust = 0.1),
+    text = element_text(size = 8)
+  )
+  
+  ## 2.9  Store the plot
+  plot_list[[i]] <- p
+  
+  ## 2.10  Extract fixed‑effect summary (includes p‑values)
+  fixed_tab <- summary(mod)$coefficients |>
+    as_tibble(rownames = "term") |>
+    dplyr::rename(
+      estimate   = Estimate,
+      std.error  = `Std. Error`,
+      statistic  = `t value`,
+      p.value    = `Pr(>|t|)`
+    ) |>
+    dplyr::mutate(
+      veg_type = vt,
+      effect   = "fixed"
+    )
+  
+  ## 2.11  Append to the master MLM table
+  mlm_table <- dplyr::bind_rows(mlm_table, fixed_tab)
+}
 
 ```
 
@@ -1618,15 +1785,20 @@ ggplot() +
 #| warning: false
 #| message: false
 
+grid_plot <- wrap_plots(plot_list, ncol = 2) &
+  theme(plot.margin = margin(1, 1, 1, 1))
+
+# Show the figure
+print(grid_plot)
 
 ```
 
 
-## 3-4 Functional types
+## 3-4 Plant functional types
 
 ### Functional groups
 
-### Specific species
+### Individual species
 
 # 4 Phenology (discussion)
 Data available from https://data.g-e-m.dk [@gem2026; @gem2026a].
@@ -1650,19 +1822,28 @@ ndvi <- readRDS("/Users/ibdj/Library/CloudStorage/OneDrive-Aarhusuniversitet/Map
 ```{r}
 #| label: ndvi-data-model
 #| echo: false
-#| output: true
+#| output: false
 #| warning: false
 #| message: false
 
-model_ndvi <- lmer(
-  ndvi ~ year_c + (1 | plot_id/section),
-  data = ndvi
-)
+# model_ndvi <- lmer(
+#   ndvi ~ year_c + (1 | plot_id/section),
+#   data = ndvi
+# )
 
-boot_ci <- confint(model_ndvi, method = "boot", nsim = 1000)
+#write_rds(model_ndvi, "model_ndvi.rds")
+model_ndvi <- read_rds("model_ndvi.rds")
+
+# Run once, then comment out:
+#boot_ci <- confint(model_ndvi, method = "boot", nsim = 1000)
+
+#write_rds(boot_ci, "boot_ci_ndvi.rds")
+
+# Read cached result every render:
+boot_ci <- read_rds("boot_ci_ndvi.rds")
 
 # Fixed effects with CIs
-ci <- confint(model_ndvi, method = "boot", nsim = 1000) |>
+ci <- boot_ci |>
   as.data.frame() |>
   rownames_to_column("term") |>
   rename(lower = `2.5 %`, upper = `97.5 %`)
@@ -1692,7 +1873,8 @@ ndvi_caption <- glue(
 ```
 
 ```{r}
-#| label: ndvi-visualisering
+#| label: fig-ndvi-visualisering
+#| fig-scap: "NDVI 2018 - 2024"
 #| fig-cap: !expr ndvi_caption
 #| echo: false
 #| output: true
@@ -1725,11 +1907,105 @@ ggplot() +
              size = 7, colour = "black", shape = 95) +
   scale_x_continuous(name = "",
                      breaks = unique(ndvi_means$year)) +
-  labs(y = "NDVI") +
-  theme_minimal()
+  labs(y = "NDVI")
 
 ```
 
 ## 4-2 Salix reproductive phenology
+
+```{r}
+#| label: phen-data-import
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+sal_total <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/r_climatedata/data/sal_total.rds") |> 
+  mutate(year = year(date), year_f = as.factor(year))
+ 
+```
+
+```{r}
+#| label: phen-data-model
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+phen_model <- lmer(total_count ~ year_f + (1 | plot),
+          data = sal_total)
+
+anova(phen_model) 
+
+emm_phen <- emmeans(phen_model, ~ year_f)
+summary(emm_phen)
+```
+
+```{r}
+#| label: phen-data-visualisation
+#| fig-scap: "Total phenology"
+#| fig-cap: !expr glue("Phenology")
+#| echo: false
+#| output: true
+#| warning: false
+#| message: false
+
+cld_result_phen <- cld(emm_phen,
+                  adjust  = "tukey",   # change to "bonferroni" etc. if preferred
+                  Letters = letters,
+                  alpha   = 0.05)
+
+cld_df_phen <- as.data.frame(cld_result_phen)
+cld_df_phen$year <- as.factor(cld_result_phen$year_f)
+
+
+catkin_emm_df  <- as.data.frame(emm_phen)
+catkin_cld_df  <- as.data.frame(cld_result_phen)
+
+# Column names for confidence limits
+cl_cols <- "lower.CL"
+cu_cols <- "upper.CL"
+
+emm_df_phen <- as.data.frame(emm_phen)
+emm_df_phen$year_f <- as.factor(emm_df_phen$year_f)
+
+# ── Plot ──────────────────────────────────────────────────────────────────────
+plot_catkins <- ggplot() +
+  geom_jitter(
+    data  = sal_total,
+    aes(x = year_f, y = total_count),
+    width = 0.05,
+    alpha = 0.5,
+    color = "darkgray"
+  ) +
+  geom_crossbar(
+    data  = emm_df_phen,
+    aes(x    = year_f,
+        y    = emmean,
+        ymin = .data[[cl_cols]],
+        ymax = .data[[cu_cols]]),
+              width = 0.3,
+              fill = "black", 
+              alpha = 0.1,      # <<< no fill
+              colour = "white",   # <<< outline back
+              linewidth = 0.2)  +  # <<< very thin
+  geom_point(
+    data   = emm_df_phen,
+    aes(x  = year_f, y = emmean),
+    size   = 7,
+    colour = "black",
+    shape  = 95
+  ) +
+  geom_text(
+    data        = cld_df_phen,
+    aes(x = year_f, y = max(sal_total$total_count), label = trimws(.group)),
+    size        = 3,
+    color       = "black",
+    inherit.aes = FALSE
+  ) +
+  labs(x = "", y = "Catkin count")
+
+plot_catkins
+```
 
 # 5 References
