@@ -458,14 +458,13 @@ data_precip_sum$pred <- predict(model_precip_mean_annual)
 #| warning: false
 
 ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
+  geom_hline(yintercept = precip_year_mean, linetype="dotted", color = "darkgray", linewidth =0.5)+
   geom_bar(stat = "identity", fill = "#6e6bc4")+
   scale_x_continuous(breaks=seq(min(data_precip_sum$year), max(data_precip_sum$year), by = 1))+
-geom_hline(yintercept = precip_year_mean, linetype="dotted", color = "blue", linewidth =0.5)+
-geom_line(
-    aes(y = pred),
-    color = "#076834",
-    linetype = "dashed",
-  )
+  geom_line(
+      aes(y = pred),
+      color = "#076834",
+      linetype = "dashed")
 
 #geom_smooth(method = lm, color = "blue", size = 0.5, se = F, linetype="dashed")+
 #  labs(x = "", y = "Precipitation (mm)")
