@@ -458,16 +458,17 @@ data_precip_sum$pred <- predict(model_precip_mean_annual)
 #| warning: false
 
 ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
-    geom_line(
-    aes(y = pred),
-    color = "#076834",
-    linetype = "dashed",
-  ) +
   geom_bar(stat = "identity", fill = "#6e6bc4")+
   scale_x_continuous(breaks=seq(min(data_precip_sum$year), max(data_precip_sum$year), by = 1))+
 geom_hline(yintercept = precip_year_mean, linetype="dotted", color = "blue", linewidth =0.5)+
-  geom_smooth(method = lm, color = "blue", size = 0.5, se = F, linetype="dashed")+
-  labs(x = "", y = "Precipitation (mm)")
+geom_line(
+    aes(y = pred),
+    color = "#076834",
+    linetype = "dashed",
+  )
+
+#geom_smooth(method = lm, color = "blue", size = 0.5, se = F, linetype="dashed")+
+#  labs(x = "", y = "Precipitation (mm)")
 
 ```
 
@@ -879,9 +880,10 @@ plot_richness <- ggplot() +
               aes(x = year, y = emmean,
                   ymin = .data[[cl_cols]], 
                   ymax = .data[[cu_cols]]),
-              width = 0.1,
-              fill = NA, alpha = 0.1,      # <<< no fill
-              colour = "black",   # <<< outline back
+              width = 0.15,
+              fill = "black", 
+              alpha = 0.1,      # <<< no fill
+              colour = "white",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
   geom_point(data = richness_emm_df,
              aes(x = year, y = emmean),
@@ -961,9 +963,10 @@ plot_evenness <- ggplot() +
               aes(x = year, y = emmean,
                   ymin = .data[[cl_cols]], 
                   ymax = .data[[cu_cols]]),
-              width = 0.1,
-              fill = NA, alpha = 0.1,      # <<< no fill
-              colour = "black",   # <<< outline back
+              width = 0.15,
+              fill = "black", 
+              alpha = 0.1,      # <<< no fill
+              colour = "white",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
   geom_point(data = evenness_emm_df,
              aes(x = year, y = emmean),
@@ -1043,10 +1046,12 @@ plot_shannon <- ggplot() +
               aes(x = year, y = emmean,
                   ymin = .data[[cl_cols]], 
                   ymax = .data[[cu_cols]]),
-              width = 0.1,
-              fill = NA, alpha = 0.1,      # <<< no fill
-              colour = "black",   # <<< outline back
+              width = 0.15,
+              fill = "black", 
+              alpha = 0.1,      # <<< no fill
+              colour = "white",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
+
   geom_point(data = shannon_emm_df,
              aes(x = year, y = emmean),
              size = 7, colour = "black", shape = 95) +
@@ -1169,10 +1174,11 @@ plot_turnover <- ggplot() +
                 aes(x = x_pos, y = emmean,
                     ymin = .data[[cl_cols]],
                     ymax = .data[[cu_cols]]),
-                width = 0.1,
-                fill = NA,
-                colour = "black",
-                linewidth = 0.2) +
+              width = 0.15,
+              fill = "black", 
+              alpha = 0.1,      # <<< no fill
+              colour = "white",   # <<< outline back
+              linewidth = 0.2)  +  # <<< very thin
   geom_point(data = turnover_plot_df,
              aes(x = x_pos, y = emmean),
              size = 7, colour = "black", shape = 95) +
