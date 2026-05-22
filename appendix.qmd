@@ -66,7 +66,7 @@ editor: visual
 
 Data is available 2007 – 2022. 2008 is the first whole year of temperature data. Data available from https://data.g-e-m.dk [@gem2026d; @gem2026c].
 
-## 1-1 Tempterature
+## 1-1 Temperature
 
 ```{r}
 #| label: importing-packages
@@ -135,7 +135,7 @@ data_temp_annual_mean <- data_temp |>
 
 ```
 
-#### Monthly mean temeprature
+#### Monthly mean temperature
 
 ```{r}
 #| label: fig-month-mean-temp
@@ -1529,8 +1529,8 @@ pairs(emm_year, adjust = "sidak") |>
 ```
 ```{r}
 #| label: fig-nmds-between
-#| fig-scap: "Between community dynamics (Figure 6)"
-#| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw subsection-level distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-scap: "Between community dynamics (Figure 5)"
+#| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw subsection-level distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 5)")
 #| echo: false
 #| warning: false
 #| message: false
@@ -1784,8 +1784,8 @@ p <- ggplot() +
 
 ```{r}
 #| label: fig-nmds-within
-#| fig-scap: "Be (Figure )"
-#| fig-cap: !expr glue("Within plant community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-scap: "Within community dynamics (Figure 6)"
+#| fig-cap: !expr glue("Within community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 6)")
 #| echo: false
 #| warning: false
 #| message: false
