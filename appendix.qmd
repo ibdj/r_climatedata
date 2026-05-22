@@ -1530,7 +1530,7 @@ pairs(emm_year, adjust = "sidak") |>
 ```{r}
 #| label: fig-nmds-between
 #| fig-scap: "Between community dynamics (Figure 6)"
-#| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black points show estimated means (± SE), and grey dots represent raw subsection-level distances (in NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw subsection-level distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| warning: false
 #| message: false
@@ -1785,7 +1785,7 @@ p <- ggplot() +
 ```{r}
 #| label: fig-nmds-within
 #| fig-scap: "Be (Figure )"
-#| fig-cap: !expr glue("Distances")
+#| fig-cap: !expr glue("Within plant community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| warning: false
 #| message: false
