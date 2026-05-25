@@ -152,11 +152,11 @@ data_temp_annual_mean <- data_temp |>
 #| warning: false
 
 ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
-  geom_line(size = 0.25, linetype="solid", alpha = 0.2)+
+  geom_line(linewidth = 0.25, linetype="solid", alpha = 0.2)+
   geom_smooth(color = "gray", se = F,  alpha = 0.1)+
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(1, 12, by = 1))+
-  geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", size=0.5)+
+  geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", linewidth = 0.5)+
   labs(x = "Month", y = "Mean temperature (°C)", title = "")
 ```
 
@@ -203,9 +203,10 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
 
 ```{r}
 #| label: data-fiveyear_intervals
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
-#| echo: false
 
 data_temp_fiveyear <- data_temp |> 
   mutate(
@@ -226,9 +227,10 @@ interval_lines <- data_temp_fiveyear |>
 
 ```{r}
 #| label: data-fiveyear_intervals_test
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
-#| echo: false
 
 # Fit the linear mixed model
 temp_data <- data_temp_fiveyear |> filter(year > 2007)
@@ -255,9 +257,10 @@ cld_plot <- cld_temp |>
 #| label: fig-temp-fiveyear
 #| fig-scap: "5 year intervals in temperature means"
 #| fig-cap: !expr glue("Five year intervals in temperature means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| echo: false
+#| output: true
 #| message: false
 #| warning: false
-#| echo: false
 
 yearly_means <- data_temp_fiveyear |>
   group_by(year) |>
@@ -323,9 +326,10 @@ Data is available from GEM. (2020). *ClimateBasis Nuuk—Precipitation—Precipi
 
 ```{r}
 #| label: importing-precip
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
-#| echo: false
 
 data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/precipitation/Precipitation accumulated (mm)_10.17897_SXJ8-WA79 2/Precipitation accumulated (mm)_10.17897_SXJ8-WA79_data.txt", delim = "\t", escape_double = FALSE, col_types = cols(Date = col_date(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
   janitor::clean_names() |> 
@@ -339,9 +343,10 @@ data_precip <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Map
 
 ```{r}
 #| label: data-precip-mean-calculations
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
-#| echo: false
 
 data_precip_sum <- data_precip |> 
   group_by(year) |> 
@@ -407,7 +412,9 @@ The months with the least precipitation are `r data_precip_month_mean$month_stri
 ```{r}
 #| label: data-yearly-mean-dist_rain-snow
 #| echo: false
+#| output: false
 #| message: false
+#| warning: false
 
 # joint the temperature precipitation data to distinguish snow and rain. 
 
@@ -427,11 +434,12 @@ data_pre_tem_year <- data_pre_tem_joined_monthly |>
 
 ```{r}
 #| label: fig-snow-rain-year
-#| echo: false
-#| message: false
-#| warning: false
 #| fig-scap: "Mean monthly distribution of types of precipitation (mm)"
 #| fig-cap: !expr glue("Mean precipitation type pr month. Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_pre_tem_joined_monthly$year)} to {max(data_pre_tem_joined_monthly$year)} (requires join with temperature data which it only available till {max(data_pre_tem_joined_monthly$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
 
 ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) + 
   geom_bar(stat = "identity")+
@@ -451,6 +459,9 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
 ```{r}
 #| label: model-annual-mean-precip
 #| echo: false
+#| output: false
+#| message: false
+#| warning: false
 
 model_precip_mean_annual <- lm(yearly_precip ~ year, data = data_precip_mean_annual)
 summary(model_precip_mean_annual)
@@ -461,9 +472,10 @@ data_precip_sum$pred <- predict(model_precip_mean_annual)
 
 ```{r}
 #| label: fig-precipitation-annual
-#| echo: false
 #| fig-scap: "Mean yearly precipitation (mm)"
 #| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm. Dashed line represent model prediction.")
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -512,6 +524,7 @@ Data available from https://data.g-e-m.dk [@gem2026b]
 ```{r}
 #| label: data-import-radiation
 #| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -552,9 +565,10 @@ par_month <- par |>
 
 ```{r}
 #| label: model-fiveyear-par
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
-#| echo: false
 
 # Fit the model explicitly
 model_par_fiveyear <- lmer(
@@ -578,9 +592,10 @@ cld_plot_par <- cld_par |>
 #| label: fig-par-fiveyear
 #| fig-scap: "PAR means, 5 year interval"
 #| fig-cap: !expr glue("Five year intervals in PAR means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| echo: false
+#| output: true
 #| message: false
 #| warning: false
-#| echo: false
 
 yearly_means_par <- par |>
   group_by(year) |>
@@ -645,6 +660,7 @@ Station 4250 is Nuuk, and element 101 is precipitation.
 ```{r}
 #| label: data-import-dmi-historic-data
 #| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -703,7 +719,8 @@ nuuk21_04_dmi_temp_smoothed_15yr <- nuuk_21_04_dmi_temp |>
 
 ```{r}
 #| label: model-annual-temp-historic
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -727,6 +744,8 @@ nuuk_21_04_dmi_temp$upper <- preds$fit + 1.96 * preds$se.fit
 #| label: fig-annual-temp-historic-raw-range-filter
 #| fig-scap: "Annual historic temperature raw data"
 #| fig-cap: !expr glue("Historic yearly mean air temperature (°C) in Nuuk, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024 (increase of {round(annual2024,2)-round(annual1784,2)}°C or {round((round(annual2024,2)-round(annual1784,2))/((2024-1784)/10),3)}°C decade⁻¹.)")
+#| echo: false
+#| output: true
 #| message: false
 #| warning: false
 
