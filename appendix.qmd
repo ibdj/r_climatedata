@@ -153,7 +153,7 @@ data_temp_annual_mean <- data_temp |>
 
 ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
   geom_line(linewidth = 0.25, linetype="solid", alpha = 0.2)+
-  geom_smooth(color = "gray", se = F,  alpha = 0.1)+
+  geom_smooth(method = "loess", formula = y ~ x, color = "gray", se = FALSE, alpha = 0.1)+
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(1, 12, by = 1))+
   geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", linewidth = 0.5)+
@@ -186,16 +186,16 @@ data_temp_annual_mean$pred <- predict(model_temp_annual_mean)
 #| warning: false
 
 ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
-  geom_line(size = 0.4, color = "gray", linetype="solid", alpha = 0.5)+
+  geom_line(linewidth = 0.4, color = "gray", linetype="solid", alpha = 0.5)+
   #geom_smooth(method = lm, color = "#076834", se = F, linetype = "dashed")+
   geom_line(
     aes(y = pred),
     color = "#076834",
-    linetype = "dashed",
+    linetype = "dashed"
   ) +
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
-  geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
+  geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", linewidth=0.7)+
   labs(x = "", y = "Mean temperature (°C)", title = "")
 ```
 
@@ -282,42 +282,57 @@ cld_plot <- cld_plot |>
 
 # 3. Plot
 ggplot() +
-  # Base: Yearly means (points)
-  geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", size=0.7)+
+
+  # Reference line: yearly grand mean
+  geom_hline(
+    yintercept = year_mean,
+    linetype   = "dotted",
+    color      = "darkgray",
+    linewidth  = 0.7
+  ) +
+
+  # Base layer: yearly means
   geom_point(
-    data = yearly_means,
+    data  = yearly_means,
     aes(x = year, y = mean_temp),
-    size = 3,
+    size  = 3,
     color = "darkgreen"
   ) +
-  
-  # Layer: Interval lines (horizontal spans)
+
+  # Interval mean lines
   geom_segment(
     data = interval_lines,
     aes(
-      x = seg_start,
+      x    = seg_start,
       xend = seg_end,
-      y = seg_mean_temp,
+      y    = seg_mean_temp,
       yend = seg_mean_temp
     )
   ) +
+
+  # Compact letter display (CLD)
   geom_text(
-  data = cld_plot,
-  aes(
-    x = x_mid,
-    y = max(yearly_means$mean_temp)*0.8,
-    label = .group
-  ),
-  vjust = -0.8,
-  size = 3
-)+
-  # Labels and Theme
-  labs(
-    x = "",
-    y = "Mean Annual Temperature (°C)",
-    title = ""
+    data = cld_plot,
+    aes(
+      x     = x_mid,
+      y     = max(yearly_means$mean_temp) * 0.8,
+      label = .group
+    ),
+    vjust = -0.8,
+    size  = 3
   ) +
-  scale_x_continuous(breaks=seq(min(yearly_means$year), max(yearly_means$year), by = 1))
+
+  # Scales
+  scale_x_continuous(
+    breaks = seq(min(yearly_means$year), max(yearly_means$year), by = 1)
+  ) +
+
+  # Labels
+  labs(
+    x     = "",
+    y     = "Mean Annual Temperature (°C)",
+    title = ""
+  )
 ```
 
 ## 1-2 Precipitation
@@ -437,7 +452,7 @@ data_pre_tem_year <- data_pre_tem_joined_monthly |>
 #| fig-scap: "Mean monthly distribution of types of precipitation (mm)"
 #| fig-cap: !expr glue("Mean precipitation type pr month. Mean monthly distribution of types of precipitation (mm). Based on data from {min(data_pre_tem_joined_monthly$year)} to {max(data_pre_tem_joined_monthly$year)} (requires join with temperature data which it only available till {max(data_pre_tem_joined_monthly$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 #| echo: false
-#| output: false
+#| output: true
 #| message: false
 #| warning: false
 
@@ -475,7 +490,7 @@ data_precip_sum$pred <- predict(model_precip_mean_annual)
 #| fig-scap: "Mean yearly precipitation (mm)"
 #| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm. Dashed line represent model prediction.")
 #| echo: false
-#| output: false
+#| output: true
 #| message: false
 #| warning: false
 
@@ -498,6 +513,7 @@ ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
 ```{r}
 #| label: data-precip-fiveyear
 #| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -615,7 +631,7 @@ cld_plot_par <- cld_plot_par |>
 overall_mean_par <- mean(par$par_mmol_sec_m2, na.rm = TRUE)
 
 ggplot() +
-  geom_hline(yintercept = overall_mean_par, linetype = "dotted", color = "darkgray", size = 0.7) +
+  geom_hline(yintercept = overall_mean_par, linetype = "dotted", color = "darkgray", linewidth = 0.7) +
   geom_point(
     data = yearly_means_par,
     aes(x = year, y = mean_par),
@@ -822,7 +838,8 @@ subsection_species_wide <- subsection_species |>
 
 ```{r}
 #| label: data-calculate-indexes
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -932,7 +949,8 @@ plot_richness
 
 ```{r}
 #| label: indices-model-evenness
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -959,6 +977,7 @@ evenness_pairs_df <- as.data.frame(evenness_pairs_f)
 #| fig-scap: "Evenness (Figure 3, b)"
 #| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -1015,7 +1034,8 @@ plot_evenness
 
 ```{r}
 #| label: indices-model-shannon
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -1042,9 +1062,9 @@ shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 #| fig-scap: "Shannon (Figure 3, c)"
 #| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
+#| output: true
 #| message: false
 #| warning: false
-
 
 subsection_indices$year <- factor(subsection_indices$year, levels = years)
 shannon_emm_df <- as.data.frame(shannon_emmeans_f)
@@ -1098,7 +1118,8 @@ plot_shannon
 
 ```{r}
 #| label: data-indices-turnover-calculation
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -1127,9 +1148,10 @@ turnover_results <- turnover(
 )
 
 ```
-````{r}
+```{r}
 #| label: indices-model-turnover
-#| echo: true
+#| echo: false
+#| output: false
 #| message: false
 #| warning: false
 
@@ -1143,12 +1165,14 @@ turnover_emmeans <- emmeans(m_turnover_sub_f, ~ year) |>
 
 turnover_emmeans
 
-````
+```
+
 ```{r}
 #| label: fig-indices-model-turnover
 #| fig-scap: "Turnover (Figure 3 d)"
 #| fig-cap: !expr glue("Turnover pr. year calculate pr subsection, but only pr present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
+#| output: true
 #| message: false
 #| warning: false
 
@@ -1254,10 +1278,10 @@ grid_labeled
 
 ```{r}
 #| label: importing-data-nmds
-#| echo: true
-#| warning: false
-#| message: false
+#| echo: false
 #| output: false
+#| message: false
+#| warning: false
 
 community_matrix <- subsection_species_wide |> 
   unite("sub_year_vt", subsection, year, veg_type, sep = "_", remove = FALSE) |> 
@@ -1277,9 +1301,9 @@ Community composition data ready for analysis consists of `r length(unique(meta$
 ```{r}
 #| label: nmds-run
 #| echo: false
-#| warning: false
+#| output: false
 #| message: false
-#| output: true
+#| warning: false
 
 
 # Set seed for reproducibility
@@ -1305,13 +1329,15 @@ nmds_scores$sub_year_vt <- rownames(nmds_scores)
 write_rds(nmds_result,"nmds_results")
 write_rds(nmds_scores,"nmds_scores")
 ```
+
 ```{r}
 #| label: fig-nmds
 #| fig-scap: "NMDS (Figure 4)"
 #| fig-cap: !expr glue("Plant community dynamics. Non-metric multidimensional scaling (NMDS) ordination of vegetation composition across years and vegetation types. Each panel represents subset of years of the full NMDS including all data to keep NMDS distances comparable. Grey lines connect plots within vegetation types, the within-type centroid distances. Black dashed lines indicate distances between vegetation-type centroids.")
 #| echo: false
-#| warning: false
+#| output: true
 #| message: false
+#| warning: false
 
 nmds_plot_data <- nmds_scores |>
   left_join(meta, by = "sub_year_vt") |>
@@ -1561,8 +1587,9 @@ pairs(emm_year, adjust = "sidak") |>
 #| fig-scap: "Between community dynamics (Figure 5)"
 #| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw subsection-level distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 5)")
 #| echo: false
-#| warning: false
+#| output: true
 #| message: false
+#| warning: false
 
 
 y_max <- max(
@@ -1604,8 +1631,8 @@ ggplot() +
 #| label: nmds-analysis-within-data-prep
 #| echo: false
 #| output: false
-#| warning: false
 #| message: false
+#| warning: false
 
 ## 1️⃣  Global NMDS site scores + metadat
 
@@ -1673,8 +1700,8 @@ global_y_limits <- c(0, global_y_upper)   # lower bound = 0 (distances cannot be
 #| label: nmds-analysis-within
 #| echo: false
 #| output: false
-#| warning: false
 #| message: false
+#| warning: false
 
 
 veg_vec   <- unique(site_scores$veg_type)
@@ -1816,8 +1843,9 @@ p <- ggplot() +
 #| fig-scap: "Within community dynamics (Figure 6)"
 #| fig-cap: !expr glue("Within community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 6)")
 #| echo: false
-#| warning: false
+#| output: false
 #| message: false
+#| warning: false
 
 grid_plot <- wrap_plots(plot_list, ncol = 2) &
   theme(plot.margin = margin(1, 1, 1, 1))
@@ -1836,8 +1864,8 @@ print(grid_plot)
 #| label: data-import-pft
 #| echo: false
 #| output: false
-#| warning: false
 #| message: false
+#| warning: false
 
 merged_data <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/nero_analysis/data/merged_data.rds") |> 
   group_by(year, subsection) |> 
@@ -1871,8 +1899,8 @@ species_sub <- species_long |>
 #| label: model-pft
 #| echo: false
 #| output: false
-#| warning: false
 #| message: false
+#| warning: false
 
 func_summed <- species_sub |> 
   group_by(year, subsection, veg_type, fraction, func_type) |> 
