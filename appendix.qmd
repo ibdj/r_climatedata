@@ -100,8 +100,10 @@ theme_set(
 
 ```{r}
 #| label: importing-temp-data
-#| echo: FALSE
-
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
 
 data_temp <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/data/temperature/data/View_ClimateBasis_Nuuk_Data_Temperature_Air_temperature_@_200_cm__30min_average__DegreesC220420240157436123.csv", delim = "\t", escape_double = FALSE,col_types = cols(Date = col_datetime(format = "%Y-%m-%d"), Time = col_time(format = "%H:%M:%S")), trim_ws = TRUE) |> 
   janitor::clean_names() |> 
@@ -116,6 +118,9 @@ data_temp <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappi
 ```{r}
 #| label: temp-mean-monthly
 #| echo: false
+#| output: false
+#| message: false
+#| warning: false
 
 data_temp_monthly_mean <- data_temp |> 
   group_by(month) |> 
@@ -142,6 +147,7 @@ data_temp_annual_mean <- data_temp |>
 #| fig-scap: "Mean air temperature (°C) pr month"
 #| fig-cap: !expr glue("Mean temperature pr month. Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(year_mean,3)}°C.")
 #| echo: false
+#| output: true
 #| message: false
 #| warning: false
 
@@ -158,7 +164,10 @@ ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
 
 ```{r}
 #| label: model-annual-mean-temp
-#| 
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
 
 model_temp_annual_mean <- lm(mean ~ year, data = data_temp_annual_mean)
 summary(model_temp_annual_mean)
@@ -171,9 +180,10 @@ data_temp_annual_mean$pred <- predict(model_temp_annual_mean)
 #| label: fig-annual-mean-temp
 #| fig-scap: "Mean air temperature pr year (°C)"
 #| fig-cap: !expr glue("Mean annual air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)} in Kangerluassunguaq. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {year_mean}°C. Dashed line is model prediction.")
+#| echo: false
+#| output: true
 #| message: false
 #| warning: false
-#| echo: false
 
 ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   geom_line(size = 0.4, color = "gray", linetype="solid", alpha = 0.5)+
@@ -1851,8 +1861,10 @@ func_summed <- species_sub |>
   filter(func_type != "rock")
 
 func_types <- unique(func_summed$func_type)
-
-plot_list <- list()
+plot_list_pft  <- list()
+fixed_list_pft <- list()
+emm_list_pft   <- list()
+pairs_list_pft <- list()
 
 for (f in func_types) {
   
@@ -1866,7 +1878,7 @@ for (f in func_types) {
     data = df
   )
   
-  emm <- emmeans(model, ~ factor(year))
+  emm    <- emmeans(model, ~ factor(year))
   emm_df <- as.data.frame(emm)
   
   cld_df <- emm |>
@@ -1875,66 +1887,102 @@ for (f in func_types) {
   
   emm_lab <- emm_df |>
     dplyr::left_join(cld_df, by = "year")
-  
-  p <- ggplot(df,
-              aes(x = factor(year), y = sum_frac)) +
+
+  # ---- store tables ----
+  fixed_list_pft[[f]] <- broom.mixed::tidy(model, effects = "fixed") |>
+    dplyr::select(term, estimate, std.error, statistic) |>
+    dplyr::mutate(
+      func_type = f,
+      term = stringr::str_replace(term, "factor\\(year\\)", "Year ")
+    )
+
+  emm_list_pft[[f]] <- emm_lab |>
+    dplyr::select(year, emmean, SE, lower.CL, upper.CL, .group) |>
+    dplyr::mutate(func_type = f)
+
+  pairs_list_pft[[f]] <- pairs(emm, adjust = "holm") |>
+    as.data.frame() |>
+    dplyr::select(contrast, estimate, SE, t.ratio, p.value) |>
+    dplyr::mutate(func_type = f)
+
+  # ---- plot ----
+  p <- ggplot() +
     
-    geom_jitter(width = 0.15,
-                alpha = 0.25,
-                colour = "gray60") +
+    geom_jitter(data = df,
+                aes(x = as.integer(factor(year)), y = sum_frac),
+                width = 0.01, height = 0,
+                alpha = 0.4, colour = "gray30") +
+    
+    geom_crossbar(data = emm_df,
+                  aes(x = as.integer(factor(year)), y = emmean,
+                      ymin = lower.CL, ymax = upper.CL),
+                  width = 0.1,
+                  fill = "black", alpha = 0.1,
+                  colour = "white",
+                  linewidth = 0.2) +
     
     geom_point(data = emm_df,
-               aes(x = factor(year), y = emmean),
-               colour = "black",
-               size = 3) +
-    
-    geom_errorbar(data = emm_df,
-                  aes(x = factor(year),
-                      ymin = lower.CL,
-                      ymax = upper.CL),
-                  width = 0.2,
-                  colour = "black",
-                  inherit.aes = FALSE) +
+               aes(x = as.integer(factor(year)), y = emmean),
+               size = 7, colour = "black", shape = 95) +
     
     geom_text(data = emm_lab,
-              aes(x = factor(year),
-                    label = .group),
+              aes(x = as.integer(factor(year)), label = .group),
               y = label_y,
-              colour = "black",
-              size = 5) +
+              vjust = 0, size = 4, colour = "black") +
     
-    labs(x = "",
-         y = "Summed FOO") +
-    annotate(
-      "text",
-      x = -Inf,
-      y = Inf,
-      label = f,
-      hjust = 0,
-      vjust = 1.1,
-      size = 4
-    )
+    scale_x_continuous(name = "",
+                       breaks = as.integer(factor(unique(df$year))),
+                       labels = as.character(sort(unique(df$year)))) +
+    
+    coord_cartesian(ylim = c(NA, label_y * 1.05)) +
+    
+    labs(y = "Summed FOO") +
+    
+    annotate("text",
+             x = -Inf, y = Inf,
+             label = f,
+             hjust = 0, vjust = 1.1,
+             size = 4)
   
-  plot_list[[f]] <- p
+  plot_list_pft[[f]] <- p
 }
 
+```
 
+```{r}
+#| label: table-pft
+#| echo: false
+#| output: true
+#| warning: false
+#| message: false
+
+dplyr::bind_rows(fixed_list_pft) |>
+  dplyr::relocate(func_type) |>
+  knitr::kable(digits = 3, caption = "Fixed effects per functional type")
+
+dplyr::bind_rows(emm_list_pft) |>
+  dplyr::relocate(func_type) |>
+  knitr::kable(digits = 3, caption = "Estimated marginal means per functional type and survey year")
+
+dplyr::bind_rows(pairs_list_pft) |>
+  dplyr::relocate(func_type) |>
+  knitr::kable(digits = 3, caption = "Pairwise contrasts per functional type (Holm-adjusted)")
 ```
 
 ```{r}
 #| label: fig-pft
 #| fig-scap: "Plant functional groups"
-#| fig-cap: !expr glue("Plant functional group dynamics. ")
+#| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence for plant functional groups. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
 #| warning: false
 #| message: false
 
 
-grid_plot <- wrap_plots(plot_list, ncol = 2) &
+grid_plot_pft <- wrap_plots(plot_list_pft, ncol = 2) &
   theme(plot.margin = margin(1, 1, 1, 1))
 
-print(grid_plot)
+print(grid_plot_pft)
 ```
 
 ### Individual species
