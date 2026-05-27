@@ -113,14 +113,8 @@ data_temp <- read_delim("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappi
          month = month(date), 
          doy = yday(date),
          month_string = month.name[month])
-```
 
-```{r}
-#| label: temp-mean-monthly
-#| echo: false
-#| output: false
-#| message: false
-#| warning: false
+temp_year_mean <- round(mean(data_temp$at_c),4)
 
 data_temp_monthly_mean <- data_temp |> 
   group_by(month) |> 
@@ -130,7 +124,17 @@ data_temp_monthly_mean <- data_temp |>
   arrange(desc(mean)) |> 
   mutate(temp_rank = row_number())
 
-year_mean <- round(mean(data_temp$at_c),4)
+data_temp_month_mean <- data_temp_monthly_mean
+
+```
+
+```{r}
+#| label: temp-mean-monthly
+#| echo: false
+#| output: false
+#| message: false
+#| warning: false
+
 
 data_temp_annual_mean <- data_temp |> 
   group_by(year) |> 
@@ -145,20 +149,24 @@ data_temp_annual_mean <- data_temp |>
 ```{r}
 #| label: fig-month-mean-temp
 #| fig-scap: "Mean air temperature (°C) pr month"
-#| fig-cap: !expr glue("Mean temperature pr month. Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(year_mean,3)}°C.")
+#| fig-cap: !expr glue("Mean temperature pr month. Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(temp_year_mean,3)}°C.")
 #| echo: false
 #| output: true
 #| message: false
 #| warning: false
 
-ggplot(data_temp_monthly_mean, aes(x = month, y = mean))+
+ggplot(data_temp_month_mean, aes(x = month, y = mean))+
   geom_line(linewidth = 0.25, linetype="solid", alpha = 0.2)+
   geom_smooth(method = "loess", formula = y ~ x, color = "gray", se = FALSE, alpha = 0.1)+
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(1, 12, by = 1))+
-  geom_hline(yintercept=year_mean, linetype="dotted", color = "#076834", linewidth = 0.5)+
+  geom_hline(yintercept=temp_year_mean, linetype="dotted", color = "#076834", linewidth = 0.5)+
   labs(x = "Month", y = "Mean temperature (°C)", title = "")
 ```
+
+The mean annual temperature is `r round(temp_year_mean, 1)` °C.
+The warmest months are `r data_temp_month_mean$month_string[1]` (`r round(data_temp_month_mean$mean[1], 1)` °C), `r data_temp_month_mean$month_string[2]` (`r round(data_temp_month_mean$mean[2], 1)` °C), `r data_temp_month_mean$month_string[3]` (`r round(data_temp_month_mean$mean[3], 1)` °C).
+The coldest months are `r data_temp_month_mean$month_string[10]` (`r round(data_temp_month_mean$mean[10], 1)` °C), `r data_temp_month_mean$month_string[11]` (`r round(data_temp_month_mean$mean[11], 1)` °C), `r data_temp_month_mean$month_string[12]` (`r round(data_temp_month_mean$mean[12], 1)` °C).
 
 #### Yearly mean temperature
 
@@ -179,7 +187,7 @@ data_temp_annual_mean$pred <- predict(model_temp_annual_mean)
 ```{r}
 #| label: fig-annual-mean-temp
 #| fig-scap: "Mean air temperature pr year (°C)"
-#| fig-cap: !expr glue("Mean annual air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)} in Kangerluassunguaq. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {year_mean}°C. Dashed line is model prediction.")
+#| fig-cap: !expr glue("Mean annual air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)} in Kangerluassunguaq. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {temp_year_mean}°C. Dashed line is model prediction.")
 #| echo: false
 #| output: true
 #| message: false
@@ -195,7 +203,7 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   ) +
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
-  geom_hline(yintercept=year_mean, linetype="dotted", color = "darkgray", linewidth=0.7)+
+  geom_hline(yintercept=temp_year_mean, linetype="dotted", color = "darkgray", linewidth=0.7)+
   labs(x = "", y = "Mean temperature (°C)", title = "")
 ```
 
@@ -285,7 +293,7 @@ ggplot() +
 
   # Reference line: yearly grand mean
   geom_hline(
-    yintercept = year_mean,
+    yintercept = temp_year_mean,
     linetype   = "dotted",
     color      = "darkgray",
     linewidth  = 0.7
@@ -337,7 +345,7 @@ ggplot() +
 
 ## 1-2 Precipitation
 
-Data is available from GEM. (2020). *ClimateBasis Nuuk—Precipitation—Precipitation accumulated (mm)* (Version 1.0) \[Dataset\]. Greenland Ecosystem Monitoring. <https://doi.org/10.17897/SXJ8-WA79>. Downloaded on XXXX.
+Data available from https://data.g-e-m.dk [@gem2026c]. 
 
 ```{r}
 #| label: importing-precip
@@ -759,7 +767,7 @@ nuuk_21_04_dmi_temp$upper <- preds$fit + 1.96 * preds$se.fit
 ```{r}
 #| label: fig-annual-temp-historic-raw-range-filter
 #| fig-scap: "Annual historic temperature raw data"
-#| fig-cap: !expr glue("Historic yearly mean air temperature (°C) in Nuuk, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024 (increase of {round(annual2024,2)-round(annual1784,2)}°C or {round((round(annual2024,2)-round(annual1784,2))/((2024-1784)/10),3)}°C decade⁻¹.)")
+#| fig-cap: !expr glue("Historic yearly mean air temperature (°C) in Nuuk, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024 (increase of {round(annual2024,2)-round(annual1784,2)}°C or {round((round(annual2024,2)-round(annual1784,2))/((2024-1784)/10),3)}°C/decade.)")
 #| echo: false
 #| output: true
 #| message: false
@@ -859,7 +867,7 @@ subsection_indices <- subsection_species |>
 years <- c("2007", "2012", "2017", "2022")
 ```
 
-Data has been filtered to remove sections with only one remaining plot and subsections in saltmarsh, due to too few replicates in this vegetation type. Final calculates included `r length(unique(subsection_indices$subsection))` subsections (original dataset includes `r length(unique(data_raw$subsection))`).
+Data has been filtered to remove sections with only one remaining plot and subsections in saltmarsh, due to too few replicates in this community type. Final calculates included `r length(unique(subsection_indices$subsection))` subsections (full transect consists of 162 subsection).
 
 ### Richness
 
@@ -875,7 +883,7 @@ model_richness_sub_f <- lmer(
   data = subsection_indices
 )
 
-summary(model_richness_sub_f)
+#summary(model_richness_sub_f)
 
 richness_emmeans_f <- emmeans(model_richness_sub_f, ~ year) 
 
@@ -977,7 +985,7 @@ evenness_pairs_df <- as.data.frame(evenness_pairs_f)
 #| fig-scap: "Evenness (Figure 3, b)"
 #| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
-#| output: false
+#| output: true
 #| message: false
 #| warning: false
 
@@ -1843,7 +1851,7 @@ p <- ggplot() +
 #| fig-scap: "Within community dynamics (Figure 6)"
 #| fig-cap: !expr glue("Within community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 6)")
 #| echo: false
-#| output: false
+#| output: true
 #| message: false
 #| warning: false
 
@@ -2034,6 +2042,46 @@ print(grid_plot_pft)
 
 ### Individual species
 
+```{r}
+#| label: species-data-prep
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+
+```
+
+```{r}
+#| label: species-analysis
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+
+```
+
+```{r}
+#| label: species-tables
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+
+```
+
+```{r}
+#| label: fig-species-tables
+#| echo: false
+#| output: false
+#| warning: false
+#| message: false
+
+
+```
+
 # 4 Phenology (discussion)
 Data available from https://data.g-e-m.dk [@gem2026; @gem2026a].
 
@@ -2145,101 +2193,6 @@ ggplot() +
 
 ```
 
-## 4-2 Salix reproductive phenology
 
-```{r}
-#| label: phen-data-import
-#| echo: false
-#| output: false
-#| warning: false
-#| message: false
-
-sal_total <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/r_climatedata/r_climatedata/data/sal_total.rds") |> 
-  mutate(year = year(date), year_f = as.factor(year))
- 
-```
-
-```{r}
-#| label: phen-data-model
-#| echo: false
-#| output: false
-#| warning: false
-#| message: false
-
-phen_model <- lmer(total_count ~ year_f + (1 | plot),
-          data = sal_total)
-
-anova(phen_model) 
-
-emm_phen <- emmeans(phen_model, ~ year_f)
-summary(emm_phen)
-```
-
-```{r}
-#| label: phen-data-visualisation
-#| fig-scap: "Total phenology"
-#| fig-cap: !expr glue("Phenology")
-#| echo: false
-#| output: true
-#| warning: false
-#| message: false
-
-cld_result_phen <- cld(emm_phen,
-                  adjust  = "tukey",   # change to "bonferroni" etc. if preferred
-                  Letters = letters,
-                  alpha   = 0.05)
-
-cld_df_phen <- as.data.frame(cld_result_phen)
-cld_df_phen$year <- as.factor(cld_result_phen$year_f)
-
-
-catkin_emm_df  <- as.data.frame(emm_phen)
-catkin_cld_df  <- as.data.frame(cld_result_phen)
-
-# Column names for confidence limits
-cl_cols <- "lower.CL"
-cu_cols <- "upper.CL"
-
-emm_df_phen <- as.data.frame(emm_phen)
-emm_df_phen$year_f <- as.factor(emm_df_phen$year_f)
-
-# ── Plot ──────────────────────────────────────────────────────────────────────
-plot_catkins <- ggplot() +
-  geom_jitter(
-    data  = sal_total,
-    aes(x = year_f, y = total_count),
-    width = 0.05,
-    alpha = 0.5,
-    color = "darkgray"
-  ) +
-  geom_crossbar(
-    data  = emm_df_phen,
-    aes(x    = year_f,
-        y    = emmean,
-        ymin = .data[[cl_cols]],
-        ymax = .data[[cu_cols]]),
-              width = 0.3,
-              fill = "black", 
-              alpha = 0.1,      # <<< no fill
-              colour = "white",   # <<< outline back
-              linewidth = 0.2)  +  # <<< very thin
-  geom_point(
-    data   = emm_df_phen,
-    aes(x  = year_f, y = emmean),
-    size   = 7,
-    colour = "black",
-    shape  = 95
-  ) +
-  geom_text(
-    data        = cld_df_phen,
-    aes(x = year_f, y = max(sal_total$total_count), label = trimws(.group)),
-    size        = 3,
-    color       = "black",
-    inherit.aes = FALSE
-  ) +
-  labs(x = "", y = "Catkin count")
-
-plot_catkins
-```
 
 # 5 References
