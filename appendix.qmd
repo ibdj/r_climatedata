@@ -2056,11 +2056,138 @@ species_sub <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/Mappin
 ```{r}
 #| label: species-analysis
 #| echo: false
-#| output: false
+#| output: true
 #| warning: false
 #| message: false
 
+species_list <- unique(species_sub$taxon_code)
+# containers for results
+model_list      <- list()
+pairwise_list   <- list()
+emm_list        <- list()
+plot_list       <- list()
+has_diff_groups <- logical(0)   # named logical to track CLD variation
 
+# loop
+for(sp in species_list){
+  
+  df_sp <- species_sub |>
+    dplyr::filter(taxon_code == sp)
+  
+  # Skip species with too little data
+  if(nrow(df_sp) < 5) next
+  
+  # ----- MODEL -----
+  mod <- lmer(
+    fraction ~ factor(year) + (1 | subsection),
+    data = df_sp,
+    REML = FALSE
+  )
+  
+  model_list[[sp]] <- mod
+  
+  
+  # ----- PAIRWISE TESTS -----
+  pairwise <- mod |>
+    emmeans(~ factor(year)) |>
+    pairs(adjust = "holm")
+  
+  pairwise_list[[sp]] <- pairwise
+  
+  
+  # ----- EMMEANS -----
+  emm_df <- mod |>
+    emmeans(~ factor(year)) |>
+    as.data.frame()
+  
+  emm_list[[sp]] <- emm_df
+  
+  
+  # ----- CLD LETTERS -----
+  cld_years <- mod |>
+    emmeans(~ factor(year)) |>
+    multcomp::cld(method = "holm", Letters = letters)
+  
+  cld_labels <- cld_years |>
+    dplyr::select(year, .group)
+  
+  year_emm_lab <- emm_df |>
+    dplyr::left_join(cld_labels, by = "year")
+  
+    # Track whether this species has any meaningful group differences
+  has_diff_groups[[sp]] <- n_distinct(trimws(year_emm_lab$.group)) > 1
+  
+  # ----- PLOT -----
+  p <- ggplot() +
+    
+    geom_jitter(
+      data = df_sp,
+      aes(x = year, y = fraction),
+      width = 0.05,
+      alpha = 0.5,
+      color = "darkgray"
+    ) +
+    
+    geom_crossbar(
+      data = emm_df,
+      aes(x = year, y = emmean,
+          ymin = lower.CL,
+          ymax = upper.CL),
+      width = 0.15,
+      fill = "black",
+      alpha = 0.1,
+      colour = "white",
+      linewidth = 0.2
+    ) +
+    
+    geom_point(
+      data = emm_df,
+      aes(x = year, y = emmean),
+      size = 7,
+      colour = "black",
+      shape = 95
+    ) +
+    
+    geom_text(
+      data = year_emm_lab,
+      aes(x = year,
+          y = max(df_sp$fraction, na.rm = TRUE),
+          label = .group),
+      size = 3,
+      color = "black",
+      inherit.aes = FALSE
+    ) +
+    
+    labs(x = "",
+         y = "Frequency of occurrence") +
+    
+    theme_minimal() +
+    
+    annotate("text",
+             x = -Inf,
+             y = Inf,
+             label = sp,
+             hjust = -0.1,
+             vjust = 1.1,
+             size = 3)
+  
+  plot_list[[sp]] <- p
+  
+}
+
+
+```
+```{r}
+#| label: species-plots
+#| echo: false
+#| warning: false
+#| message: false
+#| results: asis
+
+for(sp in names(plot_list[has_diff_groups])){
+  print(plot_list[[sp]])
+  cat("\n\n")
+}
 ```
 
 ```{r}
