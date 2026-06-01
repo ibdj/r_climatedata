@@ -77,7 +77,9 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble, broom.mixed, ggeffects, systemfonts, ragg)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble, broom.mixed, ggeffects, systemfonts, ragg, pbkrtest)
+
+# pbkrtest dependincy for the species mode
 
 opts_chunk$set(size = "small", dev = "cairo_pdf")
 
@@ -1915,91 +1917,99 @@ func_summed <- species_sub |>
   reframe(sum_frac = sum(fraction)) |> 
   filter(func_type != "rock")
 
-func_types <- unique(func_summed$func_type)
+func_types     <- unique(func_summed$func_type)
 plot_list_pft  <- list()
 fixed_list_pft <- list()
 emm_list_pft   <- list()
 pairs_list_pft <- list()
+has_diff_groups_pft <- logical(0)   # separate from the species one
 
-for (f in func_types) {
+for(pft in func_types){
   
-  df <- func_summed |> 
-    filter(func_type == f)
+  df_pft <- func_summed |>
+    dplyr::filter(func_type == pft)
   
-  label_y <- max(df$sum_frac, na.rm = TRUE)
+  if(nrow(df_pft) < 5) next
   
-  model <- lmer(
+  # ----- MODEL -----
+  mod <- lmer(
     sum_frac ~ factor(year) + (1 | subsection),
-    data = df
+    data = df_pft,
+    REML = FALSE
   )
+  fixed_list_pft[[pft]] <- mod
   
-  emm    <- emmeans(model, ~ factor(year))
-  emm_df <- as.data.frame(emm)
+  # ----- PAIRWISE TESTS -----
+  pairwise <- mod |>
+    emmeans(~ factor(year)) |>
+    pairs(adjust = "holm")
+  pairs_list_pft[[pft]] <- pairwise
   
-  cld_df <- emm |>
-    cld(method = "holm", Letters = letters) |>
+  # ----- EMMEANS -----
+  emm_df <- mod |>
+    emmeans(~ factor(year)) |>
+    as.data.frame() |>
+    dplyr::rename_with(~ "year", 1) |>
+    dplyr::mutate(year = as.numeric(as.character(year)))
+  emm_list_pft[[pft]] <- emm_df
+  
+    # --- DEBUG ---
+  print(paste(pft, "- year values:"))
+  print(emm_df$year)
+  print(class(emm_df$year))
+
+  
+  # ----- CLD LETTERS -----
+  cld_years <- mod |>
+    emmeans(~ factor(year)) |>
+    multcomp::cld(method = "holm", Letters = letters) |>
+    as.data.frame() |>
+    dplyr::rename_with(~ "year", 1) |>
+    dplyr::mutate(year = as.numeric(as.character(year)))
+
+  cld_labels <- cld_years |>
     dplyr::select(year, .group)
   
-  emm_lab <- emm_df |>
-    dplyr::left_join(cld_df, by = "year")
-
-  # ---- store tables ----
-  fixed_list_pft[[f]] <- broom.mixed::tidy(model, effects = "fixed") |>
-    dplyr::select(term, estimate, std.error, statistic) |>
-    dplyr::mutate(
-      func_type = f,
-      term = stringr::str_replace(term, "factor\\(year\\)", "Year ")
-    )
-
-  emm_list_pft[[f]] <- emm_lab |>
-    dplyr::select(year, emmean, SE, lower.CL, upper.CL, .group) |>
-    dplyr::mutate(func_type = f)
-
-  pairs_list_pft[[f]] <- pairs(emm, adjust = "holm") |>
-    as.data.frame() |>
-    dplyr::select(contrast, estimate, SE, t.ratio, p.value) |>
-    dplyr::mutate(func_type = f)
-
-  # ---- plot ----
-  p <- ggplot() +
-    
-    geom_jitter(data = df,
-                aes(x = as.integer(factor(year)), y = sum_frac),
-                width = 0.01, height = 0,
-                alpha = 0.4, colour = "gray30") +
-    
-    geom_crossbar(data = emm_df,
-                  aes(x = as.integer(factor(year)), y = emmean,
-                      ymin = lower.CL, ymax = upper.CL),
-                  width = 0.1,
-                  fill = "black", alpha = 0.1,
-                  colour = "white",
-                  linewidth = 0.2) +
-    
-    geom_point(data = emm_df,
-               aes(x = as.integer(factor(year)), y = emmean),
-               size = 7, colour = "black", shape = 95) +
-    
-    geom_text(data = emm_lab,
-              aes(x = as.integer(factor(year)), label = .group),
-              y = label_y,
-              vjust = 0, size = 4, colour = "black") +
-    
-    scale_x_continuous(name = "",
-                       breaks = as.integer(factor(unique(df$year))),
-                       labels = as.character(sort(unique(df$year)))) +
-    
-    coord_cartesian(ylim = c(NA, label_y * 1.05)) +
-    
-    labs(y = "Summed FOO") +
-    
-    annotate("text",
-             x = -Inf, y = Inf,
-             label = f,
-             hjust = 0, vjust = 1.1,
-             size = 4)
+  cld_labels <- cld_years |>
+    dplyr::select(year, .group)
   
-  plot_list_pft[[f]] <- p
+  year_emm_lab <- emm_df |>
+    dplyr::left_join(cld_labels, by = "year")
+  
+  has_diff_groups_pft[[pft]] <- n_distinct(trimws(year_emm_lab$.group)) > 1
+  
+  # ----- PLOT -----
+  p <- ggplot() +
+    geom_jitter(
+      data = df_pft,
+      aes(x = year, y = sum_frac),
+      width = 0.05, alpha = 0.5, color = "darkgray"
+    ) +
+    geom_crossbar(
+      data = emm_df,
+      aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
+      width = 0.15, fill = "black", alpha = 0.1,
+      colour = "white", linewidth = 0.2
+    ) +
+    geom_point(
+      data = emm_df,
+      aes(x = year, y = emmean),
+      size = 7, colour = "black", shape = 95
+    ) +
+    geom_text(
+      data = year_emm_lab,
+      aes(x = year, y = max(df_pft$sum_frac, na.rm = TRUE), label = .group),
+      size = 3, color = "black", inherit.aes = FALSE
+    ) +
+    labs(x = "", y = "Summed fraction") +
+    theme_minimal() +
+    annotate("text", x = -Inf, y = Inf, label = pft,
+             hjust = -0.1, vjust = 1.1, size = 3)+
+    scale_x_continuous(name = "",
+                   breaks = c(2007, 2012, 2017, 2022),
+                   labels = c("2007", "2012", "2017", "2022"))
+  
+  plot_list_pft[[pft]] <- p
 }
 
 ```
@@ -2011,15 +2021,18 @@ for (f in func_types) {
 #| warning: false
 #| message: false
 
-dplyr::bind_rows(fixed_list_pft) |>
+# Fixed effects table
+purrr::map_dfr(fixed_list_pft, broom.mixed::tidy, effects = "fixed", .id = "func_type") |>
   dplyr::relocate(func_type) |>
   knitr::kable(digits = 3, caption = "Fixed effects per functional type")
 
-dplyr::bind_rows(emm_list_pft) |>
+# Emmeans table
+dplyr::bind_rows(emm_list_pft, .id = "func_type") |>
   dplyr::relocate(func_type) |>
   knitr::kable(digits = 3, caption = "Estimated marginal means per functional type and survey year")
 
-dplyr::bind_rows(pairs_list_pft) |>
+# Pairwise contrasts table
+purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
   dplyr::relocate(func_type) |>
   knitr::kable(digits = 3, caption = "Pairwise contrasts per functional type (Holm-adjusted)")
 ```
@@ -2033,11 +2046,11 @@ dplyr::bind_rows(pairs_list_pft) |>
 #| warning: false
 #| message: false
 
+for(sp in names(plot_list[has_diff_groups_pft])){
+  print(plot_list[[sp]])
+  cat("\n\n")
+}
 
-grid_plot_pft <- wrap_plots(plot_list_pft, ncol = 2) &
-  theme(plot.margin = margin(1, 1, 1, 1))
-
-print(grid_plot_pft)
 ```
 
 ### Individual species
@@ -2169,7 +2182,11 @@ for(sp in species_list){
              label = sp,
              hjust = -0.1,
              vjust = 1.1,
-             size = 3)
+             size = 3)+
+    scale_x_continuous(name = "",
+                   breaks = c(2007, 2012, 2017, 2022),
+                   labels = c("2007", "2012", "2017", "2022"))
+  
   
   plot_list[[sp]] <- p
   
