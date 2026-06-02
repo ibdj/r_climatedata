@@ -2111,16 +2111,21 @@ for(sp in species_list){
   # ----- EMMEANS -----
   emm_df <- mod |>
     emmeans(~ factor(year)) |>
-    as.data.frame()
-  
+    as.data.frame() |>
+    dplyr::rename_with(~ "year", 1) |>
+    dplyr::mutate(year = as.numeric(as.character(year)))
+
   emm_list[[sp]] <- emm_df
   
   
   # ----- CLD LETTERS -----
   cld_years <- mod |>
     emmeans(~ factor(year)) |>
-    multcomp::cld(method = "holm", Letters = letters)
-  
+    multcomp::cld(method = "holm", Letters = letters) |>
+    as.data.frame() |>
+    dplyr::rename_with(~ "year", 1) |>
+    dplyr::mutate(year = as.numeric(as.character(year)))
+
   cld_labels <- cld_years |>
     dplyr::select(year, .group)
   
@@ -2201,10 +2206,14 @@ for(sp in species_list){
 #| message: false
 #| results: asis
 
+cat("Total number if species is", length(model_list), ". ")
+cat(sum(has_diff_groups), "of them has significantly different means between surveys.","\n")
+
 for(sp in names(plot_list[has_diff_groups])){
   print(plot_list[[sp]])
   cat("\n\n")
 }
+
 ```
 
 ```{r}
