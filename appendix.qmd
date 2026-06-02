@@ -1963,11 +1963,6 @@ for(pft in func_types){
     dplyr::rename_with(~ "year", 1) |>
     dplyr::mutate(year = as.numeric(as.character(year)))
   emm_list_pft[[pft]] <- emm_df
-  
-    # --- DEBUG ---
-  print(paste(pft, "- year values:"))
-  print(emm_df$year)
-  print(class(emm_df$year))
 
   
   # ----- CLD LETTERS -----
@@ -2025,16 +2020,6 @@ for(pft in func_types){
 
 ```
 
-```{r}
-#| label: fig-pft
-#| echo: false
-#| output: true
-#| warning: false
-#| message: false
-
-print(plot_list[[pft]])
-
-```
 
 ```{r}
 #| label: table-pft
@@ -2069,7 +2054,7 @@ purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
 #| message: false
 
 for(sp in names(plot_list[has_diff_groups_pft])){
-  print(plot_list[[sp]])
+  print(plot_list[[pft]])
   cat("\n\n")
 }
 
