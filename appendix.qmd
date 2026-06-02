@@ -1875,6 +1875,7 @@ print(grid_plot)
 
 ```
 
+{{< pagebreak >}}
 
 ## 3-4 Plant functional types
 
@@ -2025,6 +2026,17 @@ for(pft in func_types){
 ```
 
 ```{r}
+#| label: fig-pft
+#| echo: false
+#| output: true
+#| warning: false
+#| message: false
+
+print(plot_list[[pft]])
+
+```
+
+```{r}
 #| label: table-pft
 #| echo: false
 #| output: true
@@ -2062,6 +2074,7 @@ for(sp in names(plot_list[has_diff_groups_pft])){
 }
 
 ```
+{{< pagebreak >}}
 
 ### Individual species
 
@@ -2320,6 +2333,6 @@ ggplot() +
 
 ```
 
-
+{{< pagebreak >}}
 
 # 5 References
