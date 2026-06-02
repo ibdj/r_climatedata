@@ -97,8 +97,8 @@ theme_set(
     theme(  
           axis.title.x = element_text(size = 10),
           axis.title.y = element_text(size = 10),
-          axis.text.x  = element_text(size = 10),
-          axis.text.y  = element_text(size = 10))
+          axis.text.x  = element_text(size = 8),
+          axis.text.y  = element_text(size = 8))
 )
 ```
 
@@ -477,11 +477,7 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
   scale_x_continuous(breaks=seq(min(data_pre_tem_monthly$month), max(data_pre_tem_monthly$month), by = 1))+
   labs(x = "Month", y = "Mean precipitation (mm)", title = "")+
   scale_fill_manual(values = c(rain,sleet,"#b3b3b3"))+
-  guides(fill = guide_legend(title = ""))+
-      theme(  axis.title.x = element_text(size = 10),
-  axis.title.y = element_text(size = 10),
-  axis.text.x  = element_text(size = 10),
-  axis.text.y  = element_text(size = 10))
+  guides(fill = guide_legend(title = ""))
 
 ```
 
