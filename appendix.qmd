@@ -213,6 +213,8 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
   labs(x = "", y = "Mean temperature (°C)", title = "")
 ```
 
+{{< pagebreak >}}
+
 #### Five year intervals of temperature
 
 ```{r}
