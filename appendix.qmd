@@ -481,6 +481,8 @@ ggplot(data_pre_tem_monthly, aes(x = month, y = mean, fill = precip_type)) +
 
 ```
 
+{{< pagebreak >}}
+
 #### Yearly mean precipitation
 
 ```{r}
@@ -544,6 +546,8 @@ data_precip_fiveyear <- data_precip |>
 summary(data_precip_fiveyear)
 
 ```
+
+{{< pagebreak >}}
 
 ## 1-3 Radiation
 
@@ -677,6 +681,8 @@ ggplot() +
   scale_x_continuous(breaks = seq(min(yearly_means_par$year), max(yearly_means_par$year), by = 1))
 ```
 
+{{< pagebreak >}}
+
 # 2 Historic climate data
 
 ## 2-1 Temperature
@@ -797,6 +803,8 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
   axis.text.x  = element_text(size = 10),
   axis.text.y  = element_text(size = 10))
 ```
+
+{{< pagebreak >}}
 
 # 3 Statistical analysis
 
@@ -2199,10 +2207,12 @@ for(sp in names(plot_list[has_diff_groups])){
 
 ```
 
+{{< pagebreak >}}
+
 # 4 Phenology (discussion)
-Data available from https://data.g-e-m.dk [@gem2026; @gem2026a].
 
 ## 4-1 NDVI
+Data available from https://data.g-e-m.dk [@gem2026].
 
 ```{r}
 #| label: ndvi-data-import
