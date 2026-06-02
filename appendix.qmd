@@ -1976,9 +1976,6 @@ for(pft in func_types){
   cld_labels <- cld_years |>
     dplyr::select(year, .group)
   
-  cld_labels <- cld_years |>
-    dplyr::select(year, .group)
-  
   year_emm_lab <- emm_df |>
     dplyr::left_join(cld_labels, by = "year")
   
@@ -2053,10 +2050,15 @@ purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
 #| warning: false
 #| message: false
 
-for(sp in names(plot_list[has_diff_groups_pft])){
-  print(plot_list[[pft]])
-  cat("\n\n")
-}
+grid_pft <- wrap_plots(plot_list_pft, ncol = 2) +
+  #plot_annotation(
+  #  tag_levels = "a",
+  #  tag_suffix = ")"
+  #) &
+  theme(plot.tag = element_text(size = fig_text_size))
+
+grid_pft
+
 
 ```
 {{< pagebreak >}}
