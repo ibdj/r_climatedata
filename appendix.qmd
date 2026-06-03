@@ -937,9 +937,9 @@ plot_richness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = richness),
-    width = 0.05,
-    alpha = 0.5,
-    color = "darkgray"
+    width = 0.01,
+    alpha = 0.4,
+    color = "darkgreen"
   ) +
     geom_crossbar(data = richness_emm_df,
               aes(x = year, y = emmean,
@@ -948,11 +948,11 @@ plot_richness <- ggplot() +
               width = 0.15,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
-              colour = "white",   # <<< outline back
+              colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
-  geom_point(data = richness_emm_df,
-             aes(x = year, y = emmean),
-             size = 7, colour = "black", shape = 95) +
+  # geom_point(data = richness_emm_df,
+  #            aes(x = year, y = emmean),
+  #            size = 7, colour = "black", shape = 95) +
   geom_text(
     data = richness_cld,
     aes(x = year, y = max(subsection_indices$richness), label = .group),
@@ -1022,9 +1022,9 @@ plot_evenness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = evenness),
-    width = 0.05,
-    alpha = 0.5,
-    color = "darkgray"
+    width = 0.01,
+    alpha = 0.4,
+    color = "darkgreen"
   ) +
       geom_crossbar(data = evenness_emm_df,
               aes(x = year, y = emmean,
@@ -1033,11 +1033,11 @@ plot_evenness <- ggplot() +
               width = 0.15,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
-              colour = "white",   # <<< outline back
+              colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
-  geom_point(data = evenness_emm_df,
-             aes(x = year, y = emmean),
-             size = 7, colour = "black", shape = 95) +
+  # geom_point(data = evenness_emm_df,
+  #            aes(x = year, y = emmean),
+  #            size = 7, colour = "black", shape = 95) +
   geom_text(
     data = evenness_cld,
     aes(x = year, y = max(subsection_indices$evenness), label = .group),
@@ -1106,9 +1106,9 @@ plot_shannon <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = shannon),
-    width = 0.05,
-    alpha = 0.5,
-    color = "darkgray"
+    width = 0.01,
+    alpha = 0.4,
+    color = "darkgreen"
   ) +
         geom_crossbar(data = shannon_emm_df,
               aes(x = year, y = emmean,
@@ -1117,12 +1117,12 @@ plot_shannon <- ggplot() +
               width = 0.15,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
-              colour = "white",   # <<< outline back
+              colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
 
-  geom_point(data = shannon_emm_df,
-             aes(x = year, y = emmean),
-             size = 7, colour = "black", shape = 95) +
+  # geom_point(data = shannon_emm_df,
+  #            aes(x = year, y = emmean),
+  #            size = 7, colour = "black", shape = 95) +
   geom_text(
     data = shannon_cld,
     aes(x = year, y = max(subsection_indices$shannon), label = .group),
@@ -1241,7 +1241,7 @@ plot_turnover <- ggplot() +
   geom_jitter(data = turnover_jitter,
               aes(x = as.integer(factor(year, levels = levels(all_years))),
                   y = total),
-              width = .05, alpha = .5, colour = "darkgray") +
+              width = 0.01, alpha = 0.4, colour = "darkgreen") +
   geom_crossbar(data = turnover_plot_df,
                 aes(x = x_pos, y = emmean,
                     ymin = .data[[cl_cols]],
@@ -1249,11 +1249,11 @@ plot_turnover <- ggplot() +
               width = 0.15,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
-              colour = "white",   # <<< outline back
+              colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
-  geom_point(data = turnover_plot_df,
-             aes(x = x_pos, y = emmean),
-             size = 7, colour = "black", shape = 95) +
+  # geom_point(data = turnover_plot_df,
+  #            aes(x = x_pos, y = emmean),
+  #            size = 7, colour = "black", shape = 95) +
   geom_text(data = turnover_cld,
             aes(x = x_pos, label = .group),
             y = max(turnover_jitter$total, na.rm = TRUE),
@@ -1571,6 +1571,7 @@ centroid_cld <- cld(emm_year, adjust = "sidak", Letters = letters) %>%
   )
 
 ```
+
 ```{r}
 #| label: nmds-between-analysis-print
 #| echo: false
@@ -1602,6 +1603,7 @@ pairs(emm_year, adjust = "sidak") |>
   knitr::kable(digits = 3, caption = "Pairwise contrasts between surveys (Sidak-adjusted)")
 
 ```
+
 ```{r}
 #| label: fig-nmds-between
 #| fig-scap: "Between community dynamics (Figure 5)"
@@ -1621,12 +1623,12 @@ ggplot() +
   geom_jitter(data = centroid_pairs,
               aes(x = as.integer(factor(year)), y = dist),
               width = 0.01, height = 0,
-              alpha = 0.4, colour = "gray30") +
+              alpha = 0.4, colour = "darkgreen") +
   geom_crossbar(data = emm_df,
               aes(x = x_pos, y = emmean, ymin = lower.CL, ymax = upper.CL),
               width = 0.1,
               fill = "black", alpha = 0.1,      # <<< no fill
-              colour = "white",   # <<< outline back
+              colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
   # geom_errorbar(data = emm_df,
   #               aes(x = x_pos, ymin = lower.CL, ymax = upper.CL),
@@ -1804,7 +1806,7 @@ p <- ggplot() +
   geom_jitter(data = vt_dat,
               aes(x = as.integer(factor(year)), y = dist_to_centroid),
               width = 0.01, height = 0,
-              alpha = 0.4, colour = "gray30") +
+              alpha = 0.4, colour = "darkgreen") +
   
   geom_crossbar(data = plot_stats,
                 aes(x = as.integer(factor(year)),
@@ -1813,12 +1815,12 @@ p <- ggplot() +
                     ymax = mean_dist + se_dist),
                 width = 0.1,
                 fill = "black", alpha = 0.1,
-                colour = "white",
+                colour = "black",
                 linewidth = 0.2) +
   
-  geom_point(data = plot_stats,
-             aes(x = as.integer(factor(year)), y = mean_dist),
-             size = 7, colour = "black", shape = 95) +
+  # geom_point(data = plot_stats,
+  #            aes(x = as.integer(factor(year)), y = mean_dist),
+  #            size = 7, colour = "black", shape = 95) +
   
   geom_text(data = centroid_cld,
             aes(x = as.integer(factor(year)), label = .group),
@@ -1986,26 +1988,25 @@ for(pft in func_types){
     geom_jitter(
       data = df_pft,
       aes(x = year, y = sum_frac),
-      width = 0.05, alpha = 0.5, color = "darkgray"
+      width = 0.05, alpha = 0.5, color = "darkgreen"
     ) +
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
       width = 0.15, fill = "black", alpha = 0.1,
-      colour = "white", linewidth = 0.2
+      colour = "black", linewidth = 0.2
     ) +
-    geom_point(
-      data = emm_df,
-      aes(x = year, y = emmean),
-      size = 7, colour = "black", shape = 95
-    ) +
+    # geom_point(
+    #   data = emm_df,
+    #   aes(x = year, y = emmean),
+    #   size = 7, colour = "black", shape = 95
+    # ) +
     geom_text(
       data = year_emm_lab,
-      aes(x = year, y = max(df_pft$sum_frac, na.rm = TRUE), label = .group),
+      aes(x = year, label = .group), y = max(df_pft$sum_frac, na.rm = TRUE),
       size = 3, color = "black", inherit.aes = FALSE
     ) +
     labs(x = "", y = "Summed fraction") +
-    theme_minimal() +
     annotate("text", x = -Inf, y = Inf, label = pft,
              hjust = -0.1, vjust = 1.1, size = 3)+
     scale_x_continuous(name = "",
@@ -2137,24 +2138,25 @@ for(sp in species_list){
     geom_jitter(
       data = df_sp,
       aes(x = year, y = fraction),
-      width = 0.05, alpha = 0.5, color = "darkgray"
+      width = 0.05, alpha = 0.5, color = "darkgreen"
     ) +
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
-      width = 0.15, fill = "black", alpha = 0.1,
-      colour = "white", linewidth = 0.2
+      width = 0.1, fill = "black", alpha = 0.1,
+      colour = "black", linewidth = 0.2
     ) +
-    geom_point(
-      data = emm_df,
-      aes(x = year, y = emmean),
-      size = 7, colour = "black", shape = 95
-    ) +
+    # geom_point(
+    #   data = emm_df,
+    #   aes(x = year, y = emmean),
+    #   size = 7, colour = "black", shape = 95
+    # ) +
     geom_text(
       data = year_emm_lab,
-      aes(x = year, y = max(df_sp$fraction, na.rm = TRUE), label = .group),
+      aes(x = year, label = .group),
+      y = max(df_sp$fraction, na.rm = TRUE),
       size = 3, color = "black", inherit.aes = FALSE
-    ) +
+    )+
     labs(x = "", y = "Frequency of occurrence") +
     theme_minimal() +
     annotate("text", x = -Inf, y = Inf, label = sp,
@@ -2304,7 +2306,7 @@ ggplot() +
   geom_jitter(data = ndvi_means,
               aes(x = year, y = ndvi_mean),
               width = 0.1, height = 0,
-              alpha = 0.4, colour = "gray30") +
+              alpha = 0.4, colour = "darkgreen") +
   geom_ribbon(data = preds,
               aes(x = year, ymin = conf.low, ymax = conf.high),
               fill = "black", alpha = 0.1) +
