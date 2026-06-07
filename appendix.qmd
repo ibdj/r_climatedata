@@ -2297,14 +2297,24 @@ A total of `r length(model_list)` species were analysed.
 ```{r}
 #| label: species-plots
 #| echo: false
+#| output: asis
 #| warning: false
 #| message: false
 #| results: asis
 
 
 for(sp in names(plot_list[has_diff_groups])){
+  
+  fig_id  <- gsub("[^a-zA-Z0-9]", "-", sp)
+  fig_scap <- paste0("Frequency of occurrence for ", sp)
+  
+  cat("::: {#fig-", fig_id, " fig-scap='", fig_scap, "'}\n\n", sep = "")
+  
   print(plot_list[[sp]])
-  cat("\n\n")
+  
+  cat("\n\nFrequency of occurrence for *", sp, "* across survey years. Points show raw observations, crossbars show estimated marginal means ± 95% CI. Compact letter display indicates statistically significant differences between years (Holm adjustment).\n", sep = "")
+  
+  cat(":::\n\n")
 }
 
 ```
