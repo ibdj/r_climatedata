@@ -152,8 +152,8 @@ data_temp_annual_mean <- data_temp |>
 
 ```{r}
 #| label: fig-month-mean-temp
-#| fig-scap: "Mean air temperature (°C) pr month (Background)"
-#| fig-cap: !expr glue("Mean temperature pr month. Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(temp_year_mean,3)}°C.")
+#| fig-scap: "Mean air temperature (°C) per month (Background)"
+#| fig-cap: !expr glue("Mean temperature per month. Mean air temperature (°C) per month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(temp_year_mean,3)}°C.")
 #| echo: false
 #| output: true
 #| message: false
@@ -161,6 +161,10 @@ data_temp_annual_mean <- data_temp |>
 
 ggplot(data_temp_month_mean, aes(x = month, y = mean))+
   geom_line(linewidth = 0.25, linetype="solid", alpha = 0.2)+
+  geom_errorbar(
+    aes(ymin = mean - sd, ymax = mean + sd),
+    width = 0.2, linewidth = 0.25, alpha = 0.4
+  ) +
   geom_smooth(method = "loess", formula = y ~ x, color = "gray", se = FALSE, alpha = 0.1)+
   geom_point(size = 3, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(1, 12, by = 1))+
@@ -192,8 +196,8 @@ data_temp_annual_mean$pred <- predict(model_temp_annual_mean)
 
 ```{r}
 #| label: fig-annual-mean-temp
-#| fig-scap: "Mean air temperature pr year (°C) (Background)"
-#| fig-cap: !expr glue("Mean annual air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)} in Kangerluassunguaq. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {temp_year_mean}°C. Dashed line is model prediction.")
+#| fig-scap: "Mean air temperature per year (°C) (Background)"
+#| fig-cap: !expr glue("Mean annual air temperature per year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)} in Kangerluassunguaq. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {temp_year_mean}°C. Dashed line is model prediction.")
 #| echo: false
 #| output: true
 #| message: false
@@ -335,7 +339,8 @@ ggplot() +
       label = .group
     ),
     vjust = -0.8,
-    size  = 3
+    size  = 3,
+    nudge_x = 0.35
   ) +
 
   # Scales
@@ -478,7 +483,7 @@ precip_type_pct <- data_pre_tem_joined |>
 ```{r}
 #| label: fig-snow-rain-year
 #| fig-scap: "Mean monthly distribution of types of precipitation (mm) (Background)"
-#| fig-cap: !expr glue("Mean precipitation type pr month. Mean monthly distribution of types of precipitation (mm). Totals based on data from {min(data_precip$year)} to {max(data_precip$year)} (requires join with temperature data which it only available till {max(precip_type_pct$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+#| fig-cap: !expr glue("Mean precipitation type per month. Mean monthly distribution of types of precipitation (mm). Totals based on data from {min(data_precip$year)} to {max(data_precip$year)} (requires join with temperature data which it only available till {max(precip_type_pct$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 #| echo: false
 #| output: true
 #| message: false
@@ -527,7 +532,7 @@ data_precip_sum$pred <- predict(model_precip_mean_annual)
 
 ```{r}
 #| label: fig-precipitation-annual
-#| fig-scap: "Mean yearly precipitation (mm)"
+#| fig-scap: "Mean yearly precipitation (mm) (Background)"
 #| fig-cap: !expr glue("Mean yearly precipitation (mm) from {min(data_precip_sum$year)} to {max(data_precip_sum$year)}. Data from 2007 is excluded because it was only from May - December. Blue dashed line indicate over all mean of {precip_year_mean} mm. Dashed line represent model prediction.")
 #| echo: false
 #| output: true
@@ -795,7 +800,7 @@ ggplot() +
       label = .group
     ),
     vjust = -0.8,
-    size = 3
+    size = 3, nudge_x = 0.35
   ) +
   labs(
     x = "",
@@ -1078,7 +1083,7 @@ plot_richness <- ggplot() +
     aes(x = year, y = max(subsection_indices$richness), label = .group),
     size = 3,
     color = "black",
-    inherit.aes = FALSE
+    inherit.aes = FALSE, nudge_x = 0.35
   ) +
   labs(x = "", y = "Species richness") 
 
@@ -1163,7 +1168,7 @@ plot_evenness <- ggplot() +
     aes(x = year, y = max(subsection_indices$evenness), label = .group),
     size = 3,
     color = "black",
-    inherit.aes = FALSE
+    inherit.aes = FALSE, nudge_x = 0.35
   ) +
   labs(x = "", y = "Evenness")
 
@@ -1248,7 +1253,7 @@ plot_shannon <- ggplot() +
     aes(x = year, y = max(subsection_indices$shannon), label = .group),
     size = 3,
     color = "black",
-    inherit.aes = FALSE
+    inherit.aes = FALSE, nudge_x = 0.35
   ) +
   labs(x = "", y = "Shannon")
 
@@ -1377,7 +1382,7 @@ plot_turnover <- ggplot() +
   geom_text(data = turnover_cld,
             aes(x = x_pos, label = .group),
             y = max(turnover_jitter$total, na.rm = TRUE),
-            size = 3, colour = "black") +
+            size = 3, colour = "black", nudge_x = 0.35) +
   scale_x_continuous(name = "",
                      breaks = 1:4,
                      labels = c("2007", "2012", "2017", "2022")) +
@@ -1678,15 +1683,15 @@ anova(m_convergence)
 emm_year <- emmeans(m_convergence, ~ year)
 pairs(emm_year)
 
-emm_df <- as.data.frame(emm_year) %>%
+emm_df <- as.data.frame(emm_year) |>
   mutate(
     year  = factor(year, levels = levels(emm_year@grid$year)),
     x_pos = as.integer(year)
   )
 
 # CLD
-centroid_cld <- cld(emm_year, adjust = "sidak", Letters = letters) %>%
-  as.data.frame() %>%
+centroid_cld <- cld(emm_year, adjust = "sidak", Letters = letters) |> 
+  as.data.frame() |>
   mutate(
     year  = factor(year, levels = levels(emm_year@grid$year)),
     x_pos = as.integer(year)
@@ -1761,7 +1766,8 @@ ggplot() +
   geom_text(data = centroid_cld,
             aes(x = x_pos, label = .group),
             y = y_max,
-            vjust = 0, size = 4, colour = "black") +
+            vjust = 0, size = 4, colour = "black",
+            nudge_x = 0.35) +
   scale_x_continuous(name = "",
                      breaks = 1:4,
                      labels = c("2007", "2012", "2017", "2022")) +
@@ -1947,17 +1953,14 @@ p <- ggplot() +
   geom_text(data = centroid_cld,
             aes(x = as.integer(factor(year)), label = .group),
             y = global_y_upper * 0.92,
-            vjust = 0, size = 4, colour = "black") +
+            vjust = 0, size = 4, colour = "black",
+            nudge_x = 0.35) +
   
   scale_x_continuous(name = "",
                      breaks = 1:4,
                      labels = c("2007", "2012", "2017", "2022")) +
   coord_cartesian(ylim = global_y_limits) +
-  labs(title = vt, y = "Centroid distance (NMDS units)") +
-  theme(
-    plot.title = element_text(face = "plain", hjust = 0.1),
-    text = element_text(size = 8)
-  )
+  labs(title = vt, y = "Centroid distance (NMDS units)") 
   
   ## 2.9  Store the plot
   plot_list[[i]] <- p
@@ -2126,7 +2129,7 @@ for(pft in func_types){
     geom_text(
       data = year_emm_lab,
       aes(x = year, label = .group), y = max(df_pft$sum_frac, na.rm = TRUE),
-      size = 3, color = "black", inherit.aes = FALSE
+      size = 3, color = "black", inherit.aes = FALSE,
     ) +
     labs(x = "", y = "Summed fraction") +
     annotate("text", x = -Inf, y = Inf, label = pft,
@@ -2195,8 +2198,12 @@ grid_pft
 #| warning: false
 #| message: false
 
+species_taxon_code <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/nero_analysis/data/taxon_code_species_key.rds")
+
 species_sub <- readRDS("~/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/01 Vegetation changes Kobbefjord/data/nero_analysis/data/species_sub.rds") |> 
-  filter(taxon_code != "rock")
+  filter(taxon_code != "rock") |> 
+  left_join(species_taxon_code, by = "taxon_code")
+
 
 ```
 
@@ -2277,12 +2284,12 @@ for(sp in species_list){
       data = year_emm_lab,
       aes(x = year, label = .group),
       y = max(df_sp$fraction, na.rm = TRUE),
-      size = 3, color = "black", inherit.aes = FALSE
+      size = 3, color = "black", inherit.aes = FALSE,
+      nudge_x = 0.35
     )+
     labs(x = "", y = "Frequency of occurrence") +
-    theme_minimal() +
-    annotate("text", x = -Inf, y = Inf, label = sp,
-             hjust = -0.1, vjust = 1.1, size = 3) +
+    #annotate("text", x = -Inf, y = Inf, label = sp,
+    #         hjust = -0.1, vjust = 1.1, size = 3) +
     scale_x_continuous(name = "",
                        breaks = c(2007, 2012, 2017, 2022),
                        labels = c("2007", "2012", "2017", "2022"))
@@ -2294,7 +2301,7 @@ for(sp in species_list){
 ```
 
 A total of `r length(model_list)` species were analysed. 
-`r sum(has_diff_groups)` of them had significantly different means between survey years. Plots of the frequency of occurrence for these `r sum(has_diff_groups)` species are rendered below. 
+`r sum(has_diff_groups)` of them had any significant differences in means between survey years. Plots of the frequency of occurrence for these `r sum(has_diff_groups)` species are rendered below. 
 
 ```{r}
 #| label: species-plots
@@ -2307,14 +2314,21 @@ A total of `r length(model_list)` species were analysed.
 
 for(sp in names(plot_list[has_diff_groups])){
   
-  fig_id  <- gsub("[^a-zA-Z0-9]", "-", sp)
-  fig_scap <- paste0("Frequency of occurrence for ", sp)
+  species_name <- as.character(unique(species_sub$species[species_sub$taxon_code == sp]))[1]
+  
+  fig_id   <- gsub("[^a-zA-Z0-9]", "-", sp)
+  
+  if(sp == "betnan"){
+    fig_scap <- paste0("Frequency of occurrence for ", species_name, " (Figure 8)")
+  } else {
+    fig_scap <- paste0("Frequency of occurrence for \\textit{", species_name, "}")
+  }
   
   cat("::: {#fig-", fig_id, " fig-scap='", fig_scap, "'}\n\n", sep = "")
   
   print(plot_list[[sp]])
   
-  cat("\n\nFrequency of occurrence for *", sp, "* across survey years. Points show raw observations, crossbars show estimated marginal means ± 95% CI. Compact letter display indicates statistically significant differences between years (Holm adjustment).\n", sep = "")
+  cat("\n\nFrequency of occurrence for *", species_name, "* across survey years. Points show raw observations, crossbars show estimated marginal means ± 95% CI. Compact letter display indicates statistically significant differences between years (Holm adjustment).\n", sep = "")
   
   cat(":::\n\n")
 }
