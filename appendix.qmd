@@ -152,7 +152,7 @@ data_temp_annual_mean <- data_temp |>
 
 ```{r}
 #| label: fig-month-mean-temp
-#| fig-scap: "Mean air temperature (°C) pr month"
+#| fig-scap: "Mean air temperature (°C) pr month (Background)"
 #| fig-cap: !expr glue("Mean temperature pr month. Mean air temperature (°C) pr month, based on data from {min(data_temp$year)} to {max(data_temp$year)}. The dashed line represent yearly mean of {round(temp_year_mean,3)}°C.")
 #| echo: false
 #| output: true
@@ -192,7 +192,7 @@ data_temp_annual_mean$pred <- predict(model_temp_annual_mean)
 
 ```{r}
 #| label: fig-annual-mean-temp
-#| fig-scap: "Mean air temperature pr year (°C)"
+#| fig-scap: "Mean air temperature pr year (°C) (Background)"
 #| fig-cap: !expr glue("Mean annual air temperature pr year (°C) from {min(data_temp_annual_mean$year)} to {max(data_temp_annual_mean$year)} in Kangerluassunguaq. Data from 2007 is excluded because data is only from October, November and December. Gray dotted line indicate over all mean of {temp_year_mean}°C. Dashed line is model prediction.")
 #| echo: false
 #| output: true
@@ -271,7 +271,7 @@ cld_plot <- cld_temp |>
 
 ```{r}
 #| label: fig-temp-fiveyear
-#| fig-scap: "5 year intervals in temperature means"
+#| fig-scap: "5 year intervals in temperature means (Background)"
 #| fig-cap: !expr glue("Five year intervals in temperature means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -477,7 +477,7 @@ precip_type_pct <- data_pre_tem_joined |>
 
 ```{r}
 #| label: fig-snow-rain-year
-#| fig-scap: "Mean monthly distribution of types of precipitation (mm)"
+#| fig-scap: "Mean monthly distribution of types of precipitation (mm) (Background)"
 #| fig-cap: !expr glue("Mean precipitation type pr month. Mean monthly distribution of types of precipitation (mm). Totals based on data from {min(data_precip$year)} to {max(data_precip$year)} (requires join with temperature data which it only available till {max(precip_type_pct$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 #| echo: false
 #| output: true
@@ -613,7 +613,7 @@ kruskal.test(annual_precip ~ segment, data = yearly_precip)
 
 ```{r}
 #| label: fig-precip-fiveyear
-#| fig-scap: "5 year intervals of precipitation means"
+#| fig-scap: "5 year intervals of precipitation means (Background)"
 #| fig-cap: !expr glue("Five year intervals in precipitation means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -746,7 +746,7 @@ cld_plot_par <- cld_par |>
 
 ```{r}
 #| label: fig-par-fiveyear
-#| fig-scap: "PAR means, 5 year interval"
+#| fig-scap: "PAR means, 5 year interval (Background)"
 #| fig-cap: !expr glue("Five year intervals in PAR means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -900,7 +900,7 @@ nuuk_21_04_dmi_temp$upper <- preds$fit + 1.96 * preds$se.fit
 
 ```{r}
 #| label: fig-annual-temp-historic-raw-range-filter
-#| fig-scap: "Annual historic temperature raw data"
+#| fig-scap: "Annual historic temperature raw data (Background)"
 #| fig-cap: !expr glue("Historic yearly mean air temperature (°C) in Nuuk, from {min(nuuk_21_04_dmi_temp$year)} to {max(nuuk_21_04_dmi_temp$year)}. Yearly mean of {round(mean(nuuk_21_04_dmi_temp$annual, na.rm= TRUE),1)}°C. Yearly mean ranges from {round(min(nuuk_21_04_dmi_temp$annual, na.rm = TRUE), 2)}°C to {max(nuuk_21_04_dmi_temp$annual, na.rm = TRUE)}°C. Modelled mean temperature has increase from {round(annual1784,2)}°C in 1784 to {round(annual2024,2)}°C in 2024 (increase of {round(annual2024,2)-round(annual1784,2)}°C or {round((round(annual2024,2)-round(annual1784,2))/((2024-1784)/10),3)}°C/decade.)")
 #| echo: false
 #| output: true
@@ -1030,7 +1030,7 @@ richness_pairs_df <- as.data.frame(richness_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-richness
-#| fig-scap: "Species richness (Figure 3, a)"
+#| fig-scap: "Species richness (Part a, Figure 3)"
 #| fig-cap: !expr glue("Species richness, number of species pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -1114,7 +1114,7 @@ evenness_pairs_df <- as.data.frame(evenness_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-evenness
-#| fig-scap: "Evenness (Figure 3, b)"
+#| fig-scap: "Evenness (Part b, Figure 3)"
 #| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -1199,7 +1199,7 @@ shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 
 ```{r}
 #| label: fig-indices-model-shannon
-#| fig-scap: "Shannon (Figure 3, c)"
+#| fig-scap: "Shannon (Part c, Figure 3)"
 #| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -1309,7 +1309,7 @@ turnover_emmeans
 
 ```{r}
 #| label: fig-indices-model-turnover
-#| fig-scap: "Turnover (Figure 3 d)"
+#| fig-scap: "Turnover (Part d, Figure 3)"
 #| fig-cap: !expr glue("Turnover pr. year calculate pr subsection, but only pr present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -1413,6 +1413,8 @@ grid_labeled <- (
 grid_labeled
 
 ````
+
+{{< pagebreak >}}
 
 ## 3-2 Community composition
 
@@ -2164,7 +2166,7 @@ purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
 
 ```{r}
 #| label: fig-pft
-#| fig-scap: "Plant functional groups"
+#| fig-scap: "Plant functional groups (Figure 7)"
 #| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence for plant functional groups. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
 #| echo: false
 #| output: true
@@ -2415,7 +2417,7 @@ ndvi_caption <- glue(
 
 ```{r}
 #| label: fig-ndvi-visualisering
-#| fig-scap: "NDVI 2018 - 2024"
+#| fig-scap: "NDVI 2018 - 2024 (Background - discussion)"
 #| fig-cap: !expr ndvi_caption
 #| echo: false
 #| output: true
