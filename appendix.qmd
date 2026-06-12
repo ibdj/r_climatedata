@@ -1,6 +1,7 @@
 ---
 title: "Supplementary Information"
-subtitle: "Document caption: Detailed methods, supplementary analyses, and results including p-values."
+subtitle: "Document caption: Detailed methods, supplementary analyses, and results including p-values. // læsevjeldning i appendix
+// tilføj significans niveau på figurer (caption)"
 bibliography: references.bib
 # author:
 #   - name: Ida Bomholt Dyrholm Jacobsen
@@ -81,7 +82,7 @@ Data is available 2007 – 2022. 2008 is the first whole year of temperature dat
 
 #install.packages("rmarkdown","pacman","tidyverse","yaml", dependencies = TRUE)
 library(pacman)
-pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms,knitr, broom, ggpmisc, yaml,readxl,zoo,emmeans,lme4,multcomp, vegan,lmerTes, codyn, patchwork,tibble, broom.mixed, ggeffects, systemfonts, ragg, pbkrtest)
+pacman::p_load(ggplot2, Hmisc, tidyverse, janitor, lubridate, glue, hms, knitr, broom, ggpmisc, yaml, readxl, zoo, emmeans, lme4, multcomp, vegan, lmerTes, codyn, patchwork, tibble, broom.mixed, ggeffects, systemfonts, ragg, pbkrtest)
 
 # pbkrtest dependincy for the species mode
 
@@ -266,7 +267,7 @@ model_temp_fiveyear <- lmer(
 # Get estimated marginal means with cld
 emm_temp_fiveyear <- model_temp_fiveyear |>
   emmeans(~ segment) |>
-  cld(alpha = 0.05, Letters = letters)
+  multcomp::cld(alpha = 0.05, Letters = letters)
 
 cld_temp <- as.data.frame(emm_temp_fiveyear)
 
