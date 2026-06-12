@@ -1393,6 +1393,7 @@ plot_turnover <- ggplot() +
 
 plot_turnover
 ```
+
 ### Plots combined
 ````{r}
 #| label: fig-indices-wrapped
@@ -1419,6 +1420,10 @@ grid_labeled <- (
   theme(legend.position = "bottom", plot.tag = element_text(size = fig_text_size))
 
 grid_labeled
+
+ggsave("figures/fig03.pdf", grid_labeled, device = cairo_pdf,
+       width = 174, height = 120, units = "mm")
+normalizePath("figures/fig03.pdf")    # prints the exact location
 
 ````
 
@@ -1615,7 +1620,7 @@ plots <- lapply(years, function(y) {
                    centroid_NMDS2,
                    fill = veg_type),
                shape = 21,
-               size = 5,
+               size = 4,
                colour = "black") +
     
     geom_text(data = cent_df,
@@ -1624,7 +1629,7 @@ plots <- lapply(years, function(y) {
                   label = veg_type),
               vjust = -0.2,
               hjust = 1.3,
-              size = 5) +
+              size = 3) +
     coord_cartesian(xlim = lims_x,
                     ylim = lims_y) +
     annotate("text",
@@ -1633,12 +1638,16 @@ plots <- lapply(years, function(y) {
          label = y,
          hjust = 0, 
          vjust = 1,
-         size = 4)+
+         size = 3)+
     theme(legend.position = "none")
 })
 
 # Combine plots in a grid
 wrap_plots(plots, ncol = 2)  
+
+ggsave("figures/fig04.pdf", wrap_plots(plots, ncol = 2), device = cairo_pdf,
+       width = 174, height = 120, units = "mm")
+normalizePath("figures/fig04.pdf")    # prints the exact location
 
 ```
 
@@ -1749,7 +1758,7 @@ y_max <- max(
   max(centroid_pairs$dist, na.rm = TRUE)
 ) * 1.05
 
-ggplot() +
+between <- ggplot() +
   geom_jitter(data = centroid_pairs,
               aes(x = as.integer(factor(year)), y = dist),
               width = 0.01, height = 0,
@@ -1776,6 +1785,12 @@ ggplot() +
                      labels = c("2007", "2012", "2017", "2022")) +
   coord_cartesian(ylim = c(NA, y_max * 1.05)) +
   labs(y = "Centroid distance (NMDS units)")
+
+between
+
+ggsave("figures/fig05.pdf", between, device = cairo_pdf,
+       width = 174, height = 120, units = "mm")
+normalizePath("figures/fig05.pdf")    # prints the exact location
 ```
 
 ### Within vegetation composition
