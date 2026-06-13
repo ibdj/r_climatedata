@@ -1067,7 +1067,8 @@ plot_richness <- ggplot() +
     aes(x = year, y = richness),
     width = 0.01,
     alpha = 0.4,
-    color = "darkgreen"
+    color = "darkgreen",
+    size = 2
   ) +
     geom_crossbar(data = richness_emm_df,
               aes(x = year, y = emmean,
@@ -1152,7 +1153,8 @@ plot_evenness <- ggplot() +
     aes(x = year, y = evenness),
     width = 0.01,
     alpha = 0.4,
-    color = "darkgreen"
+    color = "darkgreen",
+    size = 2
   ) +
       geom_crossbar(data = evenness_emm_df,
               aes(x = year, y = emmean,
@@ -1236,7 +1238,8 @@ plot_shannon <- ggplot() +
     aes(x = year, y = shannon),
     width = 0.01,
     alpha = 0.4,
-    color = "darkgreen"
+    color = "darkgreen",
+    size = 2
   ) +
         geom_crossbar(data = shannon_emm_df,
               aes(x = year, y = emmean,
@@ -1369,7 +1372,7 @@ plot_turnover <- ggplot() +
   geom_jitter(data = turnover_jitter,
               aes(x = as.integer(factor(year, levels = levels(all_years))),
                   y = total),
-              width = 0.01, alpha = 0.4, colour = "darkgreen") +
+              width = 0.01, alpha = 0.4, colour = "darkgreen", size = 2) +
   geom_crossbar(data = turnover_plot_df,
                 aes(x = x_pos, y = emmean,
                     ymin = .data[[cl_cols]],
@@ -1762,7 +1765,7 @@ between <- ggplot() +
   geom_jitter(data = centroid_pairs,
               aes(x = as.integer(factor(year)), y = dist),
               width = 0.01, height = 0,
-              alpha = 0.4, colour = "darkgreen") +
+              alpha = 0.4, colour = "darkgreen", , size = 2) +
   geom_crossbar(data = emm_df,
               aes(x = x_pos, y = emmean, ymin = lower.CL, ymax = upper.CL),
               width = 0.1,
@@ -1952,7 +1955,7 @@ p <- ggplot() +
   geom_jitter(data = vt_dat,
               aes(x = as.integer(factor(year)), y = dist_to_centroid),
               width = 0.01, height = 0,
-              alpha = 0.4, colour = "darkgreen") +
+              alpha = 0.4, colour = "darkgreen", size = 2) +
   
   geom_crossbar(data = plot_stats,
                 aes(x = as.integer(factor(year)),
@@ -1963,10 +1966,6 @@ p <- ggplot() +
                 fill = "black", alpha = 0.1,
                 colour = "black",
                 linewidth = 0.2) +
-  
-  # geom_point(data = plot_stats,
-  #            aes(x = as.integer(factor(year)), y = mean_dist),
-  #            size = 7, colour = "black", shape = 95) +
   
   geom_text(data = centroid_cld,
             aes(x = as.integer(factor(year)), label = .group),
@@ -2131,8 +2130,7 @@ for(pft in func_types){
     geom_jitter(
       data = df_pft,
       aes(x = year, y = sum_frac),
-      width = 0.05, alpha = 0.5, color = "darkgreen"
-    ) +
+      width = 0.05, alpha = 0.5, color = "darkgreen", , size = 2) +
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
@@ -2285,7 +2283,7 @@ for(sp in species_list){
     geom_jitter(
       data = df_sp,
       aes(x = year, y = fraction),
-      width = 0.05, alpha = 0.5, color = "darkgreen"
+      width = 0.05, alpha = 0.5, color = "darkgreen", size = 2
     ) +
     geom_crossbar(
       data = emm_df,
@@ -2470,7 +2468,7 @@ ggplot() +
   geom_jitter(data = ndvi_means,
               aes(x = year, y = ndvi_mean),
               width = 0.1, height = 0,
-              alpha = 0.4, colour = "darkgreen") +
+              alpha = 0.4, colour = "darkgreen",size = 2) +
   geom_ribbon(data = preds,
               aes(x = year, ymin = conf.low, ymax = conf.high),
               fill = "black", alpha = 0.1) +
