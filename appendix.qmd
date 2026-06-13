@@ -169,7 +169,7 @@ ggplot(data_temp_month_mean, aes(x = month, y = mean))+
     width = 0.2, linewidth = 0.25, alpha = 0.4
   ) +
   geom_smooth(method = "loess", formula = y ~ x, color = "gray", se = FALSE, alpha = 0.1)+
-  geom_point(size = 3, alpha = 0.7, color = "#076834") +
+  geom_point(size = 2, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(1, 12, by = 1))+
   geom_hline(yintercept=temp_year_mean, linetype="dotted", color = "#076834", linewidth = 0.5)+
   labs(x = "Month", y = "Mean temperature (°C)", title = "")
@@ -214,7 +214,7 @@ ggplot(data_temp_annual_mean, aes(x = year, y = mean))+
     color = "#076834",
     linetype = "dashed"
   ) +
-  geom_point(size = 3, alpha = 0.7, color = "#076834") +
+  geom_point(size = 2, alpha = 0.7, color = "#076834") +
     scale_x_continuous(breaks=seq(min(data_temp_annual_mean$year), max(data_temp_annual_mean$year), by = 1))+
   geom_hline(yintercept=temp_year_mean, linetype="dotted", color = "darkgray", linewidth=0.7)+
   labs(x = "", y = "Mean temperature (°C)", title = "")
@@ -318,7 +318,7 @@ ggplot() +
   geom_point(
     data  = yearly_means,
     aes(x = year, y = mean_temp),
-    size  = 3,
+    size  = 2,
     color = "darkgreen"
   ) +
 
@@ -783,7 +783,7 @@ ggplot() +
   geom_point(
     data = yearly_means_par,
     aes(x = year, y = mean_par),
-    size = 3,
+    size = 2,
     color = "darkgreen"
   ) +
   geom_segment(
@@ -924,7 +924,7 @@ ggplot(data = nuuk_21_04_dmi_temp, aes(x = year, y = annual)) +
     geom_ribbon(aes(ymin = lower, ymax = upper), 
               fill = "darkgray", 
               alpha = 0.2) + 
-  geom_point(size = 3, alpha = 0.7, color = "darkgreen") +
+  geom_point(size = 2, alpha = 0.7, color = "darkgreen") +
   #geom_smooth(method = "lm")+
   scale_x_continuous(
     breaks = seq(min(gr_monthly_all_1784_2020$year),
@@ -1614,7 +1614,7 @@ plots <- lapply(years, function(y) {
                aes(NMDS1, NMDS2,
                    shape = veg_type,
                    colour = veg_type),
-               size = 3,
+               size = 2,
                alpha = 0.7) +
     
     # Centroids
@@ -1623,7 +1623,7 @@ plots <- lapply(years, function(y) {
                    centroid_NMDS2,
                    fill = veg_type),
                shape = 21,
-               size = 4,
+               size = 3,
                colour = "black") +
     
     geom_text(data = cent_df,
@@ -1775,9 +1775,9 @@ between <- ggplot() +
   # geom_errorbar(data = emm_df,
   #               aes(x = x_pos, ymin = lower.CL, ymax = upper.CL),
   #               width = 0.2, colour = "black") +
-  geom_point(data = emm_df,
-             aes(x = x_pos, y = emmean),
-             size = 7, colour = "black", shape = 95) +
+  # geom_point(data = emm_df,
+  #            aes(x = x_pos, y = emmean),
+  #            size = 7, colour = "black", shape = 95) +
   geom_text(data = centroid_cld,
             aes(x = x_pos, label = .group),
             y = y_max,
@@ -2147,7 +2147,7 @@ for(pft in func_types){
       aes(x = year, label = .group), y = max(df_pft$sum_frac, na.rm = TRUE),
       size = 3, color = "black", inherit.aes = FALSE,
     ) +
-    labs(x = "", y = "Summed fraction") +
+    labs(x = "", y = "Summed FOO") +
     annotate("text", x = -Inf, y = Inf, label = pft,
              hjust = -0.1, vjust = 1.1, size = 3)+
     scale_x_continuous(name = "",
@@ -2186,7 +2186,7 @@ purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
 ```{r}
 #| label: fig-pft
 #| fig-scap: "Plant functional groups (Figure 7)"
-#| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence for plant functional groups. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence (FOO) for plant functional groups. Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 7)")
 #| echo: false
 #| output: true
 #| warning: false
@@ -2468,16 +2468,16 @@ ggplot() +
   geom_jitter(data = ndvi_means,
               aes(x = year, y = ndvi_mean),
               width = 0.1, height = 0,
-              alpha = 0.4, colour = "darkgreen",size = 2) +
+              alpha = 0.4, colour = "darkgreen", size = 2) +
   geom_ribbon(data = preds,
               aes(x = year, ymin = conf.low, ymax = conf.high),
               fill = "black", alpha = 0.1) +
   geom_line(data = preds,
             aes(x = year, y = predicted),
             colour = "black", linewidth = 0.2) +
-  geom_point(data = preds |> filter(year %in% unique(ndvi_means$year)),
-             aes(x = year, y = predicted),
-             size = 7, colour = "black", shape = 95) +
+  # geom_point(data = preds |> filter(year %in% unique(ndvi_means$year)),
+  #            aes(x = year, y = predicted),
+  #            size = 2, colour = "black", shape = 95) +
   scale_x_continuous(name = "",
                      breaks = unique(ndvi_means$year)) +
   labs(y = "NDVI")
