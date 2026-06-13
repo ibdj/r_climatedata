@@ -2017,6 +2017,10 @@ grid_plot <- wrap_plots(plot_list, ncol = 2) &
 # Show the figure
 print(grid_plot)
 
+ggsave("figures/fig06.pdf", grid_plot, device = cairo_pdf,
+       width = 174, height = 120, units = "mm")
+normalizePath("figures/fig06.pdf")    # prints the exact location
+
 ```
 
 {{< pagebreak >}}
