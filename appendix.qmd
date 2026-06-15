@@ -2162,6 +2162,9 @@ for(pft in func_types){
   plot_list_pft[[pft]] <- p
 }
 
+ggsave("figures/fig07.pdf", plot_list_pft[[pft]], device = cairo_pdf,
+       width = 174, height = 120, units = "mm")
+normalizePath("figures/fig07.pdf")    # prints the exact location
 
 ```
 
