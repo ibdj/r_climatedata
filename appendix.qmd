@@ -2358,6 +2358,10 @@ for(sp in names(plot_list[has_diff_groups])){
   cat(":::\n\n")
 }
 
+ggsave("figures/fig08.pdf", plot_list[["betnan"]], device = cairo_pdf,
+       width = 174, height = 120, units = "mm")
+normalizePath("figures/fig08.pdf")
+
 ```
 
 ```{r}
