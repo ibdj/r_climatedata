@@ -2020,7 +2020,8 @@ print(grid_plot)
 
 ggsave("figures/fig06.pdf", grid_plot, device = cairo_pdf,
        width = 174, height = 120, units = "mm")
-normalizePath("figures/fig06.pdf")    # prints the exact location
+
+#normalizePath("figures/fig06.pdf")    # prints the exact location
 
 ```
 
@@ -2150,21 +2151,22 @@ for(pft in func_types){
     geom_text(
       data = year_emm_lab,
       aes(x = year, label = .group), y = max(df_pft$sum_frac, na.rm = TRUE),
-      size = 3, color = "black", inherit.aes = FALSE,
+      size = 3, color = "black", inherit.aes = FALSE, nudge_x = 0.2
     ) +
     labs(x = "", y = "Summed FOO") +
     annotate("text", x = -Inf, y = Inf, label = pft,
-             hjust = -0.1, vjust = 1.1, size = 3)+
+             hjust = -0.1, vjust = 1.4, size = 3)+
     scale_x_continuous(name = "",
                    breaks = c(2007, 2012, 2017, 2022),
-                   labels = c("2007", "2012", "2017", "2022"))
+                   labels = c("2007", "2012", "2017", "2022"))+
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.18)))
   
   plot_list_pft[[pft]] <- p
 }
 
 ggsave("figures/fig07.pdf", plot_list_pft[[pft]], device = cairo_pdf,
        width = 174, height = 120, units = "mm")
-normalizePath("figures/fig07.pdf")    # prints the exact location
+#normalizePath("figures/fig07.pdf")    # prints the exact location
 
 ```
 
@@ -2177,19 +2179,19 @@ normalizePath("figures/fig07.pdf")    # prints the exact location
 #| message: false
 
 # Fixed effects table
-purrr::map_dfr(fixed_list_pft, broom.mixed::tidy, effects = "fixed", .id = "func_type") |>
-  dplyr::relocate(func_type) |>
-  knitr::kable(digits = 3, caption = "Fixed effects per functional type")
+# purrr::map_dfr(fixed_list_pft, broom.mixed::tidy, effects = "fixed", .id = "func_type") |>
+#   dplyr::relocate(func_type) |>
+#   knitr::kable(digits = 3, caption = "Fixed effects per functional type")
 
 # Emmeans table
 dplyr::bind_rows(emm_list_pft, .id = "func_type") |>
   dplyr::relocate(func_type) |>
   knitr::kable(digits = 3, caption = "Estimated marginal means per functional type and survey year")
 
-# Pairwise contrasts table
-purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
-  dplyr::relocate(func_type) |>
-  knitr::kable(digits = 3, caption = "Pairwise contrasts per functional type (Holm-adjusted)")
+# # Pairwise contrasts table
+# purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
+#   dplyr::relocate(func_type) |>
+#   knitr::kable(digits = 3, caption = "Pairwise contrasts per functional type (Adjusted)")
 ```
 
 ```{r}
