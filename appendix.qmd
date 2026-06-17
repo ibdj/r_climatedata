@@ -267,7 +267,7 @@ model_temp_fiveyear <- lmer(
 # Get estimated marginal means with cld
 emm_temp_fiveyear <- model_temp_fiveyear |>
   emmeans(~ segment) |>
-  multcomp::cld(alpha = 0.05, Letters = letters)
+  multcomp::cld(alpha = 0.05, Letters = letters, adjust = "tukey")
 
 cld_temp <- as.data.frame(emm_temp_fiveyear)
 
@@ -743,7 +743,7 @@ model_par_fiveyear <- lmer(
 # Get estimated marginal means with cld
 emm_par_fiveyear <- model_par_fiveyear |>
   emmeans(~ segment) |>
-  cld(alpha = 0.05, Letters = letters)
+  cld(alpha = 0.05, Letters = letters, adjust = "tukey")
 
 cld_par <- as.data.frame(emm_par_fiveyear)
 
@@ -1051,7 +1051,7 @@ richness_emm_df$year <- factor(richness_emm_df$year, levels = years)
 
 richness_cld <- cld(
   richness_emmeans_f,
-  adjust = "sidak",
+  adjust = "tukey",
   Letters = letters
 )
 
@@ -1137,7 +1137,7 @@ evenness_emm_df$year <- factor(evenness_emm_df$year, levels = years)
 
 evenness_cld <- cld(
   evenness_emmeans_f,
-  adjust = "sidak",
+  adjust = "tukey",
   Letters = letters
 )
 
@@ -1222,7 +1222,7 @@ shannon_emm_df$year <- factor(shannon_emm_df$year, levels = years)
 
 shannon_cld <- cld(
   shannon_emmeans_f,
-  adjust = "sidak",
+  adjust = "tukey",
   Letters = letters
 )
 
@@ -1349,7 +1349,7 @@ turnover_plot_df <- tibble(year = all_years) |>          # 4 rows, ordered
 ## 5️⃣  Compact‑letter‑display (add a dummy row for 2007)
 # CLD for the three real means
 cld_three <- cld(emmeans(m_turnover_sub_f, ~ year),
-                 adjust = "sidak", Letters = letters) |>
+                 adjust = "tukey", Letters = letters) |>
   as.data.frame() |>
   mutate(year = factor(year, levels = levels(all_years)),
          x_pos = as.integer(year))
@@ -1706,7 +1706,7 @@ emm_df <- as.data.frame(emm_year) |>
   )
 
 # CLD
-centroid_cld <- cld(emm_year, adjust = "sidak", Letters = letters) |> 
+centroid_cld <- cld(emm_year, adjust = "tukey", Letters = letters) |> 
   as.data.frame() |>
   mutate(
     year  = factor(year, levels = levels(emm_year@grid$year)),
@@ -1909,7 +1909,7 @@ for (i in seq_along(veg_vec)) {
 
   cld_df <- multcomp::cld(
     emm,
-    adjust = "sidak",
+    adjust = "tukey",
     Letters = letters,
     sort = FALSE
   ) |> as_tibble() |> dplyr::select(year, .group)
@@ -2118,7 +2118,7 @@ for(pft in func_types){
   # ----- CLD LETTERS -----
   cld_years <- mod |>
     emmeans(~ factor(year)) |>
-    multcomp::cld(method = "holm", Letters = letters) |>
+    multcomp::cld(adjust = "tukey", Letters = letters) |>
     as.data.frame() |>
     dplyr::rename_with(~ "year", 1) |>
     dplyr::mutate(year = as.numeric(as.character(year)))
@@ -2140,7 +2140,7 @@ for(pft in func_types){
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
-      width = 0.25, fill = "black", alpha = 0.1,
+      width = 0.5, fill = "black", alpha = 0.1,
       colour = "black", linewidth = 0.2
     ) +
     # geom_point(
@@ -2151,7 +2151,7 @@ for(pft in func_types){
     geom_text(
       data = year_emm_lab,
       aes(x = year, label = .group), y = max(df_pft$sum_frac, na.rm = TRUE),
-      size = 3, color = "black", inherit.aes = FALSE, nudge_x = 0.2
+      size = 3, color = "black", inherit.aes = FALSE, nudge_x = 0.45
     ) +
     labs(x = "", y = "Summed FOO") +
     annotate("text", x = -Inf, y = Inf, label = pft,
@@ -2278,7 +2278,7 @@ for(sp in species_list){
   
   # ----- CLD LETTERS -----
   cld_labels <- suppressMessages(emm_obj |>
-    multcomp::cld(method = "holm", Letters = letters) |>
+    multcomp::cld(adjust = "tukey", Letters = letters) |>
     as.data.frame() |>
     dplyr::rename_with(~ "year", 1) |>
     dplyr::mutate(year = as.numeric(as.character(year))) |>
