@@ -1065,7 +1065,7 @@ plot_richness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = richness),
-    width = 0.01,
+    width = 0.1,
     alpha = 0.4,
     color = "darkgreen",
     size = 2
@@ -1151,7 +1151,7 @@ plot_evenness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = evenness),
-    width = 0.01,
+    width = 0.1,
     alpha = 0.4,
     color = "darkgreen",
     size = 2
@@ -1236,7 +1236,7 @@ plot_shannon <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = shannon),
-    width = 0.01,
+    width = 0.1,
     alpha = 0.4,
     color = "darkgreen",
     size = 2
@@ -1373,7 +1373,7 @@ plot_turnover <- ggplot() +
   geom_jitter(data = turnover_jitter,
               aes(x = as.integer(factor(year, levels = levels(all_years))),
                   y = total),
-              width = 0.01, alpha = 0.4, colour = "darkgreen", size = 2) +
+              width = 0.1, alpha = 0.4, colour = "darkgreen", size = 2) +
   geom_crossbar(data = turnover_plot_df,
                 aes(x = x_pos, y = emmean,
                     ymin = .data[[cl_cols]],
@@ -1765,11 +1765,11 @@ y_max <- max(
 between <- ggplot() +
   geom_jitter(data = centroid_pairs,
               aes(x = as.integer(factor(year)), y = dist),
-              width = 0.01, height = 0,
+              width = 0.1, height = 0,
               alpha = 0.4, colour = "darkgreen", , size = 2) +
   geom_crossbar(data = emm_df,
               aes(x = x_pos, y = emmean, ymin = lower.CL, ymax = upper.CL),
-              width = 0.1,
+              width = 0.15,
               fill = "black", alpha = 0.1,      # <<< no fill
               colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
@@ -1955,7 +1955,7 @@ for (i in seq_along(veg_vec)) {
 p <- ggplot() +
   geom_jitter(data = vt_dat,
               aes(x = as.integer(factor(year)), y = dist_to_centroid),
-              width = 0.01, height = 0,
+              width = 0.1, height = 0,
               alpha = 0.4, colour = "darkgreen", size = 2) +
   
   geom_crossbar(data = plot_stats,
@@ -1963,7 +1963,7 @@ p <- ggplot() +
                     y = mean_dist,
                     ymin = mean_dist - se_dist,
                     ymax = mean_dist + se_dist),
-                width = 0.1,
+                width = 0.15,
                 fill = "black", alpha = 0.1,
                 colour = "black",
                 linewidth = 0.2) +
@@ -2135,11 +2135,11 @@ for(pft in func_types){
     geom_jitter(
       data = df_pft,
       aes(x = year, y = sum_frac),
-      width = 0.05, alpha = 0.5, color = "darkgreen", , size = 2) +
+      width = 0.1, alpha = 0.5, color = "darkgreen", , size = 2) +
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
-      width = 0.15, fill = "black", alpha = 0.1,
+      width = 0.25, fill = "black", alpha = 0.1,
       colour = "black", linewidth = 0.2
     ) +
     # geom_point(
@@ -2292,12 +2292,12 @@ for(sp in species_list){
     geom_jitter(
       data = df_sp,
       aes(x = year, y = fraction),
-      width = 0.05, alpha = 0.5, color = "darkgreen", size = 2
+      width = 0.1, alpha = 0.5, color = "darkgreen", size = 2
     ) +
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
-      width = 0.1, fill = "black", alpha = 0.1,
+      width = 0.15, fill = "black", alpha = 0.1,
       colour = "black", linewidth = 0.2
     ) +
     # geom_point(
