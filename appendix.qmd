@@ -102,6 +102,20 @@ theme_set(
           axis.text.x  = element_text(size = 8),
           axis.text.y  = element_text(size = 8))
 )
+
+cld_table <- function(cld_df, caption) {
+  cld_df <- as.data.frame(cld_df)
+  cl <- intersect(c("lower.CL", "asymp.LCL"), names(cld_df))[1]
+  cu <- intersect(c("upper.CL", "asymp.UCL"), names(cld_df))[1]
+  cld_df |>
+    dplyr::mutate(group = trimws(.group)) |>
+    dplyr::select(year, emmean, SE,
+                  lower = dplyr::all_of(cl),
+                  upper = dplyr::all_of(cu),
+                  group) |>
+    dplyr::arrange(year) |>
+    knitr::kable(digits = 3, caption = caption)
+}
 ```
 
 ```{r}
@@ -1100,20 +1114,8 @@ plot_richness
 #| warning: false
 
 
-cl_col <- intersect(c("lower.CL", "asymp.LCL"), names(richness_cld))[1]
-cu_col <- intersect(c("upper.CL", "asymp.UCL"), names(richness_cld))[1]
+cld_table(richness_cld,  "Estimated marginal means and CLD for species richness per survey year")
 
-richness_cld |>
-  dplyr::mutate(group = trimws(.group)) |>
-  dplyr::select(year, emmean, SE,
-                lower = dplyr::all_of(cl_col),
-                upper = dplyr::all_of(cu_col),
-                group) |>
-  dplyr::arrange(year) |>
-  knitr::kable(
-    digits = 3,
-    caption = "Estimated marginal means and compact letter display for species richness per survey year"
-  )
 ```
 
 ### Evenness
@@ -1201,7 +1203,16 @@ plot_evenness <- ggplot() +
 
 plot_evenness
 ```
+```{r}
+#| label: indices-tbl-evenness
+#| echo: false
+#| output: true
+#| message: false
+#| warning: false
 
+
+cld_table(evenness_cld, "Estimated marginal means and compact letter display for evenness per survey year")
+```
 
 ### Shannon
 
@@ -1287,6 +1298,16 @@ plot_shannon <- ggplot() +
   labs(x = "", y = "Shannon")
 
 plot_shannon
+```
+```{r}
+#| label: indices-tbl-shannon
+#| echo: false
+#| output: true
+#| message: false
+#| warning: false
+
+
+cld_table(shannon_cld, "Estimated marginal means and compact letter display for evenness per survey year")
 ```
 ### Turnover
 
