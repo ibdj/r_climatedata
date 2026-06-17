@@ -1441,12 +1441,22 @@ plot_turnover <- ggplot() +
 
 plot_turnover
 ```
+```{r}
+#| label: indices-tbl-turnover
+#| echo: false
+#| output: true
+#| message: false
+#| warning: false
+
+
+cld_table(turnover_cld, "Estimated marginal means and compact letter display for evenness per survey year")
+```
 
 ### Plots combined
 ````{r}
 #| label: fig-indices-wrapped
 #| fig-scap: "All indices plot, wrapped (Figure 3)"
-#| fig-cap: !expr glue("Diversity metrices, a) Shannon diversity, b) Species richness, c) Evenness, c) Species turnover. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
+#| fig-cap: !expr glue("Diversity metrices, a) Shannon diversity, b) Species richness, c) Evenness, c) Species turnover. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 3)")
 #| echo: false
 #| output: true
 #| message: false
@@ -1471,7 +1481,7 @@ grid_labeled
 
 ggsave("figures/fig03.pdf", grid_labeled, device = cairo_pdf,
        width = 174, height = 120, units = "mm")
-normalizePath("figures/fig03.pdf")    # prints the exact location
+#normalizePath("figures/fig03.pdf")    # prints the exact location
 
 ````
 ```{r}
@@ -1705,7 +1715,7 @@ wrap_plots(plots, ncol = 2)
 
 ggsave("figures/fig04.pdf", wrap_plots(plots, ncol = 2), device = cairo_pdf,
        width = 174, height = 120, units = "mm")
-normalizePath("figures/fig04.pdf")    # prints the exact location
+#normalizePath("figures/fig04.pdf")    # prints the exact location
 
 ```
 
@@ -1848,7 +1858,17 @@ between
 
 ggsave("figures/fig05.pdf", between, device = cairo_pdf,
        width = 174, height = 120, units = "mm")
-normalizePath("figures/fig05.pdf")    # prints the exact location
+#normalizePath("figures/fig05.pdf")    # prints the exact location
+```
+```{r}
+#| label: tbl-between
+#| echo: false
+#| output: true
+#| message: false
+#| warning: false
+
+
+cld_table(centroid_cld, "Estimated mean centroid distances and compact letter display per survey year")
 ```
 
 ### Within vegetation composition
@@ -1863,17 +1883,17 @@ normalizePath("figures/fig05.pdf")    # prints the exact location
 ## 1️⃣  Global NMDS site scores + metadat
 
 nmds_result <- read_rds("nmds_results")
-# 1.1  Pull the three NMDS axes for every plot
-site_scores <- scores(nmds_result, display = "sites") |>
-  as.data.frame() |>
-  tibble::rownames_to_column("sub_year_vt")
-
-# 1.2  Join the metadata (veg_type, year, etc.)
-site_scores <- site_scores |>
-  left_join(meta, by = "sub_year_vt")
+# # 1.1  Pull the three NMDS axes for every plot
+# within_site_scores <- scores(nmds_result, display = "sites") |>
+#   as.data.frame() |>
+#   tibble::rownames_to_column("sub_year_vt")
+# 
+# # 1.2  Join the metadata (veg_type, year, etc.)
+# within_site_scores <- within_site_scores |>
+#   left_join(meta, by = "sub_year_vt")
 
 # 1.3  Keep only the columns we need
-site_scores <- scores(nmds_result, display = "sites") |>
+within_site_scores <- scores(nmds_result, display = "sites") |>
   as.data.frame() |>
   tibble::rownames_to_column("sub_year_vt") |>
   left_join(meta, by = "sub_year_vt") |>
@@ -1886,7 +1906,7 @@ site_scores <- scores(nmds_result, display = "sites") |>
   )
 
 # 1. Compute global centroids (veg_type × year)
-centroids_all <- site_scores |>
+within_centroids <- within_site_scores |>
   dplyr::group_by(veg_type, year) |>
   dplyr::summarise(
     cen1 = mean(NMDS1),
@@ -1896,8 +1916,8 @@ centroids_all <- site_scores |>
   )
 
 # 2. Join and create the distance column (single operation)
-site_scores <- site_scores |>
-  dplyr::left_join(centroids_all,
+within_site_scores <- within_site_scores |>
+  dplyr::left_join(within_centroids,
                    by = c("veg_type", "year")) |>
   dplyr::mutate(
     dist_to_centroid = sqrt(
@@ -1911,7 +1931,7 @@ site_scores <- site_scores |>
   dplyr::select(-cen1, -cen2, -cen3)
 ##  Global y‑axis limits (computed once)
 # Raw distances from the full data set (used for the jitter points)
-global_y_max <- site_scores |>
+global_y_max <- within_site_scores |>
   dplyr::summarise(max_dist = max(dist_to_centroid, na.rm = TRUE)) |>
   dplyr::pull(max_dist)
 
@@ -1930,17 +1950,18 @@ global_y_limits <- c(0, global_y_upper)   # lower bound = 0 (distances cannot be
 #| warning: false
 
 
-veg_vec   <- unique(site_scores$veg_type)
-plot_list <- vector("list", length(veg_vec))
-mlm_table <- tibble()   # collect fixed‑effect summaries
-pairwise_table  <- tibble()   # pairwise year contrasts for all veg types
+veg_vec   <- unique(within_site_scores$veg_type)
+within_plots <- vector("list", length(veg_vec))
+within_fixed <- tibble()   # collect fixed‑effect summaries
+within_pairwise  <- tibble()   # pairwise year contrasts for all veg types
+within_emm_table <- tibble()
 
 for (i in seq_along(veg_vec)) {
   vt <- veg_vec[i]
   
 
   ## 2.1  Subset data (year stays a factor for the model)
-  vt_dat <- site_scores |>
+  vt_dat <- within_site_scores |>
     dplyr::filter(veg_type == vt) |>
     dplyr::mutate(year = factor(year))
   
@@ -1958,6 +1979,15 @@ for (i in seq_along(veg_vec)) {
 
   emm <- emmeans::emmeans(mod, ~ year)
   
+  ## 2.31
+  within_cld <- multcomp::cld(emm, adjust = "tukey", Letters = letters, sort = FALSE) |>
+  tibble::as_tibble() |>
+  dplyr::mutate(veg_type = vt, group = trimws(.group)) |>
+  dplyr::select(veg_type, year, emmean, SE,
+                dplyr::any_of(c("lower.CL", "asymp.LCL")),
+                dplyr::any_of(c("upper.CL", "asymp.UCL")), group)
+
+  within_emm_table <- dplyr::bind_rows(within_emm_table, within_cld)
 
   ## 2.4  CLD letters (Sidak‑adjusted) – for the plot
 
@@ -1987,7 +2017,7 @@ for (i in seq_along(veg_vec)) {
 
   ## 2.6  Append pairwise results to the master table
 
-  pairwise_table <- dplyr::bind_rows(pairwise_table, pairwise_cmp)
+  within_pairwise <- dplyr::bind_rows(within_pairwise, pairwise_cmp)
   
   ## 2.7  Plot‑ready summary (mean ± SE) + attach CLD letters
   plot_stats <- vt_dat |>
@@ -1999,7 +2029,7 @@ for (i in seq_along(veg_vec)) {
     ) |>
     dplyr::left_join(cld_df, by = "year")
   
-  centroid_cld <- plot_stats |>
+  within_centroid_cld <- plot_stats |>
     dplyr::mutate(
       y_pos = global_y_upper * 0.92   # fixed vertical position inside panel
     ) |>
@@ -2022,7 +2052,7 @@ p <- ggplot() +
                 colour = "black",
                 linewidth = 0.2) +
   
-  geom_text(data = centroid_cld,
+  geom_text(data = within_centroid_cld,
             aes(x = as.integer(factor(year)), label = .group),
             y = global_y_upper * 0.92,
             vjust = 0, size = 4, colour = "black",
@@ -2035,7 +2065,7 @@ p <- ggplot() +
   labs(title = vt, y = "Centroid distance (NMDS units)") 
   
   ## 2.9  Store the plot
-  plot_list[[i]] <- p
+  within_plots[[i]] <- p
   
   ## 2.10  Extract fixed‑effect summary (includes p‑values)
   fixed_tab <- summary(mod)$coefficients |>
@@ -2052,7 +2082,7 @@ p <- ggplot() +
     )
   
   ## 2.11  Append to the master MLM table
-  mlm_table <- dplyr::bind_rows(mlm_table, fixed_tab)
+  within_fixed <- dplyr::bind_rows(within_fixed, fixed_tab)
 }
 
 ```
@@ -2066,17 +2096,31 @@ p <- ggplot() +
 #| message: false
 #| warning: false
 
-grid_plot <- wrap_plots(plot_list, ncol = 2) &
+within_grid_plot <- wrap_plots(within_plots, ncol = 2) &
   theme(plot.margin = margin(1, 1, 1, 1))
 
 # Show the figure
-print(grid_plot)
+print(within_grid_plot)
 
-ggsave("figures/fig06.pdf", grid_plot, device = cairo_pdf,
+ggsave("figures/fig06.pdf", within_grid_plot, device = cairo_pdf,
        width = 174, height = 120, units = "mm")
 
 #normalizePath("figures/fig06.pdf")    # prints the exact location
 
+```
+
+```{r}
+#| label: tbl-within
+#| echo: false
+#| output: true
+#| message: false
+#| warning: false
+
+
+within_emm_table |>
+  dplyr::arrange(veg_type, year) |>
+  knitr::kable(digits = 3,
+    caption = "Estimated marginal means and compact letter display per vegetation type and survey year")
 ```
 
 {{< pagebreak >}}
@@ -2259,10 +2303,6 @@ suppressMessages(purrr::imap_dfr(fixed_list_pft, function(mod, pft) {
     caption = "Estimated marginal means and compact letter display (based adjusted pairwise comparisons at the 5% significance level) per functional type and survey year"
   ))
 
-# Emmeans table
-dplyr::bind_rows(emm_list_pft, .id = "func_type") |>
-  dplyr::relocate(func_type) |>
-  knitr::kable(digits = 3, caption = "Estimated marginal means per functional type and survey year")
 
 # # Pairwise contrasts table
 # purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
