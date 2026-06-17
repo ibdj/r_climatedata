@@ -2478,12 +2478,23 @@ normalizePath("figures/fig08.pdf")
 ```
 
 ```{r}
-#| label: species-tables
+#| label: species-tbl-betnan
 #| echo: false
-#| output: false
+#| output: true
 #| warning: false
 #| message: false
 
+model_list[["betnan"]] |>
+  emmeans(~ factor(year)) |>
+  multcomp::cld(adjust = "tukey", Letters = letters) |>
+  as.data.frame() |>
+  dplyr::rename_with(~ "year", 1) |>
+  dplyr::mutate(year  = as.numeric(as.character(year)),
+                group = trimws(.group)) |>
+  dplyr::select(year, emmean, SE, lower.CL, upper.CL, group) |>
+  dplyr::arrange(year) |>
+  knitr::kable(digits = 3,
+    caption = "Estimated marginal means and compact letter display for *Betula nana* per survey year")
 
 ```
 
