@@ -1092,6 +1092,29 @@ plot_richness <- ggplot() +
 
 plot_richness
 ```
+```{r}
+#| label: indices-tbl-richness
+#| echo: false
+#| output: true
+#| message: false
+#| warning: false
+
+
+cl_col <- intersect(c("lower.CL", "asymp.LCL"), names(richness_cld))[1]
+cu_col <- intersect(c("upper.CL", "asymp.UCL"), names(richness_cld))[1]
+
+richness_cld |>
+  dplyr::mutate(group = trimws(.group)) |>
+  dplyr::select(year, emmean, SE,
+                lower = dplyr::all_of(cl_col),
+                upper = dplyr::all_of(cu_col),
+                group) |>
+  dplyr::arrange(year) |>
+  knitr::kable(
+    digits = 3,
+    caption = "Estimated marginal means and compact letter display for species richness per survey year"
+  )
+```
 
 ### Evenness
 
@@ -1178,6 +1201,7 @@ plot_evenness <- ggplot() +
 
 plot_evenness
 ```
+
 
 ### Shannon
 
@@ -1429,6 +1453,16 @@ ggsave("figures/fig03.pdf", grid_labeled, device = cairo_pdf,
 normalizePath("figures/fig03.pdf")    # prints the exact location
 
 ````
+```{r}
+#| label: indices-tbl
+#| echo: false
+#| output: true
+#| message: false
+#| warning: false
+
+
+
+```
 
 {{< pagebreak >}}
 
