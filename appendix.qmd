@@ -1,7 +1,6 @@
 ---
 title: "Supplementary Information"
-subtitle: "Document caption: Detailed methods, supplementary analyses, and results including p-values. // læsevjeldning i appendix
-// tilføj significans niveau på figurer (caption)"
+subtitle: "Contains supplementary background figures and tables for figures included in Jacobsen et al . Document is generated from Quato R script enabling recreating of test and figures. Script is available at XXX."
 bibliography: references.bib
 # author:
 #   - name: Ida Bomholt Dyrholm Jacobsen
@@ -279,7 +278,7 @@ cld_plot <- cld_temp |>
 ```{r}
 #| label: fig-temp-fiveyear
 #| fig-scap: "5 year intervals in temperature means (Background)"
-#| fig-cap: !expr glue("Five year intervals in temperature means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Five year intervals in temperature means. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display .")
 #| echo: false
 #| output: true
 #| message: false
@@ -622,7 +621,7 @@ kruskal.test(annual_precip ~ segment, data = yearly_precip)
 ```{r}
 #| label: fig-precip-fiveyear
 #| fig-scap: "5 year intervals of precipitation means (Background)"
-#| fig-cap: !expr glue("Five year intervals in precipitation means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Five year intervals in precipitation means. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -755,7 +754,7 @@ cld_plot_par <- cld_par |>
 ```{r}
 #| label: fig-par-fiveyear
 #| fig-scap: "PAR means, 5 year interval (Background)"
-#| fig-cap: !expr glue("Five year intervals in PAR means. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Five year intervals in PAR means. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1039,7 +1038,7 @@ richness_pairs_df <- as.data.frame(richness_pairs_f)
 ```{r}
 #| label: fig-indices-model-richness
 #| fig-scap: "Species richness (Part a, Figure 3)"
-#| fig-cap: !expr glue("Species richness, number of species pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Species richness, number of species pr. subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1124,7 +1123,7 @@ evenness_pairs_df <- as.data.frame(evenness_pairs_f)
 ```{r}
 #| label: fig-indices-model-evenness
 #| fig-scap: "Evenness (Part b, Figure 3)"
-#| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1210,7 +1209,7 @@ shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 ```{r}
 #| label: fig-indices-model-shannon
 #| fig-scap: "Shannon (Part c, Figure 3)"
-#| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1322,7 +1321,7 @@ turnover_emmeans
 ```{r}
 #| label: fig-indices-model-turnover
 #| fig-scap: "Turnover (Part d, Figure 3)"
-#| fig-cap: !expr glue("Turnover pr. year calculate pr subsection, but only pr present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Turnover pr. year calculate pr subsection, but only pr present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1402,7 +1401,7 @@ plot_turnover
 ````{r}
 #| label: fig-indices-wrapped
 #| fig-scap: "All indices plot, wrapped (Figure 3)"
-#| fig-cap: !expr glue("Diversity metrices, a) Shannon diversity, b) Species richness, c) Evenness, c) Species turnover. Shared letters indicate non-significant differences among estimated means according to compact letter display.")
+#| fig-cap: !expr glue("Diversity metrices, a) Shannon diversity, b) Species richness, c) Evenness, c) Species turnover. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1750,7 +1749,7 @@ pairs(emm_year, adjust = "sidak") |>
 ```{r}
 #| label: fig-nmds-between
 #| fig-scap: "Between community dynamics (Figure 5)"
-#| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw subsection-level distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 5)")
+#| fig-cap: !expr glue("Between plant community dynamics. Estimated mean distance between vegetation-type centroids within each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw subsection-level distances (NMDS units). Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 5)")
 #| echo: false
 #| output: true
 #| message: false
@@ -2006,7 +2005,7 @@ p <- ggplot() +
 ```{r}
 #| label: fig-nmds-within
 #| fig-scap: "Within community dynamics (Figure 6)"
-#| fig-cap: !expr glue("Within community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 6)")
+#| fig-cap: !expr glue("Within community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 6)")
 #| echo: false
 #| output: true
 #| message: false
@@ -2082,6 +2081,7 @@ func_types     <- unique(func_summed$func_type)
 plot_list_pft  <- list()
 fixed_list_pft <- list()
 emm_list_pft   <- list()
+emm_cld_list_pft <- list()
 pairs_list_pft <- list()
 has_diff_groups_pft <- logical(0)   # separate from the species one
 
@@ -2103,7 +2103,7 @@ for(pft in func_types){
   # ----- PAIRWISE TESTS -----
   pairwise <- mod |>
     emmeans(~ factor(year)) |>
-    pairs(adjust = "holm")
+    pairs(adjust = "tukey")
   pairs_list_pft[[pft]] <- pairwise
   
   # ----- EMMEANS -----
@@ -2164,6 +2164,8 @@ for(pft in func_types){
   plot_list_pft[[pft]] <- p
 }
 
+emm_cld_list_pft[[pft]] <- year_emm_lab
+
 ggsave("figures/fig07.pdf", plot_list_pft[[pft]], device = cairo_pdf,
        width = 174, height = 120, units = "mm")
 #normalizePath("figures/fig07.pdf")    # prints the exact location
@@ -2183,6 +2185,25 @@ ggsave("figures/fig07.pdf", plot_list_pft[[pft]], device = cairo_pdf,
 #   dplyr::relocate(func_type) |>
 #   knitr::kable(digits = 3, caption = "Fixed effects per functional type")
 
+suppressMessages(purrr::imap_dfr(fixed_list_pft, function(mod, pft) {
+  mod |>
+    emmeans(~ factor(year)) |>
+    multcomp::cld(adjust = "tukey", Letters = letters) |>
+    as.data.frame() |>
+    dplyr::rename_with(~ "year", 1) |>
+    dplyr::mutate(
+      year      = as.numeric(as.character(year)),
+      func_type = pft,
+      group     = trimws(.group)
+    ) |>
+    dplyr::select(func_type, year, emmean, SE, df, lower.CL, upper.CL, group)
+}) |>
+  dplyr::arrange(func_type, year) |>
+  knitr::kable(
+    digits = 3,
+    caption = "Estimated marginal means and compact letter display (based adjusted pairwise comparisons at the 5% significance level) per functional type and survey year"
+  ))
+
 # Emmeans table
 dplyr::bind_rows(emm_list_pft, .id = "func_type") |>
   dplyr::relocate(func_type) |>
@@ -2197,7 +2218,7 @@ dplyr::bind_rows(emm_list_pft, .id = "func_type") |>
 ```{r}
 #| label: fig-pft
 #| fig-scap: "Plant functional groups (Figure 7)"
-#| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence (FOO) for plant functional groups. Shared letters indicate non-significant differences among estimated means according to compact letter display. (Figure 7)")
+#| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence (FOO) for plant functional groups. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 7)")
 #| echo: false
 #| output: true
 #| warning: false
@@ -2267,7 +2288,7 @@ for(sp in species_list){
   emm_obj <- suppressMessages(emmeans(mod, ~ factor(year)))
   
   # ----- PAIRWISE TESTS -----
-  pairwise_list[[sp]] <- emm_obj |> pairs(adjust = "holm")
+  pairwise_list[[sp]] <- emm_obj |> pairs(adjust = "tukey")
   
   # ----- EMMEANS -----
   emm_df <- emm_obj |>
@@ -2355,7 +2376,7 @@ for(sp in names(plot_list[has_diff_groups])){
   
   print(plot_list[[sp]])
   
-  cat("\n\nFrequency of occurrence for *", species_name, "* across survey years. Points show raw observations, crossbars show estimated marginal means ± 95% CI. Compact letter display indicates statistically significant differences between years (Holm adjustment).\n", sep = "")
+  cat("\n\nFrequency of occurrence for *", species_name, "* across survey years. Points show raw observations, crossbars show estimated marginal means ± 95% CI. Compact letter display indicates statistically significant differences between years (adjusted).\n", sep = "")
   
   cat(":::\n\n")
 }
