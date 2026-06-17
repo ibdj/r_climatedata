@@ -2273,6 +2273,27 @@ ggsave("figures/fig07.pdf", plot_list_pft[[pft]], device = cairo_pdf,
 
 
 ```{r}
+#| label: fig-pft
+#| fig-scap: "Plant functional groups (Figure 7)"
+#| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence (FOO) for plant functional groups. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 7)")
+#| echo: false
+#| output: true
+#| warning: false
+#| message: false
+
+grid_pft <- wrap_plots(plot_list_pft, ncol = 2) +
+  #plot_annotation(
+  #  tag_levels = "a",
+  #  tag_suffix = ")"
+  #) &
+  theme(plot.tag = element_text(size = fig_text_size))
+
+grid_pft
+
+
+```
+
+```{r}
 #| label: table-pft
 #| echo: false
 #| output: true
@@ -2302,32 +2323,6 @@ suppressMessages(purrr::imap_dfr(fixed_list_pft, function(mod, pft) {
     digits = 3,
     caption = "Estimated marginal means and compact letter display (based adjusted pairwise comparisons at the 5% significance level) per functional type and survey year"
   ))
-
-
-# # Pairwise contrasts table
-# purrr::map_dfr(pairs_list_pft, as.data.frame, .id = "func_type") |>
-#   dplyr::relocate(func_type) |>
-#   knitr::kable(digits = 3, caption = "Pairwise contrasts per functional type (Adjusted)")
-```
-
-```{r}
-#| label: fig-pft
-#| fig-scap: "Plant functional groups (Figure 7)"
-#| fig-cap: !expr glue("Plant functional group dynamics. Summed frequency of occurrence (FOO) for plant functional groups. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 7)")
-#| echo: false
-#| output: true
-#| warning: false
-#| message: false
-
-grid_pft <- wrap_plots(plot_list_pft, ncol = 2) +
-  #plot_annotation(
-  #  tag_levels = "a",
-  #  tag_suffix = ")"
-  #) &
-  theme(plot.tag = element_text(size = fig_text_size))
-
-grid_pft
-
 
 ```
 {{< pagebreak >}}
