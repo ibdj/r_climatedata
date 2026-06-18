@@ -1068,6 +1068,9 @@ richness_cld <- cld(
   Letters = letters
 )
 
+jitter_width = 0.06
+crossbar_width = 0.25
+
 richness_cld <- as.data.frame(richness_cld)
 richness_cld$year <- factor(richness_cld$year, levels = years)
 
@@ -1078,7 +1081,7 @@ plot_richness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = richness),
-    width = 0.1,
+    width = jitter_width,
     alpha = 0.4,
     color = "darkgreen",
     size = 2
@@ -1087,7 +1090,7 @@ plot_richness <- ggplot() +
               aes(x = year, y = emmean,
                   ymin = .data[[cl_cols]], 
                   ymax = .data[[cu_cols]]),
-              width = 0.15,
+              width = crossbar_width,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
               colour = "black",   # <<< outline back
@@ -1175,7 +1178,7 @@ plot_evenness <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = evenness),
-    width = 0.1,
+    width = jitter_width,
     alpha = 0.4,
     color = "darkgreen",
     size = 2
@@ -1184,7 +1187,7 @@ plot_evenness <- ggplot() +
               aes(x = year, y = emmean,
                   ymin = .data[[cl_cols]], 
                   ymax = .data[[cu_cols]]),
-              width = 0.15,
+              width = crossbar_width,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
               colour = "black",   # <<< outline back
@@ -1270,7 +1273,7 @@ plot_shannon <- ggplot() +
   geom_jitter(
     data = subsection_indices,
     aes(x = year, y = shannon),
-    width = 0.1,
+    width = jitter_width,
     alpha = 0.4,
     color = "darkgreen",
     size = 2
@@ -1279,7 +1282,7 @@ plot_shannon <- ggplot() +
               aes(x = year, y = emmean,
                   ymin = .data[[cl_cols]], 
                   ymax = .data[[cu_cols]]),
-              width = 0.15,
+              width = crossbar_width,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
               colour = "black",   # <<< outline back
@@ -1417,12 +1420,12 @@ plot_turnover <- ggplot() +
   geom_jitter(data = turnover_jitter,
               aes(x = as.integer(factor(year, levels = levels(all_years))),
                   y = total),
-              width = 0.1, alpha = 0.4, colour = "darkgreen", size = 2) +
+              width = jitter_width, alpha = 0.4, colour = "darkgreen", size = 2) +
   geom_crossbar(data = turnover_plot_df,
                 aes(x = x_pos, y = emmean,
                     ymin = .data[[cl_cols]],
                     ymax = .data[[cu_cols]]),
-              width = 0.15,
+              width = crossbar_width,
               fill = "black", 
               alpha = 0.1,      # <<< no fill
               colour = "black",   # <<< outline back
@@ -1691,13 +1694,12 @@ plots <- lapply(years, function(y) {
                size = 3,
                colour = "black") +
     
-    geom_text(data = cent_df,
-              aes(centroid_NMDS1,
-                  centroid_NMDS2,
-                  label = veg_type),
-              vjust = -0.2,
-              hjust = 1.3,
-              size = 3) +
+geom_label(data = cent_df,
+           aes(centroid_NMDS1, centroid_NMDS2, label = veg_type),
+           vjust = -0.2, hjust = 1.3, size = 2.5,
+           fill = "white", alpha = 0.7,
+           label.size = 0,                      # no border line
+           label.padding = unit(0.1, "lines"))+  # tight padding
     coord_cartesian(xlim = lims_x,
                     ylim = lims_y) +
     annotate("text",
@@ -2473,7 +2475,7 @@ for(sp in names(plot_list[has_diff_groups])){
 
 ggsave("figures/fig08.pdf", plot_list[["betnan"]], device = cairo_pdf,
        width = 174, height = 120, units = "mm")
-normalizePath("figures/fig08.pdf")
+#normalizePath("figures/fig08.pdf")
 
 ```
 
