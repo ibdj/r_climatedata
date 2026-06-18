@@ -1835,7 +1835,7 @@ between <- ggplot() +
               alpha = 0.4, colour = "darkgreen", , size = 2) +
   geom_crossbar(data = emm_df,
               aes(x = x_pos, y = emmean, ymin = lower.CL, ymax = upper.CL),
-              width = 0.15,
+              width = crossbar_width,
               fill = "black", alpha = 0.1,      # <<< no fill
               colour = "black",   # <<< outline back
               linewidth = 0.2)  +  # <<< very thin
@@ -2049,7 +2049,7 @@ p <- ggplot() +
                     y = mean_dist,
                     ymin = mean_dist - se_dist,
                     ymax = mean_dist + se_dist),
-                width = 0.15,
+                width = crossbar_width,
                 fill = "black", alpha = 0.1,
                 colour = "black",
                 linewidth = 0.2) +
@@ -2241,7 +2241,7 @@ for(pft in func_types){
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
-      width = 0.5, fill = "black", alpha = 0.1,
+      width = crossbar_width, fill = "black", alpha = 0.1,
       colour = "black", linewidth = 0.2
     ) +
     # geom_point(
@@ -2412,7 +2412,7 @@ for(sp in species_list){
     geom_crossbar(
       data = emm_df,
       aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
-      width = 0.15, fill = "black", alpha = 0.1,
+      width = crossbar_width, fill = "black", alpha = 0.1,
       colour = "black", linewidth = 0.2
     ) +
     # geom_point(
