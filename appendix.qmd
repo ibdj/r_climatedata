@@ -1,6 +1,6 @@
 ---
 title: "Supplementary Information"
-subtitle: "Contains supplementary background figures and tables for figures included in Jacobsen et al . Document is generated from Quato R script enabling recreating of test and figures. Script is available at XXX."
+subtitle: "Contains supplementary background figures and tables for figures included in No directional change in local vascular plant communities from 2007 to 2022 in Kangerluarsunnguaq (West Greenland). Document is generated from Quato R script enabling recreating of test and figures. Script is available at XXX."
 bibliography: references.bib
 # author:
 #   - name: Ida Bomholt Dyrholm Jacobsen
@@ -37,7 +37,7 @@ format:
     number-sections: true
     number-depth: 2
     pdf-engine: xelatex
-    sansfont: "Myriad Pro"
+    sansfont: "Helvetica"
     link-citations: true
     fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
     out-width: 100%
@@ -95,7 +95,7 @@ fig_text_size = 11
 
 # global font settings
 theme_set(
-  theme_minimal(base_family = "Myriad Pro", base_size = 8) +
+  theme_minimal(base_family = "Helvetica", base_size = 8) +
     theme(  
           axis.title.x = element_text(size = 10),
           axis.title.y = element_text(size = 10),
@@ -1698,7 +1698,7 @@ geom_label(data = cent_df,
            aes(centroid_NMDS1, centroid_NMDS2, label = veg_type),
            vjust = -0.2, hjust = 1.3, size = 2.5,
            fill = "white", alpha = 0.7,
-           label.size = 0,                      # no border line
+           linewidth = 0,                      # no border line
            label.padding = unit(0.1, "lines"))+  # tight padding
     coord_cartesian(xlim = lims_x,
                     ylim = lims_y) +
@@ -1781,37 +1781,6 @@ centroid_cld <- cld(emm_year, adjust = "tukey", Letters = letters) |>
 
 ```
 
-```{r}
-#| label: nmds-between-analysis-print
-#| echo: false
-#| output: true
-#| warning: false
-#| message: false
-
-# Model structure (one line description)
-cat("Model: dist ~ factor(year) + (1 | veg_pair), fitted by REML\n")
-cat("N observations:", nobs(m_convergence), 
-    "| N groups (veg_pair):", ngrps(m_convergence), "\n\n")
-
-# Model fixed effects
-broom.mixed::tidy(m_convergence, effects = "fixed") |>
-  dplyr::select(term, estimate, std.error, statistic) |>
-  dplyr::mutate(term = stringr::str_replace(term, "factor\\(year\\)", "Year ")) |>
-  knitr::kable(digits = 3, caption = "Fixed effects: centroid distance ~ survey year (factor)")
-
-
-# 1. EMMs per survey with 95% CI
-emm_df |>
-  dplyr::select(year, emmean, SE, lower.CL, upper.CL) |>
-  knitr::kable(digits = 3, caption = "Estimated mean centroid distances per survey")
-
-# 2. Pairwise comparisons with p-values
-pairs(emm_year, adjust = "sidak") |>
-  as.data.frame() |>
-  dplyr::select(contrast, estimate, SE, t.ratio, p.value) |>
-  knitr::kable(digits = 3, caption = "Pairwise contrasts between surveys (Sidak-adjusted)")
-
-```
 
 ```{r}
 #| label: fig-nmds-between
@@ -1871,6 +1840,7 @@ ggsave("figures/fig05.pdf", between, device = cairo_pdf,
 
 
 cld_table(centroid_cld, "Estimated mean centroid distances and compact letter display per survey year")
+
 ```
 
 ### Within vegetation composition
@@ -2036,12 +2006,14 @@ for (i in seq_along(veg_vec)) {
       y_pos = global_y_upper * 0.92   # fixed vertical position inside panel
     ) |>
     dplyr::select(year, .group, y_pos)
+
+jitter_width2 = jitter_width*0.8
   
 ## 2.8  Build the facet plot
 p <- ggplot() +
   geom_jitter(data = vt_dat,
               aes(x = as.integer(factor(year)), y = dist_to_centroid),
-              width = jitter_width, height = 0,
+              width = jitter_width2, height = 0,
               alpha = 0.4, colour = "darkgreen", size = 2) +
   
   geom_crossbar(data = plot_stats,
@@ -2100,7 +2072,6 @@ p <- ggplot() +
 
 within_grid_plot <- wrap_plots(within_plots, ncol = 2) &
   theme(plot.margin = margin(1, 1, 1, 1))
-
 # Show the figure
 print(within_grid_plot)
 
@@ -2236,11 +2207,11 @@ for(pft in func_types){
   p <- ggplot() +
     geom_jitter(
       data = df_pft,
-      aes(x = year, y = sum_frac),
+      aes(x = as.integer(factor(year)), y = sum_frac),
       width = jitter_width, alpha = 0.5, color = "darkgreen", , size = 2) +
     geom_crossbar(
       data = emm_df,
-      aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
+      aes(x = as.integer(factor(year)), y = emmean, ymin = lower.CL, ymax = upper.CL),
       width = crossbar_width, fill = "black", alpha = 0.1,
       colour = "black", linewidth = 0.2
     ) +
@@ -2251,25 +2222,22 @@ for(pft in func_types){
     # ) +
     geom_text(
       data = year_emm_lab,
-      aes(x = year, label = .group), y = max(df_pft$sum_frac, na.rm = TRUE),
+      aes(x = as.integer(factor(year)), label = .group), y = max(df_pft$sum_frac, na.rm = TRUE),
       size = 3, color = "black", inherit.aes = FALSE, nudge_x = 0.45
     ) +
     labs(x = "", y = "Summed FOO") +
     annotate("text", x = -Inf, y = Inf, label = pft,
              hjust = -0.1, vjust = 1.4, size = 3)+
     scale_x_continuous(name = "",
-                   breaks = c(2007, 2012, 2017, 2022),
+                   breaks = 1:4,
                    labels = c("2007", "2012", "2017", "2022"))+
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.18)))
   
   plot_list_pft[[pft]] <- p
-}
 
-emm_cld_list_pft[[pft]] <- year_emm_lab
+emm_cld_list_pft[[pft]] <- year_emm_lab  
+  }
 
-ggsave("figures/fig07.pdf", plot_list_pft[[pft]], device = cairo_pdf,
-       width = 174, height = 120, units = "mm")
-#normalizePath("figures/fig07.pdf")    # prints the exact location
 
 ```
 
@@ -2291,7 +2259,9 @@ grid_pft <- wrap_plots(plot_list_pft, ncol = 2) +
   theme(plot.tag = element_text(size = fig_text_size))
 
 grid_pft
-
+ggsave("figures/fig07.pdf", grid_pft, device = cairo_pdf,
+       width = 200, height = 60 * ceiling(length(plot_list_pft) / 2), units = "mm")
+#normalizePath("figures/fig07.pdf")    # prints the exact location
 
 ```
 
@@ -2406,12 +2376,12 @@ for(sp in species_list){
   p <- ggplot() +
     geom_jitter(
       data = df_sp,
-      aes(x = year, y = fraction),
+      aes(x = as.integer(factor(year)), y = fraction),
       width = jitter_width, alpha = 0.5, color = "darkgreen", size = 2
     ) +
     geom_crossbar(
       data = emm_df,
-      aes(x = year, y = emmean, ymin = lower.CL, ymax = upper.CL),
+      aes(x = as.integer(factor(year)), y = emmean, ymin = lower.CL, ymax = upper.CL),
       width = crossbar_width, fill = "black", alpha = 0.1,
       colour = "black", linewidth = 0.2
     ) +
@@ -2422,7 +2392,7 @@ for(sp in species_list){
     # ) +
     geom_text(
       data = year_emm_lab,
-      aes(x = year, label = .group),
+      aes(x = as.integer(factor(year)), label = .group),
       y = max(df_sp$fraction, na.rm = TRUE),
       size = 3, color = "black", inherit.aes = FALSE,
       nudge_x = 0.2
@@ -2431,7 +2401,7 @@ for(sp in species_list){
     #annotate("text", x = -Inf, y = Inf, label = sp,
     #         hjust = -0.1, vjust = 1.1, size = 3) +
     scale_x_continuous(name = "",
-                       breaks = c(2007, 2012, 2017, 2022),
+                       breaks = 1:4,
                        labels = c("2007", "2012", "2017", "2022"))
   
   plot_list[[sp]] <- p
