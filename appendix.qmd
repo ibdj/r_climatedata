@@ -269,13 +269,14 @@ interval_lines <- data_temp_fiveyear |>
 #| warning: false
 
 # Fit the linear mixed model
-temp_data <- data_temp_fiveyear |> filter(year > 2007)
+data_temp_five <- data_temp_fiveyear |> 
+  filter(year > 2007) |> 
+  group_by(year, segment) |>
+  summarise(annual_temp = mean(at_c, na.rm = TRUE), .groups = "drop")
 
-# Fit the model explicitly
-model_temp_fiveyear <- lmer(
-  at_c ~ segment + (1 | year), 
-  data = temp_data
-)
+# lm chosen because Shapiro-Wilk normality test did not give evidence against normality
+
+model_temp_fiveyear <- lm(annual_temp ~ segment, data = data_temp_five)
 
 # Get estimated marginal means with cld
 emm_temp_fiveyear <- model_temp_fiveyear |>
@@ -626,7 +627,7 @@ precip_year_mean <- mean(yearly_precip$annual_precip, na.rm = TRUE)
 #| message: false
 #| warning: false
 
-#The residuals are not well-approximated by a normal distribution. The Shapiro-Wilk p-value is borderline but the Q-Q plot shows meaningful tail deviation, and with this sample size the test is underpowered to detect it.
+#The residuals are not well-approximated by a normal distribution. The Shapiro-Wilk p-value is borderline but the Q-Q plot shows meaningful tail deviation, and with this sample size the test is underpowered.
 
 kruskal.test(annual_precip ~ segment, data = yearly_precip)
 
