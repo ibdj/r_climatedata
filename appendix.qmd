@@ -1259,7 +1259,7 @@ shannon_emm_df$year <- factor(shannon_emm_df$year, levels = years)
 
 shannon_cld <- cld(
   shannon_emmeans_f,
-  adjust = "tukey",
+  adjust = "sidak",
   Letters = letters
 )
 
@@ -2459,7 +2459,7 @@ ggsave("figures/fig08.pdf", plot_list[["betnan"]], device = cairo_pdf,
 
 model_list[["betnan"]] |>
   emmeans(~ factor(year)) |>
-  multcomp::cld(adjust = "tukey", Letters = letters) |>
+  multcomp::cld(adjust = "sidak", Letters = letters) |>
   as.data.frame() |>
   dplyr::rename_with(~ "year", 1) |>
   dplyr::mutate(year  = as.numeric(as.character(year)),
