@@ -1064,7 +1064,7 @@ richness_emm_df$year <- factor(richness_emm_df$year, levels = years)
 
 richness_cld <- cld(
   richness_emmeans_f,
-  adjust = "tukey",
+  adjust = "sidak",
   Letters = letters
 )
 
