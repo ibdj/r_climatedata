@@ -1312,6 +1312,7 @@ plot_shannon
 
 cld_table(shannon_cld, "Estimated marginal means and compact letter display for evenness per survey year")
 ```
+
 ### Turnover
 
 ```{r}
@@ -1396,7 +1397,7 @@ turnover_plot_df <- tibble(year = all_years) |>          # 4 rows, ordered
 ## 5️⃣  Compact‑letter‑display (add a dummy row for 2007)
 # CLD for the three real means
 cld_three <- cld(emmeans(m_turnover_sub_f, ~ year),
-                 adjust = "tukey", Letters = letters) |>
+                 adjust = "sidak", Letters = letters) |>
   as.data.frame() |>
   mutate(year = factor(year, levels = levels(all_years)),
          x_pos = as.integer(year))
