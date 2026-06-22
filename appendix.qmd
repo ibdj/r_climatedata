@@ -1164,7 +1164,7 @@ evenness_emm_df$year <- factor(evenness_emm_df$year, levels = years)
 
 evenness_cld <- cld(
   evenness_emmeans_f,
-  adjust = "tukey",
+  adjust = "sidak",
   Letters = letters
 )
 
