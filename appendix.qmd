@@ -1,6 +1,6 @@
 ---
 title: "Supplementary Information"
-subtitle: "Contains supplementary background figures and tables for figures included in No directional change in local vascular plant communities from 2007 to 2022 in Kangerluarsunnguaq (West Greenland). Document is generated from Quato R script enabling recreating of test and figures. Script is available at XXX."
+subtitle: "Contains supplementary background figures and tables for figures included in *No directional change in local vascular plant communities from 2007 to 2022 in Kangerluarsunnguaq (West Greenland)*. Document is generated from Quato R script enabling recreating of test and figures. Script is available on Zenodo."
 bibliography: references.bib
 # author:
 #   - name: Ida Bomholt Dyrholm Jacobsen
@@ -57,7 +57,7 @@ format:
         \setlength{\headheight}{15pt}
         \fancypagestyle{plain}{
           \fancyhf{}
-          \lhead{Appendix: NERO line paper}
+          \lhead{Supplementary Information}
           \rhead{\thepage}
           \renewcommand{\headrulewidth}{0.4pt}
         }
