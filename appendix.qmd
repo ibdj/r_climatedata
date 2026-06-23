@@ -2,47 +2,29 @@
 title: "Supplementary Information"
 subtitle: "Contains supplementary background figures and tables for figures included in *No directional change in local vascular plant communities from 2007 to 2022 in Kangerluarsunnguaq (West Greenland)*. Document is generated from Quato R script enabling recreating of test and figures. Script is available on Zenodo."
 bibliography: references.bib
-# author:
-#   - name: Ida Bomholt Dyrholm Jacobsen
-#     orcid: 0000-0003-2481-8061
-#     affiliation: [1, 2]
-#     email: ida@example.com
-#     corresponding: true
-# 
-#   - name: Katrine Raundrup
-#     orcid: 0000-0002-2110-3709
-#     affiliation: 1
-# 
-#   - name: Niels Martin Schmidt
-#     orcid: 0000-0002-4166-6218 
-#     affiliation: 2
-# 
-# affiliations:
-#   - id: 1
-#     name: Greenland Institute of Natural Resources
-#   - id: 2
-#     name: Arctic Research Centre, University Y
 
-output:
-  pdf_document:
-    toc: true
-    fig_width: 6.5
-    fig_caption: true
-    keep_tex: true
-    includes:
-      in_header: header.tex
+# output:
+#   pdf_document:
+#     toc: true
+#     fig_width: 6.5
+#     fig_caption: true
+#     keep_tex: true
+#     includes:
+#       in_header: header.tex
 
 format:
   pdf:
+    toc: true
+    #toc-title: " "
+    fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
+    keep-tex: true
     number-sections: true
     number-depth: 2
     pdf-engine: xelatex
     sansfont: "Helvetica"
     link-citations: true
-    fig-width: 6.5  # Approx 16.5cm, slightly wider than text to be safe
     out-width: 100%
     fig-align: center
-    toc: true
     lof: true
     fig-pos: "H"
     include-in-header:
@@ -61,6 +43,9 @@ format:
           \rhead{\thepage}
           \renewcommand{\headrulewidth}{0.4pt}
         }
+        \makeatletter
+        \renewcommand{\tableofcontents}{\begingroup\parskip=0pt\@starttoc{toc}\endgroup}
+        \makeatother
 editor: visual
 ---
 
@@ -500,7 +485,7 @@ precip_type_pct <- data_pre_tem_joined |>
 ```{r}
 #| label: fig-snow-rain-year
 #| fig-scap: "Mean monthly distribution of types of precipitation (mm) (Background)"
-#| fig-cap: !expr glue("Mean precipitation type per month. Mean monthly distribution of types of precipitation (mm). Totals based on data from {min(data_precip$year)} to {max(data_precip$year)} (requires join with temperature data which it only available till {max(precip_type_pct$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
+#| fig-cap: !expr glue("Mean precipitation type per month. Mean monthly distribution of types of precipitation (mm). Totals based on data from {min(data_precip$year)} to {max(data_precip$year)} (requires join with temperature data which it only available till {max(data_pre_tem_joined$year)}). Sleet is defined as precipitation that fell when temperatures were between {sleet_lower}°C and {sleet_upper}°C.")
 #| echo: false
 #| output: true
 #| message: false
@@ -566,10 +551,9 @@ ggplot(data_precip_sum, aes(y = pre_mm_sum, x = year))+
       linetype = "dashed")+
   labs(x = "", y = "Precipitation (mm)")
 
-#geom_smooth(method = lm, color = "blue", size = 0.5, se = F, linetype="dashed")+
-#  
-
 ```
+
+{{< pagebreak >}}
 
 #### Five year interval precipitation
 
@@ -1053,7 +1037,7 @@ richness_pairs_df <- as.data.frame(richness_pairs_f)
 ```{r}
 #| label: fig-indices-model-richness
 #| fig-scap: "Species richness (Part a, Figure 3)"
-#| fig-cap: !expr glue("Species richness, number of species pr. subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
+#| fig-cap: !expr glue("Species richness, number of species per subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1152,7 +1136,7 @@ evenness_pairs_df <- as.data.frame(evenness_pairs_f)
 ```{r}
 #| label: fig-indices-model-evenness
 #| fig-scap: "Evenness (Part b, Figure 3)"
-#| fig-cap: !expr glue("Evenness pr. subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
+#| fig-cap: !expr glue("Evenness per subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1248,7 +1232,7 @@ shannon_pairs_df <- as.data.frame(shannon_pairs_f)
 ```{r}
 #| label: fig-indices-model-shannon
 #| fig-scap: "Shannon (Part c, Figure 3)"
-#| fig-cap: !expr glue("Shannon diversity pr. year calculate pr subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
+#| fig-cap: !expr glue("Shannon diversity per year calculate pr subsection. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -1371,7 +1355,7 @@ turnover_emmeans
 ```{r}
 #| label: fig-indices-model-turnover
 #| fig-scap: "Turnover (Part d, Figure 3)"
-#| fig-cap: !expr glue("Turnover pr. year calculate pr subsection, but only pr present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
+#| fig-cap: !expr glue("Turnover per year calculate per subsection, but only  for plots/subsections present all survey years. A totalt of {length(unique(turnover_results$subsection))} subsections maintain more than 1 plots for all 4 surveys. Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level.")
 #| echo: false
 #| output: true
 #| message: false
@@ -2066,7 +2050,7 @@ p <- ggplot() +
 ```{r}
 #| label: fig-nmds-within
 #| fig-scap: "Within community dynamics (Figure 6)"
-#| fig-cap: !expr glue("Within community dynamics. Estimated mean centroids-subsection distances pr community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 6)")
+#| fig-cap: !expr glue("Within community dynamics. Estimated mean centroids-subsection distances per community each survey year based on linear mixed-effects models. Black lines are estimated means (± SE), and grey dots represent raw distances (NMDS units). Shared letters indicate non-significant differences among estimated marginal means according to a compact letter display based on Tukey-adjusted pairwise comparisons at the 5% significance level. (Figure 6)")
 #| echo: false
 #| output: true
 #| message: false
